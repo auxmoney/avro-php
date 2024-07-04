@@ -23,6 +23,7 @@ use Apache\Avro\Avro;
 use Apache\Avro\AvroGMP;
 use Apache\Avro\Datum\AvroIOBinaryDecoder;
 use Apache\Avro\Datum\AvroIOBinaryEncoder;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class LongEncodingTest extends TestCase
@@ -32,9 +33,7 @@ class LongEncodingTest extends TestCase
         Avro::checkPlatform();
     }
 
-    /**
-     * @dataProvider bit_shift_provider
-     */
+    #[DataProvider('bit_shift_provider')]
     function test_bit_shift($val, $shift, $expected_lval, $expected_rval, $lbin, $rbin)
     {
 
@@ -74,9 +73,7 @@ class LongEncodingTest extends TestCase
                 $expected_binary, $actual_binary));
     }
 
-    /**
-     * @dataProvider bit_shift_provider
-     */
+    #[DataProvider('bit_shift_provider')]
     function test_left_shift_gmp(
         $val,
         $shift,
@@ -98,9 +95,7 @@ class LongEncodingTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider bit_shift_provider
-     */
+    #[DataProvider('bit_shift_provider')]
     function test_right_shift_gmp(
         $val,
         $shift,
@@ -115,9 +110,7 @@ class LongEncodingTest extends TestCase
             $rbin, decbin((int) $rval));
     }
 
-    /**
-     * @dataProvider long_provider
-     */
+    #[DataProvider('long_provider')]
     function test_encode_long($val, $expected_bytes)
     {
         $this->skip_64_bit_test_on_32_bit();
@@ -125,9 +118,7 @@ class LongEncodingTest extends TestCase
         $this->assertEquals($expected_bytes, $bytes);
     }
 
-    /**
-     * @dataProvider long_provider
-     */
+    #[DataProvider('long_provider')]
     function test_gmp_encode_long($val, $expected_bytes)
     {
         $this->skip_if_no_gmp();
@@ -135,9 +126,7 @@ class LongEncodingTest extends TestCase
         $this->assertEquals($expected_bytes, $bytes);
     }
 
-    /**
-     * @dataProvider long_provider
-     */
+    #[DataProvider('long_provider')]
     function test_decode_long_from_array($expected_val, $bytes)
     {
         $this->skip_64_bit_test_on_32_bit();
@@ -146,9 +135,7 @@ class LongEncodingTest extends TestCase
         $this->assertEquals($expected_val, $val);
     }
 
-    /**
-     * @dataProvider long_provider
-     */
+    #[DataProvider('long_provider')]
     function test_gmp_decode_long_from_array($expected_val, $bytes)
     {
         $this->skip_if_no_gmp();
@@ -157,7 +144,7 @@ class LongEncodingTest extends TestCase
         $this->assertEquals($expected_val, $val);
     }
 
-    function long_provider()
+    public static function long_provider()
     {
         return [
             ['0', "\x0"],
@@ -175,7 +162,7 @@ class LongEncodingTest extends TestCase
 
     }
 
-    function bit_shift_provider()
+    public static function bit_shift_provider()
     {
         // val shift lval rval
         return [

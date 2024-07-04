@@ -21,6 +21,7 @@ namespace Apache\Avro\Tests;
 
 use Apache\Avro\Schema\AvroSchema;
 use Apache\Avro\Schema\AvroSchemaParseException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class SchemaExample
@@ -72,7 +73,7 @@ class SchemaTest extends TestCase
         $this->assertEquals(json_decode('"boolean"'), 'boolean');
     }
 
-    public function schema_examples_provider()
+    public static function schema_examples_provider()
     {
         self::make_examples();
         $ary = array();
@@ -465,9 +466,7 @@ class SchemaTest extends TestCase
         return $examples;
     }
 
-    /**
-     * @dataProvider schema_examples_provider
-     */
+    #[DataProvider('schema_examples_provider')]
     function test_parse($example)
     {
         $schema_string = $example->schema_string;

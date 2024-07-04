@@ -26,13 +26,12 @@ use Apache\Avro\Datum\AvroIODatumReader;
 use Apache\Avro\Datum\AvroIODatumWriter;
 use Apache\Avro\IO\AvroStringIO;
 use Apache\Avro\Schema\AvroSchema;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class DatumIOTest extends TestCase
 {
-    /**
-     * @dataProvider data_provider
-     */
+    #[DataProvider('data_provider')]
     function test_datum_round_trip($schema_json, $datum, $binary)
     {
         $schema = AvroSchema::parse($schema_json);
@@ -54,7 +53,7 @@ class DatumIOTest extends TestCase
         $this->assertEquals($datum, $read_datum);
     }
 
-    function data_provider()
+    public static function data_provider()
     {
         return array(
             array('"null"', null, ''),
@@ -118,7 +117,7 @@ class DatumIOTest extends TestCase
         );
     }
 
-    function default_provider()
+    public static function default_provider()
     {
         return array(
             array('"null"', 'null', null),
@@ -154,9 +153,7 @@ class DatumIOTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider default_provider
-     */
+    #[DataProvider('default_provider')]
     function test_field_default_value(
         $field_schema_json,
         $default_json,

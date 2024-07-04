@@ -22,6 +22,8 @@ namespace Apache\Avro\Tests;
 use Apache\Avro\DataFile\AvroDataIO;
 use Apache\Avro\IO\AvroFile;
 use Apache\Avro\Schema\AvroSchema;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class InterOpTest extends TestCase
@@ -36,7 +38,7 @@ class InterOpTest extends TestCase
         $this->projection = AvroSchema::parse($this->projection_json);
     }
 
-    public function file_name_provider()
+    public static function file_name_provider()
     {
         $data_dir = AVRO_BUILD_DATA_DIR;
         $data_files = array();
@@ -61,10 +63,8 @@ class InterOpTest extends TestCase
         return $ary;
     }
 
-    /**
-     * @coversNothing
-     * @dataProvider file_name_provider
-     */
+    #[CoversNothing]
+    #[DataProvider('file_name_provider')]
     public function test_read($file_name)
     {
         $dr = AvroDataIO::openFile(

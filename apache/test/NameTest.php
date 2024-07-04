@@ -21,6 +21,7 @@ namespace Apache\Avro\Tests;
 
 use Apache\Avro\Schema\AvroName;
 use Apache\Avro\Schema\AvroSchemaParseException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class NameExample
@@ -54,7 +55,7 @@ class NameExample
 class NameTest extends TestCase
 {
 
-    function fullname_provider()
+    public static function fullname_provider()
     {
         $examples = array(
             new NameExample('foo', null, null, true, 'foo'),
@@ -77,9 +78,7 @@ class NameTest extends TestCase
         return $exes;
     }
 
-    /**
-     * @dataProvider fullname_provider
-     */
+    #[DataProvider('fullname_provider')]
     function test_fullname($ex)
     {
         try {
@@ -93,7 +92,7 @@ class NameTest extends TestCase
         }
     }
 
-    function name_provider()
+    public static function name_provider()
     {
         return [
             ['a', true],
@@ -106,9 +105,7 @@ class NameTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider name_provider
-     */
+    #[DataProvider('name_provider')]
     function test_name($name, $is_well_formed)
     {
         $this->assertEquals(AvroName::isWellFormedName($name), $is_well_formed);

@@ -22,6 +22,7 @@ namespace Apache\Avro\Tests;
 use Apache\Avro\AvroDebug;
 use Apache\Avro\Datum\AvroIOBinaryDecoder;
 use Apache\Avro\Datum\AvroIOBinaryEncoder;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class FloatIntEncodingTest extends TestCase
@@ -97,7 +98,7 @@ class FloatIntEncodingTest extends TestCase
 
   }
 
-  function special_vals_provider()
+  public static function special_vals_provider()
   {
     self::make_special_vals();
     return array(array(self::DOUBLE_TYPE, self::$DOUBLE_POS_INF, self::$LONG_BITS_POS_INF),
@@ -106,30 +107,26 @@ class FloatIntEncodingTest extends TestCase
                  array(self::FLOAT_TYPE, self::$FLOAT_NEG_INF, self::$INT_BITS_NEG_INF));
   }
 
-  /**
-   * @dataProvider special_vals_provider
-   */
-  function test_encoding_special_values($type, $val, $bits)
+  #[DataProvider('special_vals_provider')]
+  public static function test_encoding_special_values($type, $val, $bits)
   {
-    $this->assert_encode_values($type, $val, $bits);
+    self::assert_encode_values($type, $val, $bits);
   }
 
-  function nan_vals_provider()
+  public static function nan_vals_provider()
   {
     self::make_special_vals();
     return array(array(self::DOUBLE_TYPE, self::$DOUBLE_NAN, self::$LONG_BITS_NAN),
                  array(self::FLOAT_TYPE, self::$FLOAT_NAN, self::$INT_BITS_NAN));
   }
 
-  /**
-   * @dataProvider nan_vals_provider
-   */
+  #[DataProvider('nan_vals_provider')]
   function test_encoding_nan_values($type, $val, $bits)
   {
     $this->assert_encode_nan_values($type, $val, $bits);
   }
 
-  function normal_vals_provider()
+  public static function normal_vals_provider()
   {
     $ruby_to_generate_vals =<<<_RUBY
       def d2lb(d); [d].pack('E') end
@@ -191,22 +188,22 @@ _RUBY;
       );
   }
 
-  function float_vals_provider()
+  public static function float_vals_provider()
   {
     $ary = array();
 
-    foreach ($this->normal_vals_provider() as $values)
+    foreach (self::normal_vals_provider() as $values)
       if (self::FLOAT_TYPE == $values[0])
         $ary []= array($values[0], $values[1], $values[2]);
 
     return $ary;
   }
 
-  function double_vals_provider()
+  public static function double_vals_provider()
   {
     $ary = array();
 
-    foreach ($this->normal_vals_provider() as $values)
+    foreach (self::normal_vals_provider() as $values)
       if (self::DOUBLE_TYPE == $values[0])
         $ary []= array($values[0], $values[1], $values[2]);
 
@@ -214,23 +211,19 @@ _RUBY;
   }
 
 
-  /**
-   * @dataProvider float_vals_provider
-   */
+  #[DataProvider('float_vals_provider')]
   function test_encoding_float_values($type, $val, $bits)
   {
-    $this->assert_encode_values($type, $val, $bits);
+    self::assert_encode_values($type, $val, $bits);
   }
 
-  /**
-   * @dataProvider double_vals_provider
-   */
+  #[DataProvider('double_vals_provider')]
   function test_encoding_double_values($type, $val, $bits)
   {
-    $this->assert_encode_values($type, $val, $bits);
+    self::assert_encode_values($type, $val, $bits);
   }
 
-  function assert_encode_values($type, $val, $bits)
+  public static function assert_encode_values($type, $val, $bits)
   {
     if (self::FLOAT_TYPE == $type)
     {
@@ -244,19 +237,19 @@ _RUBY;
     }
 
     $decoded_bits_val = call_user_func($decoder, $bits);
-    $this->assertEquals($val, $decoded_bits_val,
+    self::assertEquals($val, $decoded_bits_val,
                         sprintf("%s\n expected: '%f'\n    given: '%f'",
                                 'DECODED BITS', $val, $decoded_bits_val));
 
     $encoded_val_bits = call_user_func($encoder, $val);
-    $this->assertEquals($bits, $encoded_val_bits,
+    self::assertEquals($bits, $encoded_val_bits,
                         sprintf("%s\n expected: '%s'\n    given: '%s'",
                                 'ENCODED VAL',
                                 AvroDebug::hexString($bits),
                                 AvroDebug::hexString($encoded_val_bits)));
 
     $round_trip_value = call_user_func($decoder, $encoded_val_bits);
-    $this->assertEquals($val, $round_trip_value,
+    self::assertEquals($val, $round_trip_value,
                         sprintf("%s\n expected: '%f'\n     given: '%f'",
                                 'ROUND TRIP BITS', $val, $round_trip_value));
   }
