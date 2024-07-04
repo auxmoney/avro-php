@@ -11,6 +11,8 @@ fail() {
     exit 1
 }
 
+git-filter-repo --version &>/dev/null || fail "Please install git-filter-repo before running this script."
+
 # If there are any changes in the working directory, the script will abort.
 if ! git diff --quiet; then
     fail "There are changes in the working directory. Please commit or stash them before running this script."
@@ -18,14 +20,17 @@ fi
 
 current_ref=$(git symbolic-ref --short HEAD) || fail "Failed to get the current branch. Please make sure you are on a branch."
 
-git switch upstream || exit 1
+git switch upstream || fail "Failed to switch to the upstream branch."
+git remote get-url upstream &>/dev/null || git remote add upstream git@github.com:apache/avro.git
+git fetch upstream || fail "Failed to fetch the upstream branch."
+git reset --hard upstream/main || fail "Failed to reset the upstream branch."
+git filter-repo \
+        --refs upstream \
+        --path lang/php/lib \
+        --path lang/php/test \
+        --path-rename lang/php/lib:apache/lib \
+        --path-rename lang/php/test:apache/test \
+        --force \
+    || exit 1
 
-rm -rf "${SCRIPT_DIR:?}"/lib "${SCRIPT_DIR:?}"/test
-
-mkdir -p "${SCRIPT_DIR:?}"/apache && cd "${SCRIPT_DIR:?}"/apache || exit 1
-curl https://github.com/apache/avro/archive/refs/heads/main.tar.gz --location \
-    | tar --extract --gunzip --file - --strip-components=3 avro-main/lang/php/lib avro-main/lang/php/test || exit 1
-
-git add lib test || exit 1
-git commit --message="Update upstream branch"
 git switch "${current_ref:?}" || exit 1

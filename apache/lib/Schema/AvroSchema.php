@@ -266,6 +266,8 @@ class AvroSchema
      */
     public $type;
 
+    public ?array $extraAttributes = null;
+
     /**
      * @param string $type a schema type name
      * @internal Should only be called from within the constructor of
@@ -295,6 +297,20 @@ class AvroSchema
      * @throws AvroSchemaParseException
      */
     public static function realParse($avro, $default_namespace = null, &$schemata = null)
+    {
+        $schema = self::internalParse($avro, $default_namespace, $schemata);
+
+        if (is_array($avro)) {
+            $extraAttributes = array_diff_key($avro, array_flip(self::$reservedAttrs));
+            if (!empty($extraAttributes)) {
+                $schema->extraAttributes = $extraAttributes;
+            }
+        }
+
+        return $schema;
+    }
+
+    private static function internalParse($avro, $default_namespace = null, &$schemata = null)
     {
         if (is_null($schemata)) {
             $schemata = new AvroNamedSchemata();

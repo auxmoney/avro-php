@@ -11,7 +11,8 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Apache\\Avro\\Tests\\": "apache/test/"
+            "Apache\\Avro\\Tests\\": "apache/test/",
+            "Auxmoney\\Avro\\Tests\\": "tests/"
         }
     },
     "authors": [

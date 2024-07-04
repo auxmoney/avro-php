@@ -22,6 +22,7 @@ namespace Apache\Avro\Datum;
 
 use Apache\Avro\AvroException;
 use Apache\Avro\Schema\AvroSchema;
+use Apache\Avro\Schema\AvroSchemaParseException;
 
 /**
  * Handles schema-specific writing of data to the encoder.
@@ -65,7 +66,7 @@ class AvroIODatumWriter
      */
     public function writeData($writers_schema, $datum, $encoder)
     {
-        if (!AvroSchema::isValidDatum($writers_schema, $datum)) {
+        if (!$this->isValidDatum($writers_schema, $datum)) {
             throw new AvroIOTypeException($writers_schema, $datum);
         }
 
@@ -173,7 +174,7 @@ class AvroIODatumWriter
         return $encoder->writeInt($datum_index);
     }
 
-    private function writeRecord($writers_schema, $datum, $encoder)
+    protected function writeRecord($writers_schema, $datum, $encoder)
     {
         foreach ($writers_schema->fields() as $field) {
             $this->writeValidatedData($field->type(), $datum[$field->name()] ?? null, $encoder);
@@ -185,7 +186,7 @@ class AvroIODatumWriter
         $datum_schema_index = -1;
         $datum_schema = null;
         foreach ($writers_schema->schemas() as $index => $schema) {
-            if (AvroSchema::isValidDatum($schema, $datum)) {
+            if ($this->isValidDatum($schema, $datum)) {
                 $datum_schema_index = $index;
                 $datum_schema = $schema;
                 break;
@@ -198,5 +199,13 @@ class AvroIODatumWriter
 
         $encoder->writeLong($datum_schema_index);
         $this->writeValidatedData($datum_schema, $datum, $encoder);
+    }
+
+    /**
+     * @throws AvroSchemaParseException
+     */
+    protected function isValidDatum(AvroSchema $schema, mixed $datum): bool
+    {
+        return AvroSchema::isValidDatum($schema, $datum);
     }
 }

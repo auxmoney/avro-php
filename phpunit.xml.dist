@@ -24,6 +24,9 @@
       <directory suffix="Test.php">apache/test</directory>
       <exclude>apache/test/InterOpTest.php</exclude>
     </testsuite>
+    <testsuite name="Auxmoney">
+      <directory suffix="Test.php">tests</directory>
+    </testsuite>
   </testsuites>
   <source>
     <include>
