@@ -81,7 +81,7 @@ class AvroIODatumWriter
      *
      * @throws AvroIOTypeException if $datum is invalid for $writers_schema
      */
-    private function writeValidatedData($writers_schema, $datum, $encoder)
+    protected function writeValidatedData($writers_schema, $datum, $encoder)
     {
         switch ($writers_schema->type()) {
             case AvroSchema::NULL_TYPE:
