@@ -27,25 +27,15 @@ class AvroIODatumWriter extends \Apache\Avro\Datum\AvroIODatumWriter
      * @throws AvroIOTypeException
      * @throws AvroSchemaParseException
      */
-    public function writeData($writers_schema, $datum, $encoder): void
+    protected function writeValidatedData($writers_schema, $datum, $encoder): void
     {
         $logicalType = $this->getLogicalType($writers_schema);
         if ($logicalType !== null) {
-            if (!$logicalType->isValid($writers_schema, $datum)) {
-                throw new AvroException(
-                    sprintf(
-                        'The datum %s is not an example of the logical type %s',
-                        var_export($datum, true),
-                        $logicalType::class
-                    )
-                );
-            }
-
             $logicalType->writeData($writers_schema, $datum, $encoder);
             return;
         }
 
-        parent::writeData($writers_schema, $datum, $encoder);
+        parent::writeValidatedData($writers_schema, $datum, $encoder);
     }
 
     protected function isValidDatum(AvroSchema $schema, mixed $datum): bool
