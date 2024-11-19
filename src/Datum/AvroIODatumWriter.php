@@ -104,14 +104,14 @@ class AvroIODatumWriter extends \Apache\Avro\Datum\AvroIODatumWriter
             case AvroSchema::REQUEST_SCHEMA:
                 if (is_array($datum)) {
                     foreach ($schema->fields() as $field) {
-                        if (!$this->isValidDatum($field->type(), $datum[$field->name()] ?? null)) {
+                        if (!$this->isValidDatum($field->type(), $datum[$field->name()] ?? $field->defaultValue())) {
                             return false;
                         }
                     }
                     return true;
                 } elseif (is_object($datum)) {
                     foreach ($schema->fields() as $field) {
-                        if (!$this->isValidDatum($field->type(), $this->getFieldValue($datum, $field->name()))) {
+                        if (!$this->isValidDatum($field->type(), $this->getFieldValue($datum, $field->name(), $field->defaultValue()))) {
                             return false;
                         }
                     }
@@ -123,15 +123,20 @@ class AvroIODatumWriter extends \Apache\Avro\Datum\AvroIODatumWriter
         }
     }
 
-    protected function writeRecord($writers_schema, $datum, $encoder)
+    /**
+     * @throws AvroException
+     * @throws AvroIOTypeException
+     * @throws AvroSchemaParseException
+     */
+    protected function writeRecord($writers_schema, $datum, $encoder): void
     {
         if (is_array($datum)) {
             foreach ($writers_schema->fields() as $field) {
-                $this->writeData($field->type(), $datum[$field->name()] ?? null, $encoder);
+                $this->writeValidatedData($field->type(), $datum[$field->name()] ?? $field->defaultValue(), $encoder);
             }
         } elseif (is_object($datum)) {
             foreach ($writers_schema->fields() as $field) {
-                $this->writeData($field->type(), $this->getFieldValue($datum, $field->name()), $encoder);
+                $this->writeValidatedData($field->type(), $this->getFieldValue($datum, $field->name(), $field->defaultValue()), $encoder);
             }
         }
     }
@@ -149,7 +154,7 @@ class AvroIODatumWriter extends \Apache\Avro\Datum\AvroIODatumWriter
         return $this->logicalTypes[$logicalTypeKey] ?? throw new AvroSchemaParseException("Unknown logical type: $logicalTypeKey");
     }
 
-    private function getFieldValue(object $datum, string $fieldName): mixed
+    private function getFieldValue(object $datum, string $fieldName, mixed $defaultValue): mixed
     {
         if (isset($datum->{$fieldName})) {
             return $datum->{$fieldName};
@@ -173,6 +178,6 @@ class AvroIODatumWriter extends \Apache\Avro\Datum\AvroIODatumWriter
             return $datum->{$hasser}();
         }
 
-        return null;
+        return $defaultValue;
     }
 }
