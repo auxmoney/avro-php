@@ -12,6 +12,8 @@ use Apache\Avro\Schema\AvroSchema;
 
 interface LogicalTypeInterface
 {
+    public function getName(): string;
+
     public function isValid(AvroSchema $schema, mixed $datum): bool;
 
     /**
