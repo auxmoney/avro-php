@@ -31,20 +31,31 @@ class AvroIODatumReader extends \Apache\Avro\Datum\AvroIODatumReader
     {
         $datum = parent::readData($writers_schema, $readers_schema, $decoder);
 
-        $logicalType = $this->getLogicalType($writers_schema);
+        $logicalType = $this->getLogicalType($writers_schema, $readers_schema);
+
         return $logicalType !== null ? $logicalType->denormalize($writers_schema, $readers_schema, $datum) : $datum;
     }
 
     /**
      * @throws AvroSchemaParseException
      */
-    protected function getLogicalType(AvroSchema $schema): ?LogicalTypeInterface
+    protected function getLogicalType(AvroSchema $writersSchema, AvroSchema $readersSchema): ?LogicalTypeInterface
     {
-        $logicalTypeKey = $schema->extraAttributes['logicalType'] ?? null;
-        if ($logicalTypeKey === null) {
+        $writersLogicalTypeKey = $writersSchema->extraAttributes['logicalType'] ?? null;
+        if ($writersLogicalTypeKey === null) {
             return null;
         }
 
-        return $this->logicalTypes[$logicalTypeKey] ?? throw new AvroSchemaParseException("Unknown logical type: $logicalTypeKey");
+        $readersLogicalTypeKey = $readersSchema->extraAttributes['logicalType'] ?? null;
+        if ($readersLogicalTypeKey === null) {
+            return null;
+        }
+
+        if ($writersLogicalTypeKey !== $readersLogicalTypeKey) {
+            throw new AvroSchemaParseException("Writers logical type: $writersLogicalTypeKey does not match readers logical type: $readersLogicalTypeKey");
+        }
+
+        return $this->logicalTypes[$writersLogicalTypeKey]
+            ?? throw new AvroSchemaParseException("Unknown logical type: $writersLogicalTypeKey");
     }
 }
