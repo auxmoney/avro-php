@@ -25,7 +25,7 @@ class AvroIODatumWriterTest extends TestCase
 
         $logicalType = $this->createMock(LogicalTypeInterface::class);
         $logicalType->expects($this->once())
-            ->method('writeData')
+            ->method('normalize')
             ->with($schema, $datum, $encoder);
 
         $logicalType->expects($this->once())

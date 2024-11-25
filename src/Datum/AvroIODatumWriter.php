@@ -30,12 +30,9 @@ class AvroIODatumWriter extends \Apache\Avro\Datum\AvroIODatumWriter
     protected function writeValidatedData($writers_schema, $datum, $encoder): void
     {
         $logicalType = $this->getLogicalType($writers_schema);
-        if ($logicalType !== null) {
-            $logicalType->writeData($writers_schema, $datum, $encoder);
-            return;
-        }
+        $normalized = $logicalType !== null ? $logicalType->normalize($writers_schema, $datum) : $datum;
 
-        parent::writeValidatedData($writers_schema, $datum, $encoder);
+        parent::writeValidatedData($writers_schema, $normalized, $encoder);
     }
 
     protected function isValidDatum(AvroSchema $schema, mixed $datum): bool

@@ -20,7 +20,7 @@ interface LogicalTypeInterface
      * @throws AvroIOTypeException if $datum is invalid for $writersSchema
      * @throws AvroException
      */
-    public function writeData(AvroSchema $writersSchema, mixed $datum, AvroIOBinaryEncoder $encoder): void;
+    public function normalize(AvroSchema $writersSchema, mixed $datum): mixed;
 
-    public function readData(AvroSchema $writersSchema, AvroSchema $readersSchema, AvroIOBinaryDecoder $decoder): mixed;
+    public function denormalize(AvroSchema $writersSchema, AvroSchema $readersSchema, mixed $datum): mixed;
 }

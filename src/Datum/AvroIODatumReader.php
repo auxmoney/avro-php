@@ -29,12 +29,10 @@ class AvroIODatumReader extends \Apache\Avro\Datum\AvroIODatumReader
      */
     public function readData($writers_schema, $readers_schema, $decoder)
     {
-        $logicalType = $this->getLogicalType($writers_schema);
-        if ($logicalType !== null) {
-            return $logicalType->readData($writers_schema, $readers_schema, $decoder);
-        }
+        $datum = parent::readData($writers_schema, $readers_schema, $decoder);
 
-        return parent::readData($writers_schema, $readers_schema, $decoder);
+        $logicalType = $this->getLogicalType($writers_schema);
+        return $logicalType !== null ? $logicalType->denormalize($writers_schema, $readers_schema, $datum) : $datum;
     }
 
     /**
