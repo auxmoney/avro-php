@@ -52,10 +52,6 @@ $encodedData = $io->string();
 ### Decoding Data
 
 ```php
-<?php
-
-require_once __DIR__ . '/vendor/autoload.php';
-
 use Apache\Avro\Datum\AvroIOBinaryDecoder;
 use Apache\Avro\IO\AvroStringIO;
 use Apache\Avro\Schema\AvroSchema;
@@ -87,6 +83,66 @@ array (
   'age' => 30,
 )
 ```
+
+### Logic Types
+
+Although this library does not provide an implementation for any logical type, it is possible to use them by providing the implementation to the AvroIODatumReader and AvroIODatumWriter classes.
+
+The logical type must implement the interface Auxmoney\Avro\Datum\LogicalTypeInterface.
+
+```php
+use Apache\Avro\Datum\AvroIOBinaryDecoder;
+use Apache\Avro\Datum\AvroIOBinaryEncoder;
+use Apache\Avro\IO\AvroStringIO;
+use Apache\Avro\Schema\AvroSchema;
+use Auxmoney\Avro\Datum\AvroIODatumReader;
+use Auxmoney\Avro\Datum\AvroIODatumWriter;
+use Auxmoney\Avro\Datum\LogicalTypeInterface;
+
+class Base64ExampleType implements LogicalTypeInterface
+{
+    public function getName(): string
+    {
+        return 'base64-example';
+    }
+
+    public function isValid(AvroSchema $schema, mixed $datum): bool
+    {
+        return is_string($datum);
+    }
+
+    public function normalize(AvroSchema $writersSchema, mixed $datum): mixed
+    {
+        return base64_encode($datum);
+    }
+
+    public function denormalize(AvroSchema $writersSchema, AvroSchema $readersSchema, mixed $datum): mixed
+    {
+        return base64_decode($datum);
+    }
+};
+
+$base64ExampleType = new Base64ExampleType();
+
+$logicalTypes = [
+    $base64ExampleType->getName() => $base64ExampleType,
+];
+
+$reader = new AvroIODatumReader($logicalTypes);
+$writer = new AvroIODatumWriter($logicalTypes);
+
+$schema = AvroSchema::parse('{"type": "string", "logicalType": "base64-example"}');
+$data = 'Hello, World!';
+$io = new AvroStringIO();
+$writer->writeData($schema, $data, new AvroIOBinaryEncoder($io));
+$encodedData = $io->string();
+echo $encodedData . PHP_EOL; // Outputs: "SGVsbG8sIFdvcmxkIQ=="
+
+$io = new AvroStringIO($encodedData);
+$data = $reader->readData($schema, $schema, new AvroIOBinaryDecoder($io));
+echo $data . PHP_EOL; // Outputs: "Hello, World!"
+```
+
 
 ## Documentation
 For more detailed documentation on usage, schema design, and advanced features like schema evolution, please refer to the official Avro documentation.
