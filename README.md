@@ -2,7 +2,7 @@
 
 A PHP library that provides schema-based Avro data serialization and deserialization.
 
-It is based on the latest changes from the original Apache Avro implementation available at https://github.com/apache/avro, and it is intended as add-on to the original library.
+It is based on the latest changes from the original Apache Avro implementation available at https://github.com/apache/avro, and it is designed to be an augmented version of the original library.
 
 The features added by this library are:
 - Basic support for logical types
@@ -84,7 +84,7 @@ array (
 )
 ```
 
-### Logic Types
+### Logical Types
 
 Although this library does not provide an implementation for any logical type, it is possible to use them by providing the implementation to the AvroIODatumReader and AvroIODatumWriter classes.
 
