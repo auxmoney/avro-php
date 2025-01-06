@@ -8,18 +8,19 @@ use Apache\Avro\AvroException;
 use Apache\Avro\Datum\AvroIOSchemaMatchException;
 use Apache\Avro\Schema\AvroSchema;
 use Apache\Avro\Schema\AvroSchemaParseException;
+use Auxmoney\Avro\Contracts\LogicalTypeFactoryInterface;
+use Auxmoney\Avro\Contracts\LogicalTypeInterface;
 
 class AvroIODatumReader extends \Apache\Avro\Datum\AvroIODatumReader
 {
     /**
-     * @param array<string, LogicalTypeInterface> $logicalTypes
+     * @param array<string, LogicalTypeFactoryInterface> $logicalTypes
      * @param AvroSchema $writers_schema
      */
     public function __construct(
-        private readonly array $logicalTypes = [],
-        $writers_schema = null
+        private readonly array $logicalTypes = []
     ) {
-        parent::__construct($writers_schema);
+        parent::__construct();
     }
 
     /**
@@ -33,7 +34,7 @@ class AvroIODatumReader extends \Apache\Avro\Datum\AvroIODatumReader
 
         $logicalType = $this->getLogicalType($writers_schema, $readers_schema);
 
-        return $logicalType !== null ? $logicalType->denormalize($writers_schema, $readers_schema, $datum) : $datum;
+        return $logicalType !== null ? $logicalType->denormalize($datum) : $datum;
     }
 
     /**
@@ -55,7 +56,6 @@ class AvroIODatumReader extends \Apache\Avro\Datum\AvroIODatumReader
             throw new AvroSchemaParseException("Writers logical type: $writersLogicalTypeKey does not match readers logical type: $readersLogicalTypeKey");
         }
 
-        return $this->logicalTypes[$writersLogicalTypeKey]
-            ?? throw new AvroSchemaParseException("Unknown logical type: $writersLogicalTypeKey");
+        return $this->logicalTypes[$writersLogicalTypeKey]?->create($writersSchema->extraAttributes);
     }
 }

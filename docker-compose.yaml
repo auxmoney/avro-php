@@ -3,7 +3,7 @@ services:
         image: webdevops/php-dev:8.3
         volumes:
             - .:/avro-php
-            - $HOME:$HOME
+            - ${DOCKER_HOME:-$HOME}:${DOCKER_HOME:-$HOME}
             - /etc/passwd:/etc/passwd
             - /etc/group:/etc/group
         environment:
@@ -11,4 +11,4 @@ services:
             - PHP_IDE_CONFIG=serverName=avro-php
         working_dir: /avro-php
         user: root
-        command: runuser -u $USER -- bash
+        command: runuser -u ${DOCKER_USER:-$USER} -- bash

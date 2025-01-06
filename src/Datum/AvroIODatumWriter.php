@@ -8,18 +8,19 @@ use Apache\Avro\AvroException;
 use Apache\Avro\Datum\AvroIOTypeException;
 use Apache\Avro\Schema\AvroSchema;
 use Apache\Avro\Schema\AvroSchemaParseException;
+use Auxmoney\Avro\Contracts\LogicalTypeFactoryInterface;
+use Auxmoney\Avro\Contracts\LogicalTypeInterface;
 
 class AvroIODatumWriter extends \Apache\Avro\Datum\AvroIODatumWriter
 {
     /**
-     * @param array<string, LogicalTypeInterface> $logicalTypes
+     * @param array<string, LogicalTypeFactoryInterface> $logicalTypesFactories
      * @param AvroSchema $writers_schema
      */
     public function __construct(
-        private readonly array $logicalTypes = [],
-        $writers_schema = null
+        private readonly array $logicalTypesFactories = [],
     ) {
-        parent::__construct($writers_schema);
+        parent::__construct();
     }
 
     /**
@@ -30,7 +31,7 @@ class AvroIODatumWriter extends \Apache\Avro\Datum\AvroIODatumWriter
     protected function writeValidatedData($writers_schema, $datum, $encoder): void
     {
         $logicalType = $this->getLogicalType($writers_schema);
-        $normalized = $logicalType !== null ? $logicalType->normalize($writers_schema, $datum) : $datum;
+        $normalized = $logicalType !== null ? $logicalType->normalize($datum) : $datum;
 
         parent::writeValidatedData($writers_schema, $normalized, $encoder);
     }
@@ -39,7 +40,7 @@ class AvroIODatumWriter extends \Apache\Avro\Datum\AvroIODatumWriter
     {
         $logicalType = $this->getLogicalType($schema);
         if ($logicalType !== null) {
-            return $logicalType->isValid($schema, $datum);
+            return $logicalType->isValid($datum);
         }
 
         switch ($schema->type) {
@@ -148,7 +149,7 @@ class AvroIODatumWriter extends \Apache\Avro\Datum\AvroIODatumWriter
             return null;
         }
 
-        return $this->logicalTypes[$logicalTypeKey] ?? throw new AvroSchemaParseException("Unknown logical type: $logicalTypeKey");
+        return $this->logicalTypesFactories[$logicalTypeKey]?->create($schema->extraAttributes);
     }
 
     private function getFieldValue(object $datum, string $fieldName, mixed $defaultValue): mixed
