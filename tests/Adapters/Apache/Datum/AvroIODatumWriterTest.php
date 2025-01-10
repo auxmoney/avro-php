@@ -1,12 +1,13 @@
 <?php
 
-namespace Auxmoney\Avro\Tests\Datum;
+namespace Auxmoney\Avro\Tests\Adapters\Apache\Datum;
 
 use Apache\Avro\AvroException;
 use Apache\Avro\Datum\AvroIOBinaryEncoder;
 use Apache\Avro\Schema\AvroSchema;
 use Auxmoney\Avro\Adapters\Apache\Datum\AvroIODatumWriter;
 use Auxmoney\Avro\Contracts\LogicalTypeFactoryInterface;
+use Auxmoney\Avro\Contracts\LogicalTypeInterface;
 use PHPUnit\Framework\TestCase;
 use Throwable;
 
@@ -24,17 +25,20 @@ class AvroIODatumWriterTest extends TestCase
 
         $encoder = $this->createMock(AvroIOBinaryEncoder::class);
 
-        $logicalType = $this->createMock(LogicalTypeFactoryInterface::class);
+        $logicalTypeFactory = $this->createMock(LogicalTypeFactoryInterface::class);
+        $logicalType = $this->createMock(LogicalTypeInterface::class);
+        $logicalTypeFactory->method('create')->with(['logicalType' => 'logical'])->willReturn($logicalType);
+
         $logicalType->expects($this->once())
             ->method('normalize')
-            ->with($schema->extraAttributes, $datum);
+            ->with($datum);
 
         $logicalType->expects($this->once())
             ->method('isValid')
-            ->with($schema->extraAttributes, $datum)
+            ->with($datum)
             ->willReturn(true);
 
-        $writer = new AvroIODatumWriter(['logical' => $logicalType]);
+        $writer = new AvroIODatumWriter(['logical' => $logicalTypeFactory]);
 
         $writer->writeData($schema, 'test', $encoder);
     }
@@ -51,15 +55,17 @@ class AvroIODatumWriterTest extends TestCase
 
         $encoder = $this->createMock(AvroIOBinaryEncoder::class);
 
-        $logicalType = $this->createMock(LogicalTypeFactoryInterface::class);
+        $logicalTypeFactory = $this->createMock(LogicalTypeFactoryInterface::class);
+        $logicalType = $this->createMock(LogicalTypeInterface::class);
+        $logicalTypeFactory->method('create')->with(['logicalType' => 'logical'])->willReturn($logicalType);
+
         $logicalType->expects($this->once())
             ->method('isValid')
-            ->with($schema->extraAttributes, $datum)
             ->willReturn(false);
 
-        $writer = new AvroIODatumWriter(['logical' => $logicalType]);
+        $writer = new AvroIODatumWriter(['logical' => $logicalTypeFactory]);
 
-        $this->expectExceptionMessage('The datum \'test\' is not an example of schema {"type":"bytes","logicalType":"logical"}');
+        $this->expectExceptionMessage('The datum \'test\' is not an example of schema {"type":"bytes"}');
         $this->expectException(AvroException::class);
 
         $writer->writeData($schema, 'test', $encoder);
