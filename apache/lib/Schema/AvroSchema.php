@@ -584,7 +584,7 @@ class AvroSchema
      */
     public function toAvro()
     {
-        return array(self::TYPE_ATTR => $this->type) + ($this->extraAttributes ?? []);
+        return array(self::TYPE_ATTR => $this->type);
     }
 
     /**
