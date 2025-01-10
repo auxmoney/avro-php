@@ -2,15 +2,21 @@
 
 declare(strict_types=1);
 
-namespace Auxmoney\Avro\Datum;
+namespace Auxmoney\Avro;
 
 use Apache\Avro\Schema\AvroSchema;
+use Auxmoney\Avro\Adapters\Apache\Datum\AvroIODatumReader;
+use Auxmoney\Avro\Adapters\Apache\Datum\AvroIODatumWriter;
 use Auxmoney\Avro\Contracts\AvroFactoryInterface;
 use Auxmoney\Avro\Contracts\LogicalTypeFactoryInterface;
 use Auxmoney\Avro\Contracts\ReadableStreamInterface;
 use Auxmoney\Avro\Contracts\ReaderInterface;
 use Auxmoney\Avro\Contracts\StringBufferInterface;
 use Auxmoney\Avro\Contracts\WriterInterface;
+use Auxmoney\Avro\IO\ReadableStringBuffer;
+use Auxmoney\Avro\IO\Reader;
+use Auxmoney\Avro\IO\WritableStringBuffer;
+use Auxmoney\Avro\IO\Writer;
 
 readonly class AvroFactory implements AvroFactoryInterface
 {

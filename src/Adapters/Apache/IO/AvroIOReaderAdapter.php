@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Auxmoney\Avro\Datum;
+namespace Auxmoney\Avro\Adapters\Apache\IO;
 
 use Apache\Avro\AvroIO;
 use Apache\Avro\AvroNotImplementedException;
@@ -14,7 +14,7 @@ class AvroIOReaderAdapter extends AvroIO
     {
     }
 
-    public function read($len)
+    public function read($len): string
     {
         return $this->stream->read($len);
     }

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Auxmoney\Avro\Datum;
+namespace Auxmoney\Avro\Adapters\Apache\Datum;
 
 use Apache\Avro\AvroException;
 use Apache\Avro\Datum\AvroIOSchemaMatchException;

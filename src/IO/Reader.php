@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Auxmoney\Avro\Datum;
+namespace Auxmoney\Avro\IO;
 
-use Apache\Avro\Datum\AvroIOBinaryDecoder;
 use Apache\Avro\Schema\AvroSchema;
+use Auxmoney\Avro\Adapters\Apache\Datum\AvroIOBinaryDecoder;
+use Auxmoney\Avro\Adapters\Apache\Datum\AvroIODatumReader;
 use Auxmoney\Avro\Contracts\ReadableStreamInterface;
 use Auxmoney\Avro\Contracts\ReaderInterface;
 
@@ -20,8 +21,7 @@ readonly class Reader implements ReaderInterface
 
     public function read(ReadableStreamInterface $stream): mixed
     {
-        $io = new AvroIOReaderAdapter($stream);
-        $decoder = new AvroIOBinaryDecoder($io);
+        $decoder = new AvroIOBinaryDecoder($stream);
         return $this->datumReader->readData($this->writerSchema, $this->readerSchema, $decoder);
     }
 }

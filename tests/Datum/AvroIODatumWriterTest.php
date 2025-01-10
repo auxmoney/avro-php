@@ -5,8 +5,8 @@ namespace Auxmoney\Avro\Tests\Datum;
 use Apache\Avro\AvroException;
 use Apache\Avro\Datum\AvroIOBinaryEncoder;
 use Apache\Avro\Schema\AvroSchema;
+use Auxmoney\Avro\Adapters\Apache\Datum\AvroIODatumWriter;
 use Auxmoney\Avro\Contracts\LogicalTypeFactoryInterface;
-use Auxmoney\Avro\Datum\AvroIODatumWriter;
 use PHPUnit\Framework\TestCase;
 use Throwable;
 

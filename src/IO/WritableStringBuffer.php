@@ -1,6 +1,6 @@
 <?php
 
-namespace Auxmoney\Avro\Datum;
+namespace Auxmoney\Avro\IO;
 
 use Auxmoney\Avro\Contracts\StringBufferInterface;
 
