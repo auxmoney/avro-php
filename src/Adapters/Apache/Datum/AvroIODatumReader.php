@@ -52,10 +52,17 @@ class AvroIODatumReader extends \Apache\Avro\Datum\AvroIODatumReader
             return null;
         }
 
-        if ($writersLogicalTypeKey !== $readersLogicalTypeKey) {
-            throw new AvroSchemaParseException("Writers logical type: $writersLogicalTypeKey does not match readers logical type: $readersLogicalTypeKey");
+        if (!is_string($writersLogicalTypeKey) || !is_string($readersLogicalTypeKey)) {
+            throw new AvroSchemaParseException('Logical type must be a string');
         }
 
-        return $this->logicalTypes[$writersLogicalTypeKey]?->create($writersSchema->extraAttributes);
+        if ($writersLogicalTypeKey !== $readersLogicalTypeKey) {
+            throw new AvroSchemaParseException(
+                "Writers logical type: {$writersLogicalTypeKey} does not match readers logical type: {$readersLogicalTypeKey}"
+            );
+        }
+
+        $logicalTypeFactory = $this->logicalTypes[$writersLogicalTypeKey] ?? null;
+        return $logicalTypeFactory?->create($writersSchema->extraAttributes);
     }
 }

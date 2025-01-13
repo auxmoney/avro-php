@@ -149,7 +149,8 @@ class AvroIODatumWriter extends \Apache\Avro\Datum\AvroIODatumWriter
             return null;
         }
 
-        return $this->logicalTypesFactories[$logicalTypeKey]?->create($schema->extraAttributes);
+        $factory = $this->logicalTypesFactories[$logicalTypeKey] ?? null;
+        return $factory?->create($schema->extraAttributes);
     }
 
     private function getFieldValue(object $datum, string $fieldName, mixed $defaultValue): mixed
