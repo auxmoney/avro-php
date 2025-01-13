@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Auxmoney\Avro\Tests\Adapters\Apache\Datum;
 
 use Apache\Avro\Datum\AvroIOBinaryDecoder;

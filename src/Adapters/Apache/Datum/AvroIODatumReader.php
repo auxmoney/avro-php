@@ -15,7 +15,6 @@ class AvroIODatumReader extends \Apache\Avro\Datum\AvroIODatumReader
 {
     /**
      * @param array<string, LogicalTypeFactoryInterface> $logicalTypes
-     * @param AvroSchema $writers_schema
      */
     public function __construct(
         private readonly array $logicalTypes = []
@@ -24,11 +23,14 @@ class AvroIODatumReader extends \Apache\Avro\Datum\AvroIODatumReader
     }
 
     /**
+     * @param AvroSchema $writers_schema
+     * @param AvroSchema $readers_schema
+     * @param \Apache\Avro\Datum\AvroIOBinaryDecoder $decoder
      * @throws AvroException
      * @throws AvroIOSchemaMatchException
      * @throws AvroSchemaParseException
      */
-    public function readData($writers_schema, $readers_schema, $decoder)
+    public function readData($writers_schema, $readers_schema, $decoder): mixed
     {
         $datum = parent::readData($writers_schema, $readers_schema, $decoder);
 
@@ -40,7 +42,7 @@ class AvroIODatumReader extends \Apache\Avro\Datum\AvroIODatumReader
     /**
      * @throws AvroSchemaParseException
      */
-    protected function getLogicalType(AvroSchema $writersSchema, AvroSchema $readersSchema): ?LogicalTypeInterface
+    private function getLogicalType(AvroSchema $writersSchema, AvroSchema $readersSchema): ?LogicalTypeInterface
     {
         $writersLogicalTypeKey = $writersSchema->extraAttributes['logicalType'] ?? null;
         if ($writersLogicalTypeKey === null) {

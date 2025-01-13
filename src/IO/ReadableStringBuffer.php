@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Auxmoney\Avro\IO;
 
 use Auxmoney\Avro\Contracts\ReadableStreamInterface;
@@ -8,8 +10,9 @@ class ReadableStringBuffer implements ReadableStreamInterface
 {
     private int $position = 0;
 
-    public function __construct(private readonly string $buffer)
-    {
+    public function __construct(
+        private readonly string $buffer,
+    ) {
     }
 
     public function read(int $count): string

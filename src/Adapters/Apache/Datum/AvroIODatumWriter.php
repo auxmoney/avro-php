@@ -6,8 +6,15 @@ namespace Auxmoney\Avro\Adapters\Apache\Datum;
 
 use Apache\Avro\AvroException;
 use Apache\Avro\Datum\AvroIOTypeException;
+use Apache\Avro\Schema\AvroArraySchema;
+use Apache\Avro\Schema\AvroEnumSchema;
+use Apache\Avro\Schema\AvroField;
+use Apache\Avro\Schema\AvroFixedSchema;
+use Apache\Avro\Schema\AvroMapSchema;
+use Apache\Avro\Schema\AvroRecordSchema;
 use Apache\Avro\Schema\AvroSchema;
 use Apache\Avro\Schema\AvroSchemaParseException;
+use Apache\Avro\Schema\AvroUnionSchema;
 use Auxmoney\Avro\Contracts\LogicalTypeFactoryInterface;
 use Auxmoney\Avro\Contracts\LogicalTypeInterface;
 
@@ -15,7 +22,6 @@ class AvroIODatumWriter extends \Apache\Avro\Datum\AvroIODatumWriter
 {
     /**
      * @param array<string, LogicalTypeFactoryInterface> $logicalTypesFactories
-     * @param AvroSchema $writers_schema
      */
     public function __construct(
         private readonly array $logicalTypesFactories = [],
@@ -24,6 +30,7 @@ class AvroIODatumWriter extends \Apache\Avro\Datum\AvroIODatumWriter
     }
 
     /**
+     * @param mixed $datum
      * @throws AvroException
      * @throws AvroIOTypeException
      * @throws AvroSchemaParseException
@@ -45,27 +52,30 @@ class AvroIODatumWriter extends \Apache\Avro\Datum\AvroIODatumWriter
 
         switch ($schema->type) {
             case AvroSchema::NULL_TYPE:
-                return is_null($datum);
+                return $datum === null;
             case AvroSchema::BOOLEAN_TYPE:
                 return is_bool($datum);
             case AvroSchema::STRING_TYPE:
             case AvroSchema::BYTES_TYPE:
                 return is_string($datum);
             case AvroSchema::INT_TYPE:
-                return (is_int($datum)
-                    && (AvroSchema::INT_MIN_VALUE <= $datum)
-                    && ($datum <= AvroSchema::INT_MAX_VALUE));
+                return is_int($datum)
+                    && ($datum >= AvroSchema::INT_MIN_VALUE)
+                    && ($datum <= AvroSchema::INT_MAX_VALUE);
             case AvroSchema::LONG_TYPE:
-                return (is_int($datum)
-                    && (AvroSchema::LONG_MIN_VALUE <= $datum)
-                    && ($datum <= AvroSchema::LONG_MAX_VALUE));
+                return is_int($datum)
+                    && ($datum >= AvroSchema::LONG_MIN_VALUE)
+                    && ($datum <= AvroSchema::LONG_MAX_VALUE);
             case AvroSchema::FLOAT_TYPE:
             case AvroSchema::DOUBLE_TYPE:
-                return (is_float($datum) || is_int($datum));
+                return is_float($datum) || is_int($datum);
             case AvroSchema::ARRAY_SCHEMA:
                 if (is_array($datum)) {
+                    assert($schema instanceof AvroArraySchema);
+                    $items = $schema->items();
+                    assert($items instanceof AvroSchema);
                     foreach ($datum as $d) {
-                        if (!$this->isValidDatum($schema->items(), $d)) {
+                        if (!$this->isValidDatum($items, $d)) {
                             return false;
                         }
                     }
@@ -74,10 +84,13 @@ class AvroIODatumWriter extends \Apache\Avro\Datum\AvroIODatumWriter
                 return false;
             case AvroSchema::MAP_SCHEMA:
                 if (is_array($datum)) {
+                    assert($schema instanceof AvroMapSchema);
+                    $values = $schema->values();
+                    assert($values instanceof AvroSchema);
                     foreach ($datum as $k => $v) {
                         if (
                             !is_string($k)
-                            || !$this->isValidDatum($schema->values(), $v)
+                            || !$this->isValidDatum($values, $v)
                         ) {
                             return false;
                         }
@@ -86,30 +99,43 @@ class AvroIODatumWriter extends \Apache\Avro\Datum\AvroIODatumWriter
                 }
                 return false;
             case AvroSchema::UNION_SCHEMA:
-                foreach ($schema->schemas() as $schema) {
+                assert($schema instanceof AvroUnionSchema);
+                $schemas = $schema->schemas();
+                foreach ($schemas as $schema) {
                     if ($this->isValidDatum($schema, $datum)) {
                         return true;
                     }
                 }
                 return false;
             case AvroSchema::ENUM_SCHEMA:
+                assert($schema instanceof AvroEnumSchema);
                 return in_array($datum, $schema->symbols());
             case AvroSchema::FIXED_SCHEMA:
-                return (is_string($datum)
-                    && (strlen($datum) == $schema->size()));
+                assert($schema instanceof AvroFixedSchema);
+                return is_string($datum)
+                    && (strlen($datum) == $schema->size());
             case AvroSchema::RECORD_SCHEMA:
             case AvroSchema::ERROR_SCHEMA:
             case AvroSchema::REQUEST_SCHEMA:
+                assert($schema instanceof AvroRecordSchema);
                 if (is_array($datum)) {
                     foreach ($schema->fields() as $field) {
-                        if (!$this->isValidDatum($field->type(), $datum[$field->name()] ?? $field->defaultValue())) {
+                        assert($field instanceof AvroField);
+
+                        /** @var AvroSchema $type */
+                        $type = $field->type();
+                        if (!$this->isValidDatum($type, $datum[$field->name()] ?? $field->defaultValue())) {
                             return false;
                         }
                     }
                     return true;
                 } elseif (is_object($datum)) {
                     foreach ($schema->fields() as $field) {
-                        if (!$this->isValidDatum($field->type(), $this->getFieldValue($datum, $field->name(), $field->defaultValue()))) {
+                        assert($field instanceof AvroField);
+
+                        /** @var AvroSchema $type */
+                        $type = $field->type();
+                        if (!$this->isValidDatum($type, $this->getFieldValue($datum, $field->name(), $field->defaultValue()))) {
                             return false;
                         }
                     }
@@ -122,6 +148,9 @@ class AvroIODatumWriter extends \Apache\Avro\Datum\AvroIODatumWriter
     }
 
     /**
+     * @param AvroRecordSchema $writers_schema
+     * @param mixed $datum
+     * @param \Apache\Avro\Datum\AvroIOBinaryEncoder $encoder
      * @throws AvroException
      * @throws AvroIOTypeException
      * @throws AvroSchemaParseException
@@ -130,11 +159,18 @@ class AvroIODatumWriter extends \Apache\Avro\Datum\AvroIODatumWriter
     {
         if (is_array($datum)) {
             foreach ($writers_schema->fields() as $field) {
-                $this->writeValidatedData($field->type(), $datum[$field->name()] ?? $field->defaultValue(), $encoder);
+                assert($field instanceof AvroField);
+                /** @var AvroSchema $type */
+                $type = $field->type();
+                $this->writeValidatedData($type, $datum[$field->name()] ?? $field->defaultValue(), $encoder);
             }
         } elseif (is_object($datum)) {
             foreach ($writers_schema->fields() as $field) {
-                $this->writeValidatedData($field->type(), $this->getFieldValue($datum, $field->name(), $field->defaultValue()), $encoder);
+                assert($field instanceof AvroField);
+                /** @var AvroSchema $type */
+                $type = $field->type();
+
+                $this->writeValidatedData($type, $this->getFieldValue($datum, $field->name(), $field->defaultValue()), $encoder);
             }
         }
     }
@@ -142,7 +178,7 @@ class AvroIODatumWriter extends \Apache\Avro\Datum\AvroIODatumWriter
     /**
      * @throws AvroSchemaParseException
      */
-    protected function getLogicalType(AvroSchema $schema): ?LogicalTypeInterface
+    private function getLogicalType(AvroSchema $schema): ?LogicalTypeInterface
     {
         $logicalTypeKey = $schema->extraAttributes['logicalType'] ?? null;
         if ($logicalTypeKey === null) {

@@ -10,10 +10,14 @@ use Auxmoney\Avro\Contracts\ReadableStreamInterface;
 
 class AvroIOReaderAdapter extends AvroIO
 {
-    public function __construct(private readonly ReadableStreamInterface $stream)
-    {
+    public function __construct(
+        private readonly ReadableStreamInterface $stream,
+    ) {
     }
 
+    /**
+     * @param int $len
+     */
     public function read($len): string
     {
         return $this->stream->read($len);
