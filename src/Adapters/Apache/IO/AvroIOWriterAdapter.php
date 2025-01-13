@@ -13,8 +13,8 @@ class AvroIOWriterAdapter extends AvroIO
     {
     }
 
-    public function write($arg): void
+    public function write($arg): int
     {
-        $this->stream->write($arg);
+        return $this->stream->write($arg);
     }
 }
