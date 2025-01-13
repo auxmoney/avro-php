@@ -75,7 +75,7 @@ class AvroNamedSchema extends AvroSchema
     }
 
     /**
-     * @returns mixed
+     * @return mixed
      */
     public function toAvro()
     {
@@ -100,7 +100,7 @@ class AvroNamedSchema extends AvroSchema
     }
 
     /**
-     * @returns string
+     * @return string
      */
     public function fullname()
     {

@@ -34,7 +34,7 @@ class AvroUtil
      * starting with zero).
      *
      * @param array $ary array to test
-     * @returns true if the array is a list and false otherwise.
+     * @return true if the array is a list and false otherwise.
      *
      */
     public static function isList($ary): bool

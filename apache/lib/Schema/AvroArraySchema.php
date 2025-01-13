@@ -67,7 +67,7 @@ class AvroArraySchema extends AvroSchema
     }
 
     /**
-     * @returns AvroName|AvroSchema named schema name or AvroSchema
+     * @return AvroName|AvroSchema named schema name or AvroSchema
      *          of this array schema's elements.
      */
     public function items()
@@ -76,7 +76,7 @@ class AvroArraySchema extends AvroSchema
     }
 
     /**
-     * @returns mixed
+     * @return mixed
      */
     public function toAvro()
     {

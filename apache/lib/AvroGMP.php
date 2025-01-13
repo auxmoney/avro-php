@@ -80,7 +80,7 @@ class AvroGMP
      * @interal Only works up to shift 63 (doesn't wrap bits around).
      * @param resource|int|string $g
      * @param int $shift number of bits to shift left
-     * @returns resource $g shifted left
+     * @return resource $g shifted left
      */
     public static function shiftLeft($g, $shift)
     {
@@ -105,7 +105,7 @@ class AvroGMP
 
     /**
      * @param GMP resource
-     * @returns GMP resource 64-bit two's complement of input.
+     * @return GMP resource 64-bit two's complement of input.
      */
     public static function gmpTwosComplement($g)
     {
@@ -116,7 +116,7 @@ class AvroGMP
      * Arithmetic right shift
      * @param resource|int|string $g
      * @param int $shift number of bits to shift right
-     * @returns resource $g shifted right $shift bits
+     * @return resource $g shifted right $shift bits
      */
     public static function shiftRight($g, $shift)
     {
@@ -147,7 +147,7 @@ class AvroGMP
     // phpcs:disable PSR1.Methods.CamelCapsMethodName
 
     /**
-     * @returns resource GMP resource for two (2)
+     * @return resource GMP resource for two (2)
      */
     private static function gmp_2()
     {
@@ -158,7 +158,7 @@ class AvroGMP
     }
 
     /**
-     * @returns resource GMP resource for 64-bits of 1
+     * @return resource GMP resource for 64-bits of 1
      */
     private static function gmp_0xfs()
     {
@@ -169,7 +169,7 @@ class AvroGMP
     }
 
     /**
-     * @returns resource GMP resource for one (1)
+     * @return resource GMP resource for one (1)
      */
     private static function gmp_1()
     {
@@ -180,7 +180,7 @@ class AvroGMP
     }
 
     /**
-     * @returns resource GMP resource for zero
+     * @return resource GMP resource for zero
      */
     private static function gmp_0()
     {
@@ -191,7 +191,7 @@ class AvroGMP
     }
 
     /**
-     * @returns resource GMP resource for 64-bit ~0x7f
+     * @return resource GMP resource for 64-bit ~0x7f
      */
     private static function gmp_n0x7f()
     {
@@ -202,7 +202,7 @@ class AvroGMP
     }
 
     /**
-     * @returns resource GMP resource for 0x7f
+     * @return resource GMP resource for 0x7f
      */
     private static function gmp_0x7f()
     {

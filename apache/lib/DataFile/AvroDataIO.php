@@ -94,7 +94,7 @@ class AvroDataIO
     private static $metadataSchema;
 
     /**
-     * @returns int count of bytes in the initial "magic" segment of the
+     * @return int count of bytes in the initial "magic" segment of the
      *              Avro container file header
      */
     public static function magicSize()
@@ -103,7 +103,7 @@ class AvroDataIO
     }
 
     /**
-     * @returns the initial "magic" segment of an Avro container file header.
+     * @return the initial "magic" segment of an Avro container file header.
      */
     public static function magic()
     {
@@ -111,7 +111,7 @@ class AvroDataIO
     }
 
     /**
-     * @returns AvroSchema object of Avro container file metadata.
+     * @return AvroSchema object of Avro container file metadata.
      */
     public static function metadataSchema()
     {
@@ -126,7 +126,7 @@ class AvroDataIO
      * @param string $mode one of AvroFile::READ_MODE or AvroFile::WRITE_MODE
      * @param string $schemaJson JSON of writer's schema
      * @param string $codec compression codec
-     * @returns AvroDataIOWriter instance of AvroDataIOWriter
+     * @return AvroDataIOWriter instance of AvroDataIOWriter
      *
      * @throws AvroDataIOException if $writers_schema is not provided
      *         or if an invalid $mode is given.
@@ -170,7 +170,7 @@ class AvroDataIO
      * @param AvroIO $io
      * @param AvroSchema $schema
      * @param string $codec
-     * @returns AvroDataIOWriter
+     * @return AvroDataIOWriter
      */
     protected static function openWriter($io, $schema, $codec = self::NULL_CODEC)
     {
@@ -181,7 +181,7 @@ class AvroDataIO
     /**
      * @param AvroIO $io
      * @param AvroSchema $schema
-     * @returns AvroDataIOReader
+     * @return AvroDataIOReader
      */
     protected static function openReader($io, $schema)
     {
@@ -191,7 +191,7 @@ class AvroDataIO
 
     /**
      * @param string $codec
-     * @returns boolean true if $codec is a valid codec value and false otherwise
+     * @return boolean true if $codec is a valid codec value and false otherwise
      */
     public static function isValidCodec($codec)
     {
@@ -199,7 +199,7 @@ class AvroDataIO
     }
 
     /**
-     * @returns array array of valid codecs
+     * @return array array of valid codecs
      */
     public static function validCodecs()
     {

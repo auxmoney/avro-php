@@ -94,7 +94,7 @@ class AvroIOBinaryEncoder
 
     /**
      * @param int|string $n
-     * @returns string long $n encoded as bytes
+     * @return string long $n encoded as bytes
      * @internal This relies on 64-bit PHP.
      */
     public static function encodeLong($n)
@@ -128,7 +128,7 @@ class AvroIOBinaryEncoder
      * encoding required by the Avro spec.
      *
      * @param float $float
-     * @returns string bytes
+     * @return string bytes
      * @see Avro::checkPlatform()
      */
     public static function floatToIntBits($float)
@@ -152,7 +152,7 @@ class AvroIOBinaryEncoder
      * {@link AvroIOBinaryEncoder::floatToIntBits()} for details.
      *
      * @param double $double
-     * @returns string bytes
+     * @return string bytes
      */
     public static function doubleToLongBits($double)
     {

@@ -266,7 +266,8 @@ class AvroSchema
      */
     public $type;
 
-    public ?array $extraAttributes = null;
+    /** @var array<string, mixed> */
+    public array $extraAttributes = [];
 
     /**
      * @param string $type a schema type name
@@ -281,7 +282,7 @@ class AvroSchema
     /**
      * @param string $json JSON-encoded schema
      * @uses self::realParse()
-     * @returns AvroSchema
+     * @return AvroSchema
      */
     public static function parse($json)
     {
@@ -293,7 +294,7 @@ class AvroSchema
      * @param mixed $avro JSON-decoded schema
      * @param string $default_namespace namespace of enclosing schema
      * @param AvroNamedSchemata &$schemata reference to named schemas
-     * @returns AvroSchema
+     * @return AvroSchema
      * @throws AvroSchemaParseException
      */
     public static function realParse($avro, $default_namespace = null, &$schemata = null)
@@ -406,7 +407,7 @@ class AvroSchema
 
     /**
      * @param string $type a schema type name
-     * @returns boolean true if the given type name is a valid schema type
+     * @return boolean true if the given type name is a valid schema type
      *                  name and false otherwise.
      */
     public static function isValidType($type)
@@ -424,7 +425,7 @@ class AvroSchema
 
     /**
      * @param string $type a schema type name
-     * @returns boolean true if the given type name is a primitive schema type
+     * @return boolean true if the given type name is a primitive schema type
      *                  name and false otherwise.
      */
     public static function isPrimitiveType($type)
@@ -434,7 +435,7 @@ class AvroSchema
 
     /**
      * @param string $type a schema type name
-     * @returns boolean true if the given type name is a named schema type name
+     * @return boolean true if the given type name is a named schema type name
      *                  and false otherwise.
      */
     public static function isNamedType($type)
@@ -462,7 +463,7 @@ class AvroSchema
     }
 
     /**
-     * @returns boolean true if $datum is valid for $expected_schema
+     * @return boolean true if $datum is valid for $expected_schema
      *                  and false otherwise.
      * @throws AvroSchemaParseException
      */
@@ -543,7 +544,7 @@ class AvroSchema
      * @param mixed $avro
      * @param string $default_namespace namespace of enclosing schema
      * @param AvroNamedSchemata &$schemata
-     * @returns AvroSchema
+     * @return AvroSchema
      * @throws AvroSchemaParseException
      * @uses AvroSchema::realParse()
      */
@@ -564,7 +565,7 @@ class AvroSchema
     }
 
     /**
-     * @returns string schema type name of this schema
+     * @return string schema type name of this schema
      */
     public function type()
     {
@@ -572,7 +573,7 @@ class AvroSchema
     }
 
     /**
-     * @returns string the JSON-encoded representation of this Avro schema.
+     * @return string the JSON-encoded representation of this Avro schema.
      */
     public function __toString()
     {
@@ -580,7 +581,7 @@ class AvroSchema
     }
 
     /**
-     * @returns mixed
+     * @return mixed
      */
     public function toAvro()
     {
@@ -588,7 +589,7 @@ class AvroSchema
     }
 
     /**
-     * @returns mixed value of the attribute with the given attribute name
+     * @return mixed value of the attribute with the given attribute name
      */
     public function attribute($attribute)
     {

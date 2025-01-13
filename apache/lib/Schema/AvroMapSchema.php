@@ -70,7 +70,7 @@ class AvroMapSchema extends AvroSchema
     }
 
     /**
-     * @returns XXX|AvroSchema
+     * @return XXX|AvroSchema
      */
     public function values()
     {
@@ -78,7 +78,7 @@ class AvroMapSchema extends AvroSchema
     }
 
     /**
-     * @returns mixed
+     * @return mixed
      */
     public function toAvro()
     {

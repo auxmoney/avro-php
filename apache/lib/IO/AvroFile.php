@@ -81,7 +81,7 @@ class AvroFile extends AvroIO
     }
 
     /**
-     * @returns int count of bytes written
+     * @return int count of bytes written
      * @throws AvroIOException if write failed.
      */
     public function write($str)
@@ -94,7 +94,7 @@ class AvroFile extends AvroIO
     }
 
     /**
-     * @returns int current position within the file
+     * @return int current position within the file
      * @throws AvroIOException if tell failed.
      */
     public function tell()
@@ -108,7 +108,7 @@ class AvroFile extends AvroIO
 
     /**
      * Closes the file.
-     * @returns boolean true if successful.
+     * @return boolean true if successful.
      * @throws AvroIOException if there was an error closing the file.
      */
     public function close()
@@ -121,7 +121,7 @@ class AvroFile extends AvroIO
     }
 
     /**
-     * @returns boolean true if the pointer is at the end of the file,
+     * @return boolean true if the pointer is at the end of the file,
      *                  and false otherwise.
      * @see AvroIO::isEof() as behavior differs from feof()
      */
@@ -137,7 +137,7 @@ class AvroFile extends AvroIO
 
     /**
      * @param int $len count of bytes to read.
-     * @returns string bytes read
+     * @return string bytes read
      * @throws AvroIOException if length value is negative or if the read failed
      */
     public function read($len)
@@ -162,7 +162,7 @@ class AvroFile extends AvroIO
     /**
      * @param int $offset
      * @param int $whence
-     * @returns boolean true upon success
+     * @return boolean true upon success
      * @throws AvroIOException if seek failed.
      * @see AvroIO::seek()
      */
@@ -183,7 +183,7 @@ class AvroFile extends AvroIO
     }
 
     /**
-     * @returns boolean true if the flush was successful.
+     * @return boolean true if the flush was successful.
      * @throws AvroIOException if there was an error flushing the file.
      */
     public function flush()

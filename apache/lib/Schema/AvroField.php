@@ -144,7 +144,7 @@ class AvroField extends AvroSchema
 
     /**
      * @param string $order
-     * @returns boolean
+     * @return boolean
      */
     private static function isValidFieldSortOrder($order)
     {
@@ -152,7 +152,7 @@ class AvroField extends AvroSchema
     }
 
     /**
-     * @returns mixed
+     * @return mixed
      */
     public function toAvro()
     {
@@ -173,7 +173,7 @@ class AvroField extends AvroSchema
     }
 
     /**
-     * @returns string the name of this field
+     * @return string the name of this field
      */
     public function name()
     {
@@ -181,7 +181,7 @@ class AvroField extends AvroSchema
     }
 
     /**
-     * @returns mixed the default value of this field
+     * @return mixed the default value of this field
      */
     public function defaultValue()
     {
@@ -189,7 +189,7 @@ class AvroField extends AvroSchema
     }
 
     /**
-     * @returns boolean true if the field has a default and false otherwise
+     * @return boolean true if the field has a default and false otherwise
      */
     public function hasDefaultValue()
     {

@@ -63,7 +63,7 @@ class AvroIODatumReader
 
     /**
      * @param AvroIOBinaryDecoder $decoder
-     * @returns string
+     * @return string
      */
     public function read($decoder)
     {
@@ -78,7 +78,7 @@ class AvroIODatumReader
     }
 
     /**
-     * @returns mixed
+     * @return mixed
      */
     public function readData($writers_schema, $readers_schema, $decoder)
     {
@@ -138,7 +138,7 @@ class AvroIODatumReader
      *
      * @param AvroSchema $writers_schema
      * @param AvroSchema $readers_schema
-     * @returns boolean true if the schemas are consistent with
+     * @return boolean true if the schemas are consistent with
      *                  each other and false otherwise.
      */
     public static function schemasMatch($writers_schema, $readers_schema)
@@ -280,7 +280,7 @@ class AvroIODatumReader
     }
 
     /**
-     * @returns array
+     * @return array
      */
     public function readMap($writers_schema, $readers_schema, $decoder)
     {
@@ -307,7 +307,7 @@ class AvroIODatumReader
     }
 
     /**
-     * @returns mixed
+     * @return mixed
      */
     public function readUnion($writers_schema, $readers_schema, $decoder)
     {
@@ -317,7 +317,7 @@ class AvroIODatumReader
     }
 
     /**
-     * @returns string
+     * @return string
      */
     public function readEnum($writers_schema, $readers_schema, $decoder)
     {
@@ -330,7 +330,7 @@ class AvroIODatumReader
     }
 
     /**
-     * @returns string
+     * @return string
      */
     public function readFixed($writers_schema, $readers_schema, $decoder)
     {
@@ -338,7 +338,7 @@ class AvroIODatumReader
     }
 
     /**
-     * @returns array
+     * @return array
      */
     public function readRecord($writers_schema, $readers_schema, $decoder)
     {
@@ -421,7 +421,7 @@ class AvroIODatumReader
     /**
      * @param AvroSchema $field_schema
      * @param null|boolean|int|float|string|array $default_value
-     * @returns null|boolean|int|float|string|array
+     * @return null|boolean|int|float|string|array
      *
      * @throws AvroException if $field_schema type is unknown.
      */

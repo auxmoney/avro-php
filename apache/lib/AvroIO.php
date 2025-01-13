@@ -63,7 +63,7 @@ class AvroIO
     /**
      * Append bytes to this buffer. (Nothing more is needed to support Avro.)
      * @param string $arg bytes to write
-     * @returns int count of bytes written.
+     * @return int count of bytes written.
      * @throws IO\AvroIOException if $args is not a string value.
      */
     public function write($arg)
@@ -88,7 +88,7 @@ class AvroIO
      * @param int $offset
      * @param int $whence one of AvroIO::SEEK_SET, AvroIO::SEEK_CUR,
      *                    or Avro::SEEK_END
-     * @returns boolean true
+     * @return boolean true
      *
      * @throws IO\AvroIOException
      */
@@ -99,7 +99,7 @@ class AvroIO
 
     /**
      * Flushes any buffered data to the AvroIO object.
-     * @returns boolean true upon success.
+     * @return boolean true upon success.
      */
     public function flush()
     {
@@ -113,7 +113,7 @@ class AvroIO
      * Note isEof() is <b>not</b> like eof in C or feof in PHP:
      * it returns TRUE if the *next* read would be end of file,
      * rather than if the *most recent* read read end of file.
-     * @returns boolean true if at the end of file, and false otherwise
+     * @return boolean true if at the end of file, and false otherwise
      */
     public function isEof()
     {

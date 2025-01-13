@@ -51,7 +51,7 @@ class AvroFixedSchema extends AvroNamedSchema
     }
 
     /**
-     * @returns int byte count of this fixed schema data value
+     * @return int byte count of this fixed schema data value
      */
     public function size()
     {
@@ -59,7 +59,7 @@ class AvroFixedSchema extends AvroNamedSchema
     }
 
     /**
-     * @returns mixed
+     * @return mixed
      */
     public function toAvro()
     {

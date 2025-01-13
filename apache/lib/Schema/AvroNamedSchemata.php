@@ -51,7 +51,7 @@ class AvroNamedSchemata
 
     /**
      * @param AvroName $name
-     * @returns AvroSchema|null
+     * @return AvroSchema|null
      */
     public function schemaByName($name)
     {
@@ -60,7 +60,7 @@ class AvroNamedSchemata
 
     /**
      * @param string $fullname
-     * @returns AvroSchema|null the schema which has the given name,
+     * @return AvroSchema|null the schema which has the given name,
      *          or null if there is no schema with the given name.
      */
     public function schema($fullname)
@@ -75,7 +75,7 @@ class AvroNamedSchemata
      * Creates a new AvroNamedSchemata instance of this schemata instance
      * with the given $schema appended.
      * @param AvroNamedSchema schema to add to this existing schemata
-     * @returns AvroNamedSchemata
+     * @return AvroNamedSchemata
      */
     public function cloneWithNewSchema($schema)
     {
@@ -93,7 +93,7 @@ class AvroNamedSchemata
 
     /**
      * @param string $fullname
-     * @returns boolean true if there exists a schema with the given name
+     * @return boolean true if there exists a schema with the given name
      *                  and false otherwise.
      */
     public function hasName($fullname)

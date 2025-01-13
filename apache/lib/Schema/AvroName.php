@@ -82,7 +82,7 @@ class AvroName
 
     /**
      * @param string $namespace
-     * @returns boolean true if namespace is composed of valid names
+     * @return boolean true if namespace is composed of valid names
      * @throws AvroSchemaParseException if any of the namespace components
      *                                  are invalid.
      */
@@ -99,7 +99,7 @@ class AvroName
     /**
      * @param string $name
      * @param string $namespace
-     * @returns string
+     * @return string
      * @throws AvroSchemaParseException if any of the names are not valid.
      */
     private static function parseFullname($name, $namespace)
@@ -112,7 +112,7 @@ class AvroName
     }
 
     /**
-     * @returns string[] array($name, $namespace)
+     * @return string[] array($name, $namespace)
      */
     public static function extractNamespace($name, $namespace = null)
     {
@@ -125,7 +125,7 @@ class AvroName
     }
 
     /**
-     * @returns boolean true if the given name is well-formed
+     * @return boolean true if the given name is well-formed
      *          (is a non-null, non-empty string) and false otherwise
      */
     public static function isWellFormedName($name)
@@ -134,7 +134,7 @@ class AvroName
     }
 
     /**
-     * @returns array array($name, $namespace)
+     * @return array array($name, $namespace)
      */
     public function nameAndNamespace()
     {
@@ -142,7 +142,7 @@ class AvroName
     }
 
     /**
-     * @returns string fullname
+     * @return string fullname
      * @uses $this->fullname()
      */
     public function __toString()
@@ -151,7 +151,7 @@ class AvroName
     }
 
     /**
-     * @returns string
+     * @return string
      */
     public function fullname()
     {
@@ -159,7 +159,7 @@ class AvroName
     }
 
     /**
-     * @returns string name qualified for its context
+     * @return string name qualified for its context
      */
     public function qualifiedName()
     {

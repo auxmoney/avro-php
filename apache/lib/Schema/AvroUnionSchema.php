@@ -84,7 +84,7 @@ class AvroUnionSchema extends AvroSchema
     }
 
     /**
-     * @returns AvroSchema[]
+     * @return AvroSchema[]
      */
     public function schemas()
     {
@@ -92,7 +92,7 @@ class AvroUnionSchema extends AvroSchema
     }
 
     /**
-     * @returns AvroSchema the particular schema from the union for
+     * @return AvroSchema the particular schema from the union for
      * the given (zero-based) index.
      * @throws AvroSchemaParseException if the index is invalid for this schema.
      */
@@ -106,7 +106,7 @@ class AvroUnionSchema extends AvroSchema
     }
 
     /**
-     * @returns mixed
+     * @return mixed
      */
     public function toAvro()
     {

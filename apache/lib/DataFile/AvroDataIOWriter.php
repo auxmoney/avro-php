@@ -115,7 +115,7 @@ class AvroDataIOWriter
     }
 
     /**
-     * @returns string a new, unique sync marker.
+     * @return string a new, unique sync marker.
      */
     private static function generateSyncMarker()
     {
@@ -230,7 +230,7 @@ class AvroDataIOWriter
 
     /**
      * Flushes biffer to AvroIO object container.
-     * @returns mixed value of $io->flush()
+     * @return mixed value of $io->flush()
      * @see AvroIO::flush()
      */
     private function flush()

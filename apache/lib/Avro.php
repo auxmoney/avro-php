@@ -83,7 +83,7 @@ class Avro
     }
 
     /**
-     * @returns boolean true if the PHP GMP extension is used and false otherwise.
+     * @return boolean true if the PHP GMP extension is used and false otherwise.
      * @internal Requires Avro::check64Bit() (exposed via Avro::checkPlatform())
      *           to have been called to set Avro::$biginteger_mode.
      */

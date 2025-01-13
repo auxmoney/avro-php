@@ -152,7 +152,7 @@ class AvroDataIOReader
 
     /**
      * @internal Would be nice to implement data() as an iterator, I think
-     * @returns array of data from object container.
+     * @return array of data from object container.
      */
     public function data()
     {
@@ -230,7 +230,7 @@ class AvroDataIOReader
     /**
      * Reads the block header (which includes the count of items in the block
      * and the length in bytes of the block)
-     * @returns int length in bytes of the block.
+     * @return int length in bytes of the block.
      */
     private function readBlockHeader()
     {

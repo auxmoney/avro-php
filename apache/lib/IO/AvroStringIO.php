@@ -66,7 +66,7 @@ class AvroStringIO extends AvroIO
      * Append bytes to this buffer.
      * (Nothing more is needed to support Avro.)
      * @param string $arg bytes to write
-     * @returns int count of bytes written.
+     * @return int count of bytes written.
      * @throws AvroIOException if $args is not a string value.
      */
     public function write($arg)
@@ -95,7 +95,7 @@ class AvroStringIO extends AvroIO
     }
 
     /**
-     * @returns boolean true if this buffer is closed and false
+     * @return boolean true if this buffer is closed and false
      *                       otherwise.
      */
     public function isClosed()
@@ -106,7 +106,7 @@ class AvroStringIO extends AvroIO
     /**
      * Appends bytes to this buffer.
      * @param string $str
-     * @returns integer count of bytes written.
+     * @return integer count of bytes written.
      */
     private function appendStr($str)
     {
@@ -118,7 +118,7 @@ class AvroStringIO extends AvroIO
     }
 
     /**
-     * @returns string bytes read from buffer
+     * @return string bytes read from buffer
      * @todo test for fencepost errors wrt updating current_index
      */
     public function read($len)
@@ -137,7 +137,7 @@ class AvroStringIO extends AvroIO
     }
 
     /**
-     * @returns int count of bytes in the buffer
+     * @return int count of bytes in the buffer
      * @internal Could probably memoize length for performance, but
      *           no need do this yet.
      */
@@ -147,7 +147,7 @@ class AvroStringIO extends AvroIO
     }
 
     /**
-     * @returns boolean true if successful
+     * @return boolean true if successful
      * @throws AvroIOException if the seek failed.
      */
     public function seek($offset, $whence = self::SEEK_SET): bool
@@ -183,7 +183,7 @@ class AvroStringIO extends AvroIO
     }
 
     /**
-     * @returns int
+     * @return int
      * @see AvroIO::tell()
      */
     public function tell()
@@ -192,7 +192,7 @@ class AvroStringIO extends AvroIO
     }
 
     /**
-     * @returns boolean
+     * @return boolean
      * @see AvroIO::isEof()
      */
     public function isEof()
@@ -202,7 +202,7 @@ class AvroStringIO extends AvroIO
 
     /**
      * No-op provided for compatibility with AvroIO interface.
-     * @returns boolean true
+     * @return boolean true
      */
     public function flush()
     {
@@ -211,7 +211,7 @@ class AvroStringIO extends AvroIO
 
     /**
      * Marks this buffer as closed.
-     * @returns boolean true
+     * @return boolean true
      */
     public function close()
     {
@@ -223,7 +223,7 @@ class AvroStringIO extends AvroIO
     /**
      * Truncates the truncate buffer to 0 bytes and returns the pointer
      * to the beginning of the buffer.
-     * @returns boolean true
+     * @return boolean true
      */
     public function truncate()
     {
@@ -234,7 +234,7 @@ class AvroStringIO extends AvroIO
     }
 
     /**
-     * @returns string
+     * @return string
      * @uses self::__toString()
      */
     public function string()
@@ -243,7 +243,7 @@ class AvroStringIO extends AvroIO
     }
 
     /**
-     * @returns string
+     * @return string
      */
     public function __toString()
     {

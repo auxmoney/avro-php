@@ -49,7 +49,7 @@ class AvroIOBinaryDecoder
     }
 
     /**
-     * @returns null
+     * @return null
      */
     public function readNull()
     {
@@ -57,7 +57,7 @@ class AvroIOBinaryDecoder
     }
 
     /**
-     * @returns boolean
+     * @return boolean
      */
     public function readBoolean()
     {
@@ -65,7 +65,7 @@ class AvroIOBinaryDecoder
     }
 
     /**
-     * @returns string the next byte from $this->io.
+     * @return string the next byte from $this->io.
      * @throws AvroException if the next byte cannot be read.
      */
     private function nextByte()
@@ -75,7 +75,7 @@ class AvroIOBinaryDecoder
 
     /**
      * @param int $len count of bytes to read
-     * @returns string
+     * @return string
      */
     public function read($len)
     {
@@ -83,7 +83,7 @@ class AvroIOBinaryDecoder
     }
 
     /**
-     * @returns int
+     * @return int
      */
     public function readInt()
     {
@@ -91,7 +91,7 @@ class AvroIOBinaryDecoder
     }
 
     /**
-     * @returns string|int
+     * @return string|int
      */
     public function readLong()
     {
@@ -111,7 +111,7 @@ class AvroIOBinaryDecoder
 
     /**
      * @param int[] array of byte ascii values
-     * @returns long decoded value
+     * @return long decoded value
      * @internal Requires 64-bit platform
      */
     public static function decodeLongFromArray($bytes)
@@ -128,7 +128,7 @@ class AvroIOBinaryDecoder
     }
 
     /**
-     * @returns float
+     * @return float
      */
     public function readFloat()
     {
@@ -142,7 +142,7 @@ class AvroIOBinaryDecoder
      * {@link AvroIOBinaryEncoder::floatToIntBits()} for details.
      *
      * @param string $bits
-     * @returns float
+     * @return float
      */
     public static function intBitsToFloat($bits)
     {
@@ -151,7 +151,7 @@ class AvroIOBinaryDecoder
     }
 
     /**
-     * @returns double
+     * @return double
      */
     public function readDouble()
     {
@@ -165,7 +165,7 @@ class AvroIOBinaryDecoder
      * {@link AvroIOBinaryEncoder::floatToIntBits()} for details.
      *
      * @param string $bits
-     * @returns float
+     * @return float
      */
     public static function longBitsToDouble($bits)
     {
@@ -176,7 +176,7 @@ class AvroIOBinaryDecoder
     /**
      * A string is encoded as a long followed by that many bytes
      * of UTF-8 encoded character data.
-     * @returns string
+     * @return string
      */
     public function readString()
     {
@@ -184,7 +184,7 @@ class AvroIOBinaryDecoder
     }
 
     /**
-     * @returns string
+     * @return string
      */
     public function readBytes()
     {
@@ -213,7 +213,7 @@ class AvroIOBinaryDecoder
     /**
      * @param int $offset
      * @param int $whence
-     * @returns boolean true upon success
+     * @return boolean true upon success
      * @uses AvroIO::seek()
      */
     private function seek($offset, $whence)
@@ -307,7 +307,7 @@ class AvroIOBinaryDecoder
     }
 
     /**
-     * @returns int position of pointer in AvroIO instance
+     * @return int position of pointer in AvroIO instance
      * @uses AvroIO::tell()
      */
     private function tell()

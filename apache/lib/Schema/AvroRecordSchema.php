@@ -73,7 +73,7 @@ class AvroRecordSchema extends AvroNamedSchema
      * @param mixed $field_data
      * @param string $default_namespace namespace of enclosing schema
      * @param AvroNamedSchemata &$schemata
-     * @returns AvroField[]
+     * @return AvroField[]
      * @throws AvroSchemaParseException
      */
     public static function parseFields($field_data, $default_namespace, &$schemata)
@@ -135,7 +135,7 @@ class AvroRecordSchema extends AvroNamedSchema
     }
 
     /**
-     * @returns mixed
+     * @return mixed
      */
     public function toAvro()
     {
@@ -156,7 +156,7 @@ class AvroRecordSchema extends AvroNamedSchema
     }
 
     /**
-     * @returns array the schema definitions of the fields of this AvroRecordSchema
+     * @return array the schema definitions of the fields of this AvroRecordSchema
      */
     public function fields()
     {
@@ -164,7 +164,7 @@ class AvroRecordSchema extends AvroNamedSchema
     }
 
     /**
-     * @returns array a hash table of the fields of this AvroRecordSchema fields
+     * @return array a hash table of the fields of this AvroRecordSchema fields
      *          keyed by each field's name
      */
     public function fieldsHash()

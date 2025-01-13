@@ -60,7 +60,7 @@ class AvroIODatumWriter
      * @param AvroSchema $writers_schema
      * @param $datum
      * @param AvroIOBinaryEncoder $encoder
-     * @returns mixed
+     * @return mixed
      *
      * @throws AvroIOTypeException if $datum is invalid for $writers_schema
      */
@@ -77,7 +77,7 @@ class AvroIODatumWriter
      * @param AvroSchema $writers_schema
      * @param $datum
      * @param AvroIOBinaryEncoder $encoder
-     * @returns mixed
+     * @return mixed
      *
      * @throws AvroIOTypeException if $datum is invalid for $writers_schema
      */

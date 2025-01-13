@@ -40,7 +40,7 @@ class AvroPrimitiveSchema extends AvroSchema
     }
 
     /**
-     * @returns mixed
+     * @return mixed
      */
     public function toAvro()
     {

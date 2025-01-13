@@ -65,7 +65,7 @@ class AvroEnumSchema extends AvroNamedSchema
     }
 
     /**
-     * @returns string[] this enum schema's symbols
+     * @return string[] this enum schema's symbols
      */
     public function symbols()
     {
@@ -74,7 +74,7 @@ class AvroEnumSchema extends AvroNamedSchema
 
     /**
      * @param string $symbol
-     * @returns boolean true if the given symbol exists in this
+     * @return boolean true if the given symbol exists in this
      *          enum schema and false otherwise
      */
     public function hasSymbol($symbol)
@@ -84,7 +84,7 @@ class AvroEnumSchema extends AvroNamedSchema
 
     /**
      * @param int $index
-     * @returns string enum schema symbol with the given (zero-based) index
+     * @return string enum schema symbol with the given (zero-based) index
      */
     public function symbolByIndex($index)
     {
@@ -96,7 +96,7 @@ class AvroEnumSchema extends AvroNamedSchema
 
     /**
      * @param string $symbol
-     * @returns int the index of the given $symbol in the enum schema
+     * @return int the index of the given $symbol in the enum schema
      */
     public function symbolIndex($symbol)
     {
@@ -108,7 +108,7 @@ class AvroEnumSchema extends AvroNamedSchema
     }
 
     /**
-     * @returns mixed
+     * @return mixed
      */
     public function toAvro()
     {
