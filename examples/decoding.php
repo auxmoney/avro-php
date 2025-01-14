@@ -11,12 +11,7 @@ $schemaJson = '{
     ]
 }';
 
-$data = [
-    'name' => 'John Doe',
-    'age' => 30
-];
-
-$avroFactory = new AvroFactory();
+$avroFactory = AvroFactory::create();
 $reader = $avroFactory->createReader($schemaJson);
 $buffer = $avroFactory->createReadableStreamFromString(hex2bin('104a6f686e20446f653c'));
 $decodedData = $reader->read($buffer);

@@ -26,9 +26,7 @@ readonly class AvroFactory implements AvroFactoryInterface
     /**
      * @param iterable<LogicalTypeFactoryInterface> $logicalTypeFactories
      */
-    public function __construct(
-        iterable $logicalTypeFactories = [],
-    ) {
+    private function __construct(iterable $logicalTypeFactories) {
         $keyedLogicalTypeFactories = [];
         foreach ($logicalTypeFactories as $logicalTypeFactory) {
             $keyedLogicalTypeFactories[$logicalTypeFactory->getName()] = $logicalTypeFactory;
@@ -60,5 +58,13 @@ readonly class AvroFactory implements AvroFactoryInterface
     public function createReadableStreamFromString(string $string): ReadableStreamInterface
     {
         return new ReadableStringBuffer($string);
+    }
+
+    /**
+     * @param iterable<LogicalTypeFactoryInterface> $logicalTypeFactories
+     */
+    public static function create(iterable $logicalTypeFactories = []): AvroFactoryInterface
+    {
+        return new AvroFactory($logicalTypeFactories);
     }
 }

@@ -16,7 +16,7 @@ $data = [
     'age' => 30
 ];
 
-$avroFactory = new AvroFactory();
+$avroFactory = AvroFactory::create();
 $writer = $avroFactory->createWriter($schemaJson);
 $buffer = $avroFactory->createStringBuffer();
 $writer->write($data, $buffer);

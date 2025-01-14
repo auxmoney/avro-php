@@ -36,7 +36,7 @@ class Base64ExampleTypeFactory implements LogicalTypeFactoryInterface
 }
 
 $logicalTypes = [];
-$avroFactory = new AvroFactory([new Base64ExampleTypeFactory()]);
+$avroFactory = AvroFactory::create([new Base64ExampleTypeFactory()]);
 
 $schema = '{"type": "string", "logicalType": "base64-example"}';
 
