@@ -20,12 +20,11 @@ class AvroIODatumWriterTest extends TestCase
      */
     public function testWriteDataWithValidLogicalType(): void
     {
-        $datum = 'test';
+        $datum = 'denormalized';
+        $normalized = 'normalized';
 
         $schema = new AvroSchema(AvroSchema::BYTES_TYPE);
         $schema->extraAttributes['logicalType'] = 'logical';
-
-        $encoder = $this->createMock(AvroIOBinaryEncoder::class);
 
         $logicalTypeFactory = $this->createMock(LogicalTypeFactoryInterface::class);
         $logicalType = $this->createMock(LogicalTypeInterface::class);
@@ -33,16 +32,22 @@ class AvroIODatumWriterTest extends TestCase
 
         $logicalType->expects($this->once())
             ->method('normalize')
-            ->with($datum);
+            ->with($datum)
+            ->willReturn($normalized);
 
         $logicalType->expects($this->once())
             ->method('isValid')
             ->with($datum)
             ->willReturn(true);
 
+        $encoder = $this->createMock(AvroIOBinaryEncoder::class);
+        $encoder->expects($this->once())
+            ->method('writeBytes')
+            ->with($normalized);
+
         $writer = new AvroIODatumWriter(['logical' => $logicalTypeFactory]);
 
-        $writer->writeData($schema, 'test', $encoder);
+        $writer->writeData($schema, $datum, $encoder);
     }
 
     /**
@@ -63,6 +68,7 @@ class AvroIODatumWriterTest extends TestCase
 
         $logicalType->expects($this->once())
             ->method('isValid')
+            ->with($datum)
             ->willReturn(false);
 
         $writer = new AvroIODatumWriter(['logical' => $logicalTypeFactory]);
@@ -70,6 +76,26 @@ class AvroIODatumWriterTest extends TestCase
         $this->expectExceptionMessage('The datum \'test\' is not an example of schema {"type":"bytes"}');
         $this->expectException(AvroException::class);
 
-        $writer->writeData($schema, 'test', $encoder);
+        $writer->writeData($schema, $datum, $encoder);
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function testWriteDataWithUnknownLogicalType(): void
+    {
+        $datum = 'test';
+
+        $schema = new AvroSchema(AvroSchema::BYTES_TYPE);
+        $schema->extraAttributes['logicalType'] = 'logical';
+
+        $encoder = $this->createMock(AvroIOBinaryEncoder::class);
+        $encoder->expects($this->once())
+            ->method('writeBytes')
+            ->with($datum);
+
+        $writer = new AvroIODatumWriter();
+
+        $writer->writeData($schema, $datum, $encoder);
     }
 }

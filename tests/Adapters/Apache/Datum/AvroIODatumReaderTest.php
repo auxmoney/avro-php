@@ -36,6 +36,22 @@ class AvroIODatumReaderTest extends TestCase
 
         $reader = new AvroIODatumReader(['logical' => $logicalTypeFactory]);
 
-        $reader->readData($schema, $schema, $decoder);
+        self::assertSame('denormalized', $reader->readData($schema, $schema, $decoder));
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function testReadDataWithUnknownLogicalType(): void
+    {
+        $schema = new AvroSchema(AvroSchema::BYTES_TYPE);
+        $schema->extraAttributes['logicalType'] = 'logical';
+
+        $decoder = $this->createMock(AvroIOBinaryDecoder::class);
+        $decoder->method('readBytes')->willReturn('normalized');
+
+        $reader = new AvroIODatumReader();
+
+        self::assertSame('normalized', $reader->readData($schema, $schema, $decoder));
     }
 }
