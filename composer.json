@@ -28,5 +28,8 @@
         "phpunit/phpunit": "^11",
         "phpstan/phpstan": "^2.1",
         "symplify/easy-coding-standard": "^12"
+    },
+    "config": {
+        "lock": false
     }
 }
