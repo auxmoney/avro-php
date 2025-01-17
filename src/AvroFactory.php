@@ -26,7 +26,8 @@ readonly class AvroFactory implements AvroFactoryInterface
     /**
      * @param iterable<LogicalTypeFactoryInterface> $logicalTypeFactories
      */
-    private function __construct(iterable $logicalTypeFactories) {
+    private function __construct(iterable $logicalTypeFactories)
+    {
         $keyedLogicalTypeFactories = [];
         foreach ($logicalTypeFactories as $logicalTypeFactory) {
             $keyedLogicalTypeFactories[$logicalTypeFactory->getName()] = $logicalTypeFactory;
@@ -65,6 +66,6 @@ readonly class AvroFactory implements AvroFactoryInterface
      */
     public static function create(iterable $logicalTypeFactories = []): AvroFactoryInterface
     {
-        return new AvroFactory($logicalTypeFactories);
+        return new self($logicalTypeFactories);
     }
 }
