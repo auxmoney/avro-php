@@ -16,10 +16,10 @@ class WritableStringBuffer implements StringBufferInterface
         return implode('', $this->buffer);
     }
 
-    public function write(string $data): int
+    public function write(string $datum): int
     {
-        $this->buffer[] = $data;
+        $this->buffer[] = $datum;
 
-        return strlen($data);
+        return strlen($datum);
     }
 }
