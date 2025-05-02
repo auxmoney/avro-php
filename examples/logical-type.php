@@ -1,14 +1,24 @@
 <?php
 
+if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
+    require_once __DIR__ . '/../vendor/autoload.php';
+}
+
 use Auxmoney\Avro\AvroFactory;
 use Auxmoney\Avro\Contracts\LogicalTypeFactoryInterface;
 use Auxmoney\Avro\Contracts\LogicalTypeInterface;
+use Auxmoney\Avro\Contracts\ValidationContextInterface;
 
 class Base64ExampleType implements LogicalTypeInterface
 {
-    public function isValid(mixed $datum): bool
+    public function validate(mixed $datum, ValidationContextInterface $context): bool
     {
-        return is_string($datum);
+        if (!is_string($datum)) {
+            $context->addError('expected string, got ' . gettype($datum));
+            return false;
+        }
+
+        return true;
     }
 
     public function denormalize(mixed $datum): mixed

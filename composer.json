@@ -22,7 +22,7 @@
         }
     ],
     "require": {
-        "php": ">=8.2"
+        "php-64bit": ">=8.2"
     },
     "require-dev": {
         "phpunit/phpunit": "^11",

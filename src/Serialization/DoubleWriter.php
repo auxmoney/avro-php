@@ -1,0 +1,29 @@
+<?php
+
+namespace Auxmoney\Avro\Serialization;
+
+use Auxmoney\Avro\Contracts\ValidationContextInterface;
+use Auxmoney\Avro\Contracts\WritableStreamInterface;
+use Auxmoney\Avro\Contracts\WriterInterface;
+
+class DoubleWriter implements WriterInterface
+{
+    public function __construct(private readonly BinaryEncoder $encoder)
+    {
+    }
+
+    public function write(mixed $datum, WritableStreamInterface $stream): void
+    {
+        $stream->write($this->encoder->encodeDouble($datum));
+    }
+
+    public function validate(mixed $datum, ?ValidationContextInterface $context = null): bool
+    {
+        if (!is_float($datum)) {
+            $context?->addError('expected float, got ' . gettype($datum));
+            return false;
+        }
+
+        return true;
+    }
+}

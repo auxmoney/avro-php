@@ -6,7 +6,7 @@ namespace Auxmoney\Avro\Contracts;
 
 interface LogicalTypeInterface
 {
-    public function isValid(mixed $datum): bool;
+    public function validate(mixed $datum, ValidationContextInterface $context): bool;
 
     public function normalize(mixed $datum): mixed;
 

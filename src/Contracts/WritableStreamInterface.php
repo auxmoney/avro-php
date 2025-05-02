@@ -6,5 +6,5 @@ namespace Auxmoney\Avro\Contracts;
 
 interface WritableStreamInterface
 {
-    public function write(string $data): int;
+    public function write(string $datum): int;
 }
