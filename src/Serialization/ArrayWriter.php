@@ -5,9 +5,12 @@ namespace Auxmoney\Avro\Serialization;
 use Auxmoney\Avro\Contracts\ValidationContextInterface;
 use Auxmoney\Avro\Contracts\WritableStreamInterface;
 use Auxmoney\Avro\Contracts\WriterInterface;
+use Generator;
 
 class ArrayWriter implements WriterInterface
 {
+    const BLOCK_SIZE = 100;
+
     public function __construct(
         private readonly WriterInterface $itemWriter,
         private readonly BinaryEncoder $encoder,
@@ -16,12 +19,13 @@ class ArrayWriter implements WriterInterface
 
     public function write(mixed $datum, WritableStreamInterface $stream): void
     {
-        assert(is_array($datum) || is_object($datum));
+        assert(is_iterable($datum));
 
-        $stream->write($this->encoder->encodeLong(count($datum)));
-
-        foreach ($datum as $item) {
-            $this->itemWriter->write($item, $stream);
+        foreach ($this->getBlocksGenerator($datum) as $block) {
+            $stream->write($this->encoder->encodeLong(count($block)));
+            foreach ($block as $item) {
+                $this->itemWriter->write($item, $stream);
+            }
         }
     }
 
@@ -40,5 +44,24 @@ class ArrayWriter implements WriterInterface
         }
 
         return $valid;
+    }
+
+    private function getBlocksGenerator(iterable $datum): Generator
+    {
+        $block = [];
+        foreach ($datum as $item) {
+            $block[] = $item;
+
+            if (count($block) >= self::BLOCK_SIZE) {
+                yield $block;
+                $block = [];
+            }
+        }
+
+        if (!empty($block)) {
+            yield $block;
+        }
+
+        yield [];
     }
 }
