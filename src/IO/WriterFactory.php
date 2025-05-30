@@ -98,9 +98,10 @@ class WriterFactory
                 throw new InvalidSchemaException('AVRO schema logicalType must be a string');
             }
 
+            $rawWriter = $this->getRawWriter($logicalType);
             $logicalTypeFactory = $this->logicalTypeResolver->resolve($logicalType);
             if ($logicalTypeFactory !== null) {
-                return new LogicalTypeWriter($logicalTypeFactory->create($datum));
+                return new LogicalTypeWriter($rawWriter, $logicalTypeFactory->create($datum));
             }
         }
 
