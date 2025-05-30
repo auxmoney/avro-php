@@ -1,17 +1,15 @@
 {
     "name": "auxmoney/avro-php",
-    "description": "Avro schema encoder/decoder based on Apache implementation",
+    "description": "Avro schema encoder/decoder",
     "type": "library",
     "license": "Apache-2.0",
     "autoload": {
         "psr-4": {
-            "Apache\\Avro\\": "apache/lib/",
             "Auxmoney\\Avro\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Apache\\Avro\\Tests\\": "apache/test/",
             "Auxmoney\\Avro\\Tests\\": "tests/"
         }
     },
