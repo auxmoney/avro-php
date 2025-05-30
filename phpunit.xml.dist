@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
-         bootstrap="apache/test/test_helper.php"
          cacheDirectory=".phpunit.cache"
          executionOrder="depends,defects"
          shortenArraysForExportThreshold="10"
@@ -15,10 +14,6 @@
     <testsuites>
         <testsuite name="default">
             <directory>tests</directory>
-        </testsuite>
-        <testsuite name="apache">
-            <directory suffix="Test.php">apache/test</directory>
-            <exclude>apache/test/InterOpTest.php</exclude>
         </testsuite>
     </testsuites>
 
