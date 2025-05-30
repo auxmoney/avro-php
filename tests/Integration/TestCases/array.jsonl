@@ -1,0 +1,6 @@
+{"schema":{"type":"array","items":{"type":"int"}}}
+{"data":[1,2,3],"hex":"0602040600"}
+{"data":[],"hex":"00"}
+{"data":[-1,-2,-3],"hex":"0601030500"}
+{"data":[2147483647,0,-2147483648],"hex":"06feffffff0f00ffffffff0f00"}
+{"data":[-2147483648,0,2147483647],"hex":"06ffffffff0f00feffffff0f00"}
