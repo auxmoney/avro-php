@@ -13,12 +13,13 @@ class UnionReader implements ReaderInterface
      */
     public function __construct(
         private readonly array $branchReaders,
+        private readonly BinaryDecoder $decoder
     ) {
     }
 
     public function read(ReadableStreamInterface $stream): mixed
     {
-        $branchIndex = ord($stream->read(1));
+        $branchIndex = $this->decoder->readLong($stream);
         if (!isset($this->branchReaders[$branchIndex])) {
             throw new RuntimeException('Invalid branch index: ' . $branchIndex);
         }
