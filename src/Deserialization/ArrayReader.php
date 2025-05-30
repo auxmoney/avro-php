@@ -15,10 +15,19 @@ class ArrayReader implements ReaderInterface
 
     public function read(ReadableStreamInterface $stream): mixed
     {
-        $length = $this->decoder->readLong($stream);
         $items = [];
-        for ($i = 0; $i < $length; ++$i) {
-            $items[] = $this->itemReader->read($stream);
+
+        while (($blockCount = $this->decoder->readLong($stream)) !== 0) {
+            if ($blockCount < 0) {
+                $blockCount = -$blockCount;
+
+                // Read block size if negative count indicates a block size
+                /*$blockSize = */$this->decoder->readLong($stream);
+            }
+
+            for ($i = 0; $i < $blockCount; ++$i) {
+                $items[] = $this->itemReader->read($stream);
+            }
         }
 
         return $items;
