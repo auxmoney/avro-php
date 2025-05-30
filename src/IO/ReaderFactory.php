@@ -3,21 +3,21 @@
 namespace Auxmoney\Avro\IO;
 
 use Auxmoney\Avro\Contracts\ReaderInterface;
-use Auxmoney\Avro\Deserialization\DoubleReader;
-use Auxmoney\Avro\Deserialization\LogicalTypeReader;
-use Auxmoney\Avro\Exceptions\InvalidSchemaException;
 use Auxmoney\Avro\Deserialization\ArrayReader;
 use Auxmoney\Avro\Deserialization\BinaryDecoder;
 use Auxmoney\Avro\Deserialization\BooleanReader;
+use Auxmoney\Avro\Deserialization\DoubleReader;
+use Auxmoney\Avro\Deserialization\EnumReader;
 use Auxmoney\Avro\Deserialization\FloatReader;
+use Auxmoney\Avro\Deserialization\LogicalTypeReader;
 use Auxmoney\Avro\Deserialization\LongReader;
 use Auxmoney\Avro\Deserialization\NullReader;
 use Auxmoney\Avro\Deserialization\PropertyReader;
 use Auxmoney\Avro\Deserialization\RecordReader;
 use Auxmoney\Avro\Deserialization\StringReader;
 use Auxmoney\Avro\Deserialization\UnionReader;
+use Auxmoney\Avro\Exceptions\InvalidSchemaException;
 use Auxmoney\Avro\LogicalTypeResolver;
-use Auxmoney\Avro\Serialization\LogicalTypeWriter;
 use JsonException;
 
 class ReaderFactory
@@ -98,6 +98,7 @@ class ReaderFactory
         return match ($datum['type']) {
             'record' => $this->getRecordReader($datum),
             'array' => $this->getArrayReader($datum),
+            'enum' => $this->getEnumReader($datum),
             default => $this->getSchemaReader($datum['type']),
         };
     }
@@ -156,5 +157,33 @@ class ReaderFactory
         $items = $datum['items'] ?? throw new InvalidSchemaException('AVRO array schema is missing items');
 
         return new ArrayReader($this->getSchemaReader($items), $this->decoder);
+    }
+
+    /**
+     * @param array<mixed> $datum
+     * @throws InvalidSchemaException
+     */
+    public function getEnumReader($datum): EnumReader
+    {
+        if (!isset($datum['symbols']) || !is_array($datum['symbols'])) {
+            throw new InvalidSchemaException('AVRO enum schema is missing symbols');
+        }
+
+        if (empty($datum['symbols'])) {
+            throw new InvalidSchemaException('AVRO enum schema symbols cannot be empty');
+        }
+
+        $symbols = $datum['symbols'];
+        foreach ($symbols as $symbol) {
+            if (!is_string($symbol)) {
+                throw new InvalidSchemaException('AVRO enum schema symbols must be strings');
+            }
+
+            if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $symbol)) {
+                throw new InvalidSchemaException("AVRO enum symbol '$symbol' is not a valid identifier");
+            }
+        }
+
+        return new EnumReader($symbols, $this->decoder);
     }
 }

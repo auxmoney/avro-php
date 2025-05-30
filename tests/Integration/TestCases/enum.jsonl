@@ -1,0 +1,4 @@
+{"schema":{"type":"enum","name":"Color","symbols":["RED","GREEN","BLUE"]}}
+{"data":"RED","hex":"00"}
+{"data":"GREEN","hex":"02"}
+{"data":"BLUE","hex":"04"}
