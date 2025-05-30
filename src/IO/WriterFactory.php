@@ -85,7 +85,7 @@ class WriterFactory
         }
 
         if ($this->isArrayIndexed($datum)) {
-            return new UnionWriter(array_map(fn($branch) => $this->getSchemaWriter($branch), $datum));
+            return new UnionWriter(array_map(fn($branch) => $this->getSchemaWriter($branch), $datum), $this->encoder);
         }
 
         if (!isset($datum['type'])) {

@@ -13,6 +13,7 @@ class UnionWriter implements WriterInterface
      */
     public function __construct(
         private readonly array $branchWriters,
+        private readonly BinaryEncoder $encoder,
     ) {
     }
 
@@ -23,7 +24,7 @@ class UnionWriter implements WriterInterface
                 continue;
             }
 
-            $stream->write(chr($index));
+            $stream->write($this->encoder->encodeLong($index));
             $branchWriter->write($datum, $stream);
         }
     }
