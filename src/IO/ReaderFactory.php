@@ -88,7 +88,7 @@ class ReaderFactory
         }
 
         if ($this->isArrayIndexed($datum)) {
-            return new UnionReader(array_map(fn($branch) => $this->getSchemaReader($branch), $datum));
+            return new UnionReader(array_map(fn($branch) => $this->getSchemaReader($branch), $datum), $this->decoder);
         }
 
         if (!isset($datum['type'])) {
