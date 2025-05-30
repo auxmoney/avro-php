@@ -2,7 +2,7 @@
 
 A PHP library that provides schema-based Avro data serialization and deserialization.
 
-It is based on the latest changes from the original Apache Avro implementation available at https://github.com/apache/avro, and it is designed to be an augmented version of the original library.
+It started as a fork of the original Apache Avro implementation available at https://github.com/apache/avro, but now it has been completely rewritten. Some of the original functionality has been removed, and new features have been added.
 
 The features added by this library are:
 - Basic support for logical types
