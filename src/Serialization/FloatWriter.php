@@ -19,8 +19,8 @@ class FloatWriter implements WriterInterface
 
     public function validate(mixed $datum, ?ValidationContextInterface $context = null): bool
     {
-        if (!is_float($datum)) {
-            $context?->addError('expected float, got ' . gettype($datum));
+        if (!is_int($datum) && !is_float($datum)) {
+            $context?->addError('expected int or float, got ' . gettype($datum));
             return false;
         }
 
