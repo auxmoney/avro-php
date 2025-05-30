@@ -1,0 +1,2 @@
+{"schema":{"type":"record","name":"User","fields":[{"name":"name","type":"string"},{"name":"age","type":"int"}]}}
+{"data":{"name":"John Doe","age":30},"hex":"104a6f686e20446f653c"}
