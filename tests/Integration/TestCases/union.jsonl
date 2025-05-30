@@ -1,0 +1,7 @@
+{"schema":["long", "string"]}
+{"data":"hello world!","hex":"021868656c6c6f20776f726c6421"}
+{"data":1,"hex":"0002"}
+
+{"schema":["null", "string"]}
+{"data":"hello world!","hex":"021868656c6c6f20776f726c6421"}
+{"data":null,"hex":"00"}

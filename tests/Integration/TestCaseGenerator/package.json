@@ -1,0 +1,12 @@
+{
+  "name": "test-case-generator",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "main.js",
+  "dependencies": {
+    "avsc": "^5.7.7"
+  }
+}
