@@ -9,6 +9,7 @@ use Auxmoney\Avro\Serialization\ArrayWriter;
 use Auxmoney\Avro\Serialization\BinaryEncoder;
 use Auxmoney\Avro\Serialization\BooleanWriter;
 use Auxmoney\Avro\Serialization\DoubleWriter;
+use Auxmoney\Avro\Serialization\EnumWriter;
 use Auxmoney\Avro\Serialization\FloatWriter;
 use Auxmoney\Avro\Serialization\LogicalTypeWriter;
 use Auxmoney\Avro\Serialization\LongWriter;
@@ -108,6 +109,7 @@ class WriterFactory
         return match ($datum['type']) {
             'record' => $this->getRecordWriter($datum),
             'array' => $this->getArrayWriter($datum),
+            'enum' => $this->getEnumWriter($datum),
             default => $this->getSchemaWriter($datum['type']),
         };
     }
@@ -166,5 +168,33 @@ class WriterFactory
         $items = $datum['items'] ?? throw new InvalidSchemaException('AVRO array schema is missing items');
 
         return new ArrayWriter($this->getSchemaWriter($items), $this->encoder);
+    }
+
+    /**
+     * @param array<mixed> $datum
+     * @throws InvalidSchemaException
+     */
+    public function getEnumWriter($datum): EnumWriter
+    {
+        if (!isset($datum['symbols']) || !is_array($datum['symbols'])) {
+            throw new InvalidSchemaException('AVRO enum schema is missing symbols');
+        }
+
+        if (empty($datum['symbols'])) {
+            throw new InvalidSchemaException('AVRO enum schema symbols cannot be empty');
+        }
+
+        $symbols = $datum['symbols'];
+        foreach ($symbols as $symbol) {
+            if (!is_string($symbol)) {
+                throw new InvalidSchemaException('AVRO enum schema symbols must be strings');
+            }
+
+            if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $symbol)) {
+                throw new InvalidSchemaException("AVRO enum symbol '$symbol' is not a valid identifier");
+            }
+        }
+
+        return new EnumWriter($symbols, $this->encoder);
     }
 }
