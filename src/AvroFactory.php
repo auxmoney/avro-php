@@ -43,7 +43,7 @@ readonly class AvroFactory implements AvroFactoryInterface
         return new Writer($parsedSchema, $datumWriter);
     }
 
-    public function createReader(string $writerSchema, string $readerSchema = null): ReaderInterface
+    public function createReader(string $writerSchema, ?string $readerSchema = null): ReaderInterface
     {
         $parsedWriterSchema = AvroSchema::parse($writerSchema);
         $parsedReaderSchema = $readerSchema === null ? $parsedWriterSchema : AvroSchema::parse($readerSchema);
