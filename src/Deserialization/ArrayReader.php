@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Auxmoney\Avro\Deserialization;
 
 use Auxmoney\Avro\Contracts\ReadableStreamInterface;
@@ -22,7 +24,7 @@ class ArrayReader implements ReaderInterface
                 $blockCount = -$blockCount;
 
                 // Read block size if negative count indicates a block size
-                /*$blockSize = */$this->decoder->readLong($stream);
+                /*$blockSize =*/ $this->decoder->readLong($stream);
             }
 
             for ($i = 0; $i < $blockCount; ++$i) {

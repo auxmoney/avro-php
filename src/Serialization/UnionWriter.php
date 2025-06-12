@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Auxmoney\Avro\Serialization;
 
 use Auxmoney\Avro\Contracts\ValidationContextInterface;
@@ -35,7 +37,7 @@ class UnionWriter implements WriterInterface
         $valid = false;
 
         foreach ($this->branchWriters as $index => $branchWriter) {
-            $context?->pushPath("branch $index");
+            $context?->pushPath("branch {$index}");
             $valid = $branchWriter->validate($datum, $context);
             $context?->popPath();
             if ($valid) {

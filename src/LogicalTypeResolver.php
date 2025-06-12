@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Auxmoney\Avro;
 
 use Auxmoney\Avro\Contracts\LogicalTypeFactoryInterface;

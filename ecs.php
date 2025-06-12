@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use PhpCsFixer\Fixer\ArrayNotation\ArraySyntaxFixer;
 use PhpCsFixer\Fixer\ClassNotation\ClassAttributesSeparationFixer;
+use PhpCsFixer\Fixer\ControlStructure\TrailingCommaInMultilineFixer;
 use PhpCsFixer\Fixer\Import\GlobalNamespaceImportFixer;
 use PhpCsFixer\Fixer\Operator\NotOperatorWithSuccessorSpaceFixer;
 use PhpCsFixer\Fixer\Phpdoc\PhpdocLineSpanFixer;
@@ -21,8 +22,6 @@ return ECSConfig::configure()
         __DIR__ . '/tests',
     ])
     ->withSkip([
-        __DIR__ . '/src/DependencyInjection/Configuration.php',
-        __DIR__ . '/tests/bootstrap.php',
         NotOperatorWithSuccessorSpaceFixer::class,
         ArrayOpenerAndCloserNewlineFixer::class,
         ArrayListItemNewlineFixer::class,
@@ -48,4 +47,14 @@ return ECSConfig::configure()
     ->withConfiguredRule(LineLengthFixer::class, [
         LineLengthFixer::LINE_LENGTH => 140,
     ])
+    ->withConfiguredRule(TrailingCommaInMultilineFixer::class,
+        [
+            'elements' => [
+                'arrays',
+                'arguments',
+                'match',
+                'parameters',
+            ],
+        ]
+    )
     ;

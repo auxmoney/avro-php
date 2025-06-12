@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Auxmoney\Avro\Serialization;
 
 use Auxmoney\Avro\Contracts\LogicalTypeInterface;
@@ -11,8 +13,8 @@ class LogicalTypeWriter implements WriterInterface
 {
     public function __construct(
         private readonly WriterInterface $rawWriter,
-        private readonly LogicalTypeInterface $logicalType
-    ){
+        private readonly LogicalTypeInterface $logicalType,
+    ) {
     }
 
     public function write(mixed $datum, WritableStreamInterface $stream): void
