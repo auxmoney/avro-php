@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Auxmoney\Avro\Serialization;
 
 use Auxmoney\Avro\Contracts\ValidationContextInterface;
@@ -9,7 +11,7 @@ use Generator;
 
 class ArrayWriter implements WriterInterface
 {
-    const BLOCK_SIZE = 100;
+    public const BLOCK_SIZE = 100;
 
     public function __construct(
         private readonly WriterInterface $itemWriter,
@@ -38,7 +40,7 @@ class ArrayWriter implements WriterInterface
 
         $valid = true;
         foreach ($datum as $index => $item) {
-            $context?->pushPath("[$index]");
+            $context?->pushPath("[{$index}]");
             $valid = $valid && $this->itemWriter->validate($item, $context);
             $context?->popPath();
         }

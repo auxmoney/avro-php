@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Auxmoney\Avro\IO;
 
 use Auxmoney\Avro\Contracts\WriterInterface;
@@ -81,12 +83,12 @@ class WriterFactory
                 'float' => new FloatWriter($this->encoder),
                 'double' => new DoubleWriter($this->encoder),
                 'bytes', 'string' => new StringWriter($this->encoder),
-                default => throw new InvalidSchemaException("Unknown AVRO schema type '$datum'"),
+                default => throw new InvalidSchemaException("Unknown AVRO schema type '{$datum}'"),
             };
         }
 
         if ($this->isArrayIndexed($datum)) {
-            return new UnionWriter(array_map(fn($branch) => $this->getSchemaWriter($branch), $datum), $this->encoder);
+            return new UnionWriter(array_map(fn ($branch) => $this->getSchemaWriter($branch), $datum), $this->encoder);
         }
 
         if (!isset($datum['type'])) {
@@ -126,7 +128,7 @@ class WriterFactory
      * @param array<mixed> $datum
      * @throws InvalidSchemaException
      */
-    public function getRecordWriter(array $datum): RecordWriter
+    private function getRecordWriter(array $datum): RecordWriter
     {
         if (!isset($datum['fields'])) {
             throw new InvalidSchemaException('AVRO record schema is missing fields');
@@ -174,7 +176,7 @@ class WriterFactory
      * @param array<mixed> $datum
      * @throws InvalidSchemaException
      */
-    public function getEnumWriter($datum): EnumWriter
+    private function getEnumWriter($datum): EnumWriter
     {
         if (!isset($datum['symbols']) || !is_array($datum['symbols'])) {
             throw new InvalidSchemaException('AVRO enum schema is missing symbols');
@@ -191,7 +193,7 @@ class WriterFactory
             }
 
             if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $symbol)) {
-                throw new InvalidSchemaException("AVRO enum symbol '$symbol' is not a valid identifier");
+                throw new InvalidSchemaException("AVRO enum symbol '{$symbol}' is not a valid identifier");
             }
         }
 
