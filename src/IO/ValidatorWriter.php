@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Auxmoney\Avro\IO;
 
-use Auxmoney\Avro\Contracts\ValidationContext;
 use Auxmoney\Avro\Contracts\ValidationContextInterface;
 use Auxmoney\Avro\Contracts\WritableStreamInterface;
 use Auxmoney\Avro\Contracts\WriterInterface;
 use Auxmoney\Avro\Exceptions\DataMismatchException;
+use Auxmoney\Avro\Serialization\ValidationContext;
 
 class ValidatorWriter implements WriterInterface
 {
