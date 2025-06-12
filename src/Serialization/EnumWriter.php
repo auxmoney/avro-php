@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Auxmoney\Avro\Serialization;
 
 use Auxmoney\Avro\Contracts\ValidationContextInterface;
@@ -15,8 +17,7 @@ class EnumWriter implements WriterInterface
     public function __construct(
         private readonly array $values,
         private readonly BinaryEncoder $encoder,
-    )
-    {
+    ) {
     }
 
     public function write(mixed $datum, WritableStreamInterface $stream): void

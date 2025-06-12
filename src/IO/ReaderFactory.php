@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Auxmoney\Avro\IO;
 
 use Auxmoney\Avro\Contracts\ReaderInterface;
@@ -24,7 +26,7 @@ class ReaderFactory
 {
     public function __construct(
         private readonly LogicalTypeResolver $logicalTypeResolver,
-        private readonly BinaryDecoder $decoder
+        private readonly BinaryDecoder $decoder,
     ) {
     }
 
@@ -83,12 +85,12 @@ class ReaderFactory
                 'float' => new FloatReader($this->decoder),
                 'double' => new DoubleReader($this->decoder),
                 'bytes', 'string' => new StringReader($this->decoder),
-                default => throw new InvalidSchemaException("Unknown AVRO schema type '$datum'"),
+                default => throw new InvalidSchemaException("Unknown AVRO schema type '{$datum}'"),
             };
         }
 
         if ($this->isArrayIndexed($datum)) {
-            return new UnionReader(array_map(fn($branch) => $this->getSchemaReader($branch), $datum), $this->decoder);
+            return new UnionReader(array_map(fn ($branch) => $this->getSchemaReader($branch), $datum), $this->decoder);
         }
 
         if (!isset($datum['type'])) {
@@ -115,7 +117,7 @@ class ReaderFactory
      * @param array<mixed> $datum
      * @throws InvalidSchemaException
      */
-    public function getRecordReader(array $datum): RecordReader
+    private function getRecordReader(array $datum): RecordReader
     {
         if (!isset($datum['fields'])) {
             throw new InvalidSchemaException('AVRO record schema is missing fields');
@@ -163,7 +165,7 @@ class ReaderFactory
      * @param array<mixed> $datum
      * @throws InvalidSchemaException
      */
-    public function getEnumReader($datum): EnumReader
+    private function getEnumReader($datum): EnumReader
     {
         if (!isset($datum['symbols']) || !is_array($datum['symbols'])) {
             throw new InvalidSchemaException('AVRO enum schema is missing symbols');
@@ -180,7 +182,7 @@ class ReaderFactory
             }
 
             if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $symbol)) {
-                throw new InvalidSchemaException("AVRO enum symbol '$symbol' is not a valid identifier");
+                throw new InvalidSchemaException("AVRO enum symbol '{$symbol}' is not a valid identifier");
             }
         }
 

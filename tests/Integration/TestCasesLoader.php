@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Auxmoney\Avro\Tests\Integration;
 
 use Generator;
@@ -16,7 +18,7 @@ class TestCasesLoader
         $testCasesDir = __DIR__ . '/TestCases';
         $files = scandir($testCasesDir);
         if ($files === false) {
-            throw new RuntimeException("Failed to read test cases directory: $testCasesDir");
+            throw new RuntimeException("Failed to read test cases directory: {$testCasesDir}");
         }
 
         foreach ($files as $file) {
@@ -27,7 +29,7 @@ class TestCasesLoader
 
             $handle = fopen($filePath, 'r');
             if ($handle === false) {
-                throw new RuntimeException("Failed to open file: $filePath");
+                throw new RuntimeException("Failed to open file: {$filePath}");
             }
 
             $lineNumber = 0;
@@ -45,10 +47,10 @@ class TestCasesLoader
                 }
 
                 if ($schema === null) {
-                    throw new RuntimeException("Schema not found in file: $file at line $lineNumber");
+                    throw new RuntimeException("Schema not found in file: {$file} at line {$lineNumber}");
                 }
 
-                yield "File $file line $lineNumber" => [
+                yield "File {$file} line {$lineNumber}" => [
                     'schema' => json_encode($schema),
                     'data' => $lineData['data'],
                     'hex' => $lineData['hex'],

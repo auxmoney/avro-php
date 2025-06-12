@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Auxmoney\Avro\Deserialization;
 
 use Auxmoney\Avro\Contracts\ReadableStreamInterface;
@@ -13,7 +15,7 @@ class UnionReader implements ReaderInterface
      */
     public function __construct(
         private readonly array $branchReaders,
-        private readonly BinaryDecoder $decoder
+        private readonly BinaryDecoder $decoder,
     ) {
     }
 

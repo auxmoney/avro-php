@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Auxmoney\Avro\Serialization;
 
 use Auxmoney\Avro\Contracts\ValidationContextInterface;
@@ -8,8 +10,9 @@ use Auxmoney\Avro\Contracts\WriterInterface;
 
 class FloatWriter implements WriterInterface
 {
-    public function __construct(private readonly BinaryEncoder $encoder)
-    {
+    public function __construct(
+        private readonly BinaryEncoder $encoder,
+    ) {
     }
 
     public function write(mixed $datum, WritableStreamInterface $stream): void
