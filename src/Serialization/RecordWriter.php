@@ -55,6 +55,9 @@ class RecordWriter implements WriterInterface
         return $valid;
     }
 
+    /**
+     * @param array<mixed>|object $datum
+     */
     private function getFieldValue(array|object $datum, PropertyWriter $property, mixed &$outputValue = null): bool
     {
         if (is_array($datum)) {
@@ -72,7 +75,8 @@ class RecordWriter implements WriterInterface
         }
 
         if (property_exists($datum, $property->name)) {
-            return $datum->{$property->name};
+            $outputValue = $datum->{$property->name};
+            return true;
         }
 
         /** @infection-ignore-all */

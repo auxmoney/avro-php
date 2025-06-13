@@ -17,6 +17,7 @@ class LongWriter implements WriterInterface
 
     public function write(mixed $datum, WritableStreamInterface $stream): void
     {
+        assert(is_int($datum));
         $stream->write($this->encoder->encodeLong($datum));
     }
 

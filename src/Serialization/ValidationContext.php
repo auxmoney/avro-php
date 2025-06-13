@@ -9,33 +9,35 @@ use Auxmoney\Avro\Contracts\ValidationContextInterface;
 class ValidationContext implements ValidationContextInterface
 {
     /** @var array<array<string>> */
-    private array $errors = [[]];
+    private array $contextErrors = [[]];
 
     /** @var array<string> */
     private array $path = [];
 
     public function pushContext(): void
     {
-        $this->errors[] = [];
+        $this->contextErrors[] = [];
     }
 
     public function popContext(bool $discardErrors): void
     {
-        if (count($this->errors) === 1) {
+        if (count($this->contextErrors) === 1) {
             return;
         }
 
-        $errors = array_pop($this->errors);
+        $errors = array_pop($this->contextErrors);
+        assert(is_array($errors), 'Expected context errors to be an array');
         if (!$discardErrors) {
-            $this->errors = array_merge($this->errors, $errors);
+            $lastIndex = count($this->contextErrors) - 1;
+            $this->contextErrors[$lastIndex] = array_merge($this->contextErrors[$lastIndex], $errors);
         }
     }
 
     public function addError(string $message): void
     {
-        $lastIndex = count($this->errors) - 1;
+        $lastIndex = count($this->contextErrors) - 1;
 
-        $this->errors[$lastIndex][] = implode('.', $this->path) . ': ' . $message;
+        $this->contextErrors[$lastIndex][] = implode('.', $this->path) . ': ' . $message;
     }
 
     public function pushPath(string $path): void
@@ -48,10 +50,13 @@ class ValidationContext implements ValidationContextInterface
         array_pop($this->path);
     }
 
-    public function getErrors(): array
+    /**
+     * @return array<string>
+     */
+    public function getContextErrors(): array
     {
-        $lastIndex = count($this->errors) - 1;
+        $lastIndex = count($this->contextErrors) - 1;
 
-        return $this->errors[$lastIndex];
+        return $this->contextErrors[$lastIndex];
     }
 }

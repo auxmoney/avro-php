@@ -41,13 +41,21 @@ class TestCasesLoader
                 }
 
                 $lineData = json_decode($line, true, flags: JSON_THROW_ON_ERROR);
+                if (!is_array($lineData)) {
+                    throw new RuntimeException("Expected a JSON of an associative array in file: {$file} at line {$lineNumber}.");
+                }
+
                 if (isset($lineData['schema'])) {
                     $schema = $lineData['schema'];
                     continue;
                 }
 
                 if ($schema === null) {
-                    throw new RuntimeException("Schema not found in file: {$file} at line {$lineNumber}");
+                    throw new RuntimeException("Schema not found in test file: {$file} at line {$lineNumber}");
+                }
+
+                if (!array_key_exists('data', $lineData) || !array_key_exists('hex', $lineData)) {
+                    throw new RuntimeException("Expected 'data' and 'hex' keys in test file: {$file} at line {$lineNumber}");
                 }
 
                 yield "File {$file} line {$lineNumber}" => [

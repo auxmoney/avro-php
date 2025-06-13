@@ -12,10 +12,12 @@ use Auxmoney\Avro\Contracts\StringBufferInterface;
 use Auxmoney\Avro\Contracts\WriterInterface;
 use Auxmoney\Avro\Deserialization\BinaryDecoder;
 use Auxmoney\Avro\IO\ReadableStringBuffer;
-use Auxmoney\Avro\IO\ReaderFactory;
 use Auxmoney\Avro\IO\WritableStringBuffer;
-use Auxmoney\Avro\IO\WriterFactory;
 use Auxmoney\Avro\Serialization\BinaryEncoder;
+use Auxmoney\Avro\Support\LogicalTypeResolver;
+use Auxmoney\Avro\Support\ReaderFactory;
+use Auxmoney\Avro\Support\SchemaHelper;
+use Auxmoney\Avro\Support\WriterFactory;
 
 readonly class AvroFactory implements AvroFactoryInterface
 {
@@ -51,10 +53,8 @@ readonly class AvroFactory implements AvroFactoryInterface
     public static function create(iterable $logicalTypeFactories = []): AvroFactoryInterface
     {
         $logicalTypeResolver = new LogicalTypeResolver($logicalTypeFactories);
+        $schemaHelper = new SchemaHelper($logicalTypeResolver);
 
-        return new self(
-            new WriterFactory($logicalTypeResolver, new BinaryEncoder()),
-            new ReaderFactory($logicalTypeResolver, new BinaryDecoder()),
-        );
+        return new self(new WriterFactory(new BinaryEncoder(), $schemaHelper), new ReaderFactory(new BinaryDecoder(), $schemaHelper));
     }
 }

@@ -17,6 +17,8 @@ class StringWriter implements WriterInterface
 
     public function write(mixed $datum, WritableStreamInterface $stream): void
     {
+        assert(is_string($datum), 'StringWriter expects a string, got ' . gettype($datum));
+
         $length = $this->encoder->encodeLong(strlen($datum));
         $stream->write($length);
         $stream->write($datum);

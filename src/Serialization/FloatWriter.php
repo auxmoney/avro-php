@@ -17,6 +17,7 @@ class FloatWriter implements WriterInterface
 
     public function write(mixed $datum, WritableStreamInterface $stream): void
     {
+        assert(is_int($datum) || is_float($datum), 'Expected int or float, got ' . gettype($datum));
         $stream->write($this->encoder->encodeFloat($datum));
     }
 

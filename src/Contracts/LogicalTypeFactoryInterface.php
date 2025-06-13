@@ -9,7 +9,7 @@ interface LogicalTypeFactoryInterface
     public function getName(): string;
 
     /**
-     * @param array<string, mixed> $attributes
+     * @param array<mixed> $attributes
      */
     public function create(array $attributes): LogicalTypeInterface;
 }

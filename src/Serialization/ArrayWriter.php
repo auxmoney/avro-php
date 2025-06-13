@@ -33,21 +33,27 @@ class ArrayWriter implements WriterInterface
 
     public function validate(mixed $datum, ?ValidationContextInterface $context = null): bool
     {
-        if (!is_iterable($datum)) {
+        if (!is_array($datum)) {
             $context?->addError('expected iterable, got ' . gettype($datum));
             return false;
         }
 
         $valid = true;
-        foreach ($datum as $index => $item) {
-            $context?->pushPath("[{$index}]");
+        $index = 0;
+        foreach ($datum as $item) {
+            $context?->pushPath("[#{$index}]");
             $valid = $valid && $this->itemWriter->validate($item, $context);
             $context?->popPath();
+            $index++;
         }
 
         return $valid;
     }
 
+    /**
+     * @param iterable<mixed> $datum
+     * @return Generator<array<mixed>>
+     */
     private function getBlocksGenerator(iterable $datum): Generator
     {
         $block = [];

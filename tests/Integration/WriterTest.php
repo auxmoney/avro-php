@@ -17,7 +17,7 @@ class WriterTest extends TestCase
      * @throws InvalidSchemaException
      */
     #[DataProvider('dataProvider')]
-    public function testWriter(string $schema, mixed $data, string $hex)
+    public function testWriter(string $schema, mixed $data, string $hex): void
     {
         $avroFactory = AvroFactory::create();
         $writer = $avroFactory->createWriter($schema);

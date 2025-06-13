@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Auxmoney\Avro\IO;
+namespace Auxmoney\Avro\Support;
 
 use Auxmoney\Avro\Contracts\ValidationContextInterface;
 use Auxmoney\Avro\Contracts\WritableStreamInterface;
@@ -21,7 +21,7 @@ class ValidatorWriter implements WriterInterface
     {
         $context = new ValidationContext();
         if (!$this->validate($datum, $context)) {
-            throw new DataMismatchException($context->getErrors());
+            throw new DataMismatchException($context->getContextErrors());
         }
 
         $this->inner->write($datum, $stream);
