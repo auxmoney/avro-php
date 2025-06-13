@@ -33,8 +33,13 @@ class ArrayWriter implements WriterInterface
 
     public function validate(mixed $datum, ?ValidationContextInterface $context = null): bool
     {
-        if (!is_array($datum)) {
+        if (!is_iterable($datum)) {
             $context?->addError('expected iterable, got ' . gettype($datum));
+            return false;
+        }
+
+        if ($datum instanceof Generator) {
+            $context?->addError('generators cannot be used as array values because they are not iterable multiple times');
             return false;
         }
 
