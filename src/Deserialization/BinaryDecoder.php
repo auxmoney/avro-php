@@ -20,6 +20,14 @@ class BinaryDecoder
         return $this->decodeLong($bytes);
     }
 
+    public function skipLong(ReadableStreamInterface $stream): void
+    {
+        $byte = ord($stream->read(1));
+        while (0 != ($byte & 0x80)) {
+            $byte = ord($stream->read(1));
+        }
+    }
+
     public function readFloat(ReadableStreamInterface $stream): float
     {
         $float = unpack('g', $stream->read(4));

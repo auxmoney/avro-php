@@ -26,4 +26,11 @@ class RecordReader implements ReaderInterface
 
         return $record;
     }
+
+    public function skip(ReadableStreamInterface $stream): void
+    {
+        foreach ($this->propertyReaders as $propertyReader) {
+            $propertyReader->skip($stream);
+        }
+    }
 }

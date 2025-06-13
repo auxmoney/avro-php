@@ -20,4 +20,10 @@ class StringReader implements ReaderInterface
 
         return $length === 0 ? '' : $stream->read($length);
     }
+
+    public function skip(ReadableStreamInterface $stream): void
+    {
+        $length = $this->decoder->readLong($stream);
+        $stream->skip($length);
+    }
 }

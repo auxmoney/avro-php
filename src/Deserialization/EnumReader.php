@@ -28,4 +28,9 @@ class EnumReader implements ReaderInterface
 
         return $this->values[$index];
     }
+
+    public function skip(ReadableStreamInterface $stream): void
+    {
+        $this->decoder->skipLong($stream);
+    }
 }

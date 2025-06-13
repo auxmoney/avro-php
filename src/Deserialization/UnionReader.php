@@ -28,4 +28,14 @@ class UnionReader implements ReaderInterface
 
         return $this->branchReaders[$branchIndex]->read($stream);
     }
+
+    public function skip(ReadableStreamInterface $stream): void
+    {
+        $branchIndex = $this->decoder->readLong($stream);
+        if (!isset($this->branchReaders[$branchIndex])) {
+            throw new RuntimeException('Invalid branch index: ' . $branchIndex);
+        }
+
+        $this->branchReaders[$branchIndex]->skip($stream);
+    }
 }

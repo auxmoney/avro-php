@@ -18,4 +18,9 @@ class FloatReader implements ReaderInterface
     {
         return $this->decoder->readFloat($stream);
     }
+
+    public function skip(ReadableStreamInterface $stream): void
+    {
+        $stream->skip(4);
+    }
 }

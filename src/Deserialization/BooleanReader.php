@@ -15,4 +15,9 @@ class BooleanReader implements ReaderInterface
 
         return $byte !== "\0";
     }
+
+    public function skip(ReadableStreamInterface $stream): void
+    {
+        $stream->skip(1);
+    }
 }

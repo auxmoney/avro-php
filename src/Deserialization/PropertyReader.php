@@ -26,4 +26,9 @@ readonly class PropertyReader implements ReaderInterface
 
         return $value;
     }
+
+    public function skip(ReadableStreamInterface $stream): void
+    {
+        $this->typeReader->skip($stream);
+    }
 }
