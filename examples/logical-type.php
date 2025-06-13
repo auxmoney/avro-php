@@ -9,10 +9,10 @@ use Auxmoney\Avro\Contracts\ValidationContextInterface;
 
 class Base64ExampleType implements LogicalTypeInterface
 {
-    public function validate(mixed $datum, ValidationContextInterface $context): bool
+    public function validate(mixed $datum, ?ValidationContextInterface $context): bool
     {
         if (!is_string($datum)) {
-            $context->addError('expected string, got ' . gettype($datum));
+            $context?->addError('expected string, got ' . gettype($datum));
             return false;
         }
 
