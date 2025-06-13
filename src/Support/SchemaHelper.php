@@ -39,9 +39,8 @@ class SchemaHelper
      * @param string|array<mixed> $schema
      * @throws InvalidSchemaException
      */
-    public function getLogicalType(
-        string|array $schema,
-    ): ?LogicalTypeInterface {
+    public function getLogicalType(string|array $schema): ?LogicalTypeInterface
+    {
         if (!is_array($schema) || !isset($schema['logicalType'])) {
             return null;
         }
@@ -64,9 +63,8 @@ class SchemaHelper
      * @return Generator<array{name: string, type: mixed, default?: mixed}>
      * @throws InvalidSchemaException
      */
-    public function getRecordFields(
-        array $schema,
-    ): Generator {
+    public function getRecordFields(array $schema): Generator
+    {
         if (!isset($schema['fields'])) {
             throw new InvalidSchemaException('AVRO record schema is missing fields');
         }
@@ -105,9 +103,8 @@ class SchemaHelper
      * @return array<mixed>|string
      * @throws InvalidSchemaException
      */
-    public function getArrayItems(
-        array $schema,
-    ): array|string {
+    public function getArrayItems(array $schema): array|string
+    {
         if (!isset($schema['items'])) {
             throw new InvalidSchemaException('AVRO array schema is missing items');
         }
@@ -124,9 +121,8 @@ class SchemaHelper
      * @return array<string>
      * @throws InvalidSchemaException
      */
-    public function getEnumSymbols(
-        array $schema,
-    ): array {
+    public function getEnumSymbols(array $schema): array
+    {
         if (!isset($schema['symbols']) || !is_array($schema['symbols'])) {
             throw new InvalidSchemaException('AVRO enum schema is missing symbols');
         }
