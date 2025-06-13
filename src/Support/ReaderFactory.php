@@ -13,6 +13,7 @@ use Auxmoney\Avro\Deserialization\EnumReader;
 use Auxmoney\Avro\Deserialization\FloatReader;
 use Auxmoney\Avro\Deserialization\LogicalTypeReader;
 use Auxmoney\Avro\Deserialization\LongReader;
+use Auxmoney\Avro\Deserialization\MapReader;
 use Auxmoney\Avro\Deserialization\NullReader;
 use Auxmoney\Avro\Deserialization\PropertyReader;
 use Auxmoney\Avro\Deserialization\RecordReader;
@@ -88,6 +89,7 @@ class ReaderFactory
             'record' => $this->getRecordReader($schema),
             'array' => $this->getArrayReader($schema),
             'enum' => $this->getEnumReader($schema),
+            'map' => $this->getMapReader($schema),
             default => $this->getSchemaReader($schema['type']),
         };
     }
@@ -137,5 +139,16 @@ class ReaderFactory
         $symbols = $this->schemaHelper->getEnumSymbols($schema);
 
         return new EnumReader($symbols, $this->decoder);
+    }
+
+    /**
+     * @param array<mixed> $schema
+     * @throws InvalidSchemaException
+     */
+    private function getMapReader(array $schema): ReaderInterface
+    {
+        $values = $this->schemaHelper->getMapValues($schema);
+
+        return new MapReader($this->getSchemaReader($values), $this->decoder);
     }
 }

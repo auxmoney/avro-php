@@ -118,6 +118,24 @@ class SchemaHelper
 
     /**
      * @param array<mixed> $schema
+     * @return array<mixed>|string
+     * @throws InvalidSchemaException
+     */
+    public function getMapValues(array $schema): array|string
+    {
+        if (!isset($schema['values'])) {
+            throw new InvalidSchemaException('AVRO map schema is missing values');
+        }
+
+        if (!is_array($schema['values']) && !is_string($schema['values'])) {
+            throw new InvalidSchemaException('AVRO map schema values must be an array or a string');
+        }
+
+        return $schema['values'];
+    }
+
+    /**
+     * @param array<mixed> $schema
      * @return array<string>
      * @throws InvalidSchemaException
      */
