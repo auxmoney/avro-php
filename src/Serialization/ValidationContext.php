@@ -37,7 +37,8 @@ class ValidationContext implements ValidationContextInterface
     {
         $lastIndex = count($this->contextErrors) - 1;
 
-        $this->contextErrors[$lastIndex][] = implode('.', $this->path) . ': ' . $message;
+        $prefix = $this->path === [] ? '' : implode('.', $this->path) . ': ';
+        $this->contextErrors[$lastIndex][] = $prefix . $message;
     }
 
     public function pushPath(string $path): void
