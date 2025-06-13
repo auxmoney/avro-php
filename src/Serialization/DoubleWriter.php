@@ -17,6 +17,7 @@ class DoubleWriter implements WriterInterface
 
     public function write(mixed $datum, WritableStreamInterface $stream): void
     {
+        assert(is_int($datum) || is_float($datum), 'DoubleWriter expects an int or float, got ' . gettype($datum));
         $stream->write($this->encoder->encodeDouble($datum));
     }
 

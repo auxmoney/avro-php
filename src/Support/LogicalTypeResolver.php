@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Auxmoney\Avro;
+namespace Auxmoney\Avro\Support;
 
 use Auxmoney\Avro\Contracts\LogicalTypeFactoryInterface;
 
