@@ -13,4 +13,8 @@ class NullReader implements ReaderInterface
     {
         return null;
     }
+
+    public function skip(ReadableStreamInterface $stream): void
+    {
+    }
 }

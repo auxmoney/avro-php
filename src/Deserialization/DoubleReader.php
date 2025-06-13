@@ -18,4 +18,9 @@ class DoubleReader implements ReaderInterface
     {
         return $this->decoder->readDouble($stream);
     }
+
+    public function skip(ReadableStreamInterface $stream): void
+    {
+        $stream->skip(8);
+    }
 }

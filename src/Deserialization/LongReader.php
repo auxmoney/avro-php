@@ -18,4 +18,9 @@ class LongReader implements ReaderInterface
     {
         return $this->decoder->readLong($stream);
     }
+
+    public function skip(ReadableStreamInterface $stream): void
+    {
+        $this->decoder->skipLong($stream);
+    }
 }

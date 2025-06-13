@@ -22,4 +22,9 @@ class LogicalTypeReader implements ReaderInterface
 
         return $this->logicalType->denormalize($value);
     }
+
+    public function skip(ReadableStreamInterface $stream): void
+    {
+        $this->rawReader->skip($stream);
+    }
 }

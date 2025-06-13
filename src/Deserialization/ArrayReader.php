@@ -35,4 +35,19 @@ class ArrayReader implements ReaderInterface
 
         return $items;
     }
+
+    public function skip(ReadableStreamInterface $stream): void
+    {
+        while (($blockCount = $this->decoder->readLong($stream)) !== 0) {
+            if ($blockCount < 0) {
+                $blockSize = $this->decoder->readLong($stream);
+                $stream->skip($blockSize);
+                continue;
+            }
+
+            for ($i = 0; $i < $blockCount; ++$i) {
+                $this->itemReader->skip($stream);
+            }
+        }
+    }
 }

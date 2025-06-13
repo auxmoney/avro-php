@@ -102,18 +102,18 @@ class SchemaHelper
 
     /**
      * @param array<mixed> $schema
-     * @return array<mixed>
+     * @return array<mixed>|string
      * @throws InvalidSchemaException
      */
     public function getArrayItems(
         array $schema,
-    ): array {
+    ): array|string {
         if (!isset($schema['items'])) {
             throw new InvalidSchemaException('AVRO array schema is missing items');
         }
 
-        if (!is_array($schema['items'])) {
-            throw new InvalidSchemaException('AVRO array schema items must be an array');
+        if (!is_array($schema['items']) && !is_string($schema['items'])) {
+            throw new InvalidSchemaException('AVRO array schema items must be an array or a string');
         }
 
         return $schema['items'];
