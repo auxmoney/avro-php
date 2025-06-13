@@ -23,19 +23,19 @@ composer require auxmoney/avro-php
 
 Try out the example scripts `examples/encoding.php` and `examples/decoding.php`:
 ```bash
-php -r 'require "vendor/autoload.php"; require "examples/encoding.php";'
-php -r 'require "vendor/autoload.php"; require "examples/decoding.php";'
+php examples/encoding.php
+php examples/decoding.php
 ```
 
 ### Logical Types
 
-Although this library does not provide an implementation for any logical type, it is possible to use them by providing the implementation to the AvroIODatumReader and AvroIODatumWriter classes.
+Although this library does not provide an implementation for any logical type, it is possible to use them by providing the factory implementation to `Auxmoney\Avro\AvroFactory::create`.
 
-The logical type must implement the interface Auxmoney\Avro\Datum\LogicalTypeInterface.
+The logical type factory must implement the interface `Auxmoney\Avro\Contracts\LogicalTypeFactoryInterface`.
 
 Try out the example script `examples/logical-type.php`:
 ```bash
-php -r 'require "vendor/autoload.php"; require "examples/logical-type.php";'
+php examples/logical-type.php
 ```
 
 ## Documentation
@@ -45,12 +45,6 @@ For more detailed documentation on usage, schema design, and advanced features l
 ## Contribution
 
 Contributions are welcome! If you find a bug or want to suggest a new feature, feel free to open an issue or submit a pull request.
-
-The code under the `apache` directory is a copy of the original Apache Avro library, and should have only minimal changes to adapt it to the new features. The code under the `src` directory is the new code added by this library.
-
-The branch `upstream` is used to track the original Apache Avro library, and the branch `master` is used to track the changes made by this library.
-
-To retrieve changes from the original library, you can use the shell script `update-upstream.sh`.
 
 ## License
 
