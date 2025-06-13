@@ -21,9 +21,10 @@ class ArrayReader implements ReaderInterface
 
         while (($blockCount = $this->decoder->readLong($stream)) !== 0) {
             if ($blockCount < 0) {
+                // If a block’s count is negative, its absolute value is used, and the count is followed immediately by a long block size
+                // indicating the number of bytes in the block. This block size permits fast skipping through data, e.g., when projecting a
+                // record to a subset of its fields.
                 $blockCount = -$blockCount;
-
-                // Read block size if negative count indicates a block size
                 /*$blockSize =*/ $this->decoder->readLong($stream);
             }
 
