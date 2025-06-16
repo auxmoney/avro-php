@@ -20,6 +20,7 @@ for (const file of files) {
     let schema = null;
     const filePath = path.join(testCasesDir, file);
     let lineCount = 0;
+    let binarySchema = false;
 
     for await (const line of readline.createInterface({ input: fsLegacy.createReadStream(filePath) })) {
         lineCount++;
@@ -36,6 +37,7 @@ for (const file of files) {
         if (lineData.schema) {
             output.push(line);
             schema = avro.Type.forSchema(lineData.schema, {wrap: 0});
+            binarySchema = ['bytes', 'fixed'].includes(lineData.schema.type);
             continue;
         }
 
@@ -43,7 +45,7 @@ for (const file of files) {
             throw new Error(`Schema not defined for data in ${file} at line: ${lineCount}`);
         }
 
-        const data = lineData.data;
+        const data = binarySchema ? Buffer.from(lineData.data) : lineData.data;
         const hex = schema.toBuffer(data).toString('hex');
         lineData.hex = hex;
         output.push(JSON.stringify(lineData));

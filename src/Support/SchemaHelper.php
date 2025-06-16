@@ -164,4 +164,17 @@ class SchemaHelper
 
         return $symbols;
     }
+
+    /**
+     * @param array<mixed> $schema
+     * @throws InvalidSchemaException
+     */
+    public function getFixedSize(array $schema): int
+    {
+        if (!isset($schema['size']) || !is_int($schema['size']) || $schema['size'] <= 0) {
+            throw new InvalidSchemaException('AVRO fixed schema is missing or has invalid size');
+        }
+
+        return $schema['size'];
+    }
 }

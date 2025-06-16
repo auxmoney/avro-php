@@ -36,3 +36,7 @@
 {"data":"hello world!","hex":"1868656c6c6f20776f726c6421"}
 {"data":"こんにちは世界！","hex":"30e38193e38293e381abe381a1e381afe4b896e7958cefbc81"}
 {"data":"😀","hex":"08f09f9880"}
+
+{"schema":{"type":"bytes"}}
+{"data":"","hex":"00"}
+{"data":"hello world!","hex":"1868656c6c6f20776f726c6421"}

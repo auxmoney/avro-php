@@ -11,6 +11,7 @@ use Auxmoney\Avro\Serialization\BinaryEncoder;
 use Auxmoney\Avro\Serialization\BooleanWriter;
 use Auxmoney\Avro\Serialization\DoubleWriter;
 use Auxmoney\Avro\Serialization\EnumWriter;
+use Auxmoney\Avro\Serialization\FixedWriter;
 use Auxmoney\Avro\Serialization\FloatWriter;
 use Auxmoney\Avro\Serialization\LogicalTypeWriter;
 use Auxmoney\Avro\Serialization\LongWriter;
@@ -89,6 +90,7 @@ class WriterFactory
             'array' => $this->getArrayWriter($schema),
             'enum' => $this->getEnumWriter($schema),
             'map' => $this->getMapWriter($schema),
+            'fixed' => $this->getFixedWriter($schema),
             default => $this->getSchemaWriter($schema['type']),
         };
     }
@@ -149,5 +151,14 @@ class WriterFactory
         $values = $this->schemaHelper->getMapValues($schema);
 
         return new MapWriter($this->getSchemaWriter($values), $this->encoder);
+    }
+
+    /**
+     * @param array<mixed> $schema
+     * @throws InvalidSchemaException
+     */
+    private function getFixedWriter(array|string $schema): FixedWriter
+    {
+        return new FixedWriter($this->schemaHelper->getFixedSize($schema));
     }
 }
