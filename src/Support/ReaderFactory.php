@@ -10,6 +10,7 @@ use Auxmoney\Avro\Deserialization\BinaryDecoder;
 use Auxmoney\Avro\Deserialization\BooleanReader;
 use Auxmoney\Avro\Deserialization\DoubleReader;
 use Auxmoney\Avro\Deserialization\EnumReader;
+use Auxmoney\Avro\Deserialization\FixedReader;
 use Auxmoney\Avro\Deserialization\FloatReader;
 use Auxmoney\Avro\Deserialization\LogicalTypeReader;
 use Auxmoney\Avro\Deserialization\LongReader;
@@ -90,6 +91,7 @@ class ReaderFactory
             'array' => $this->getArrayReader($schema),
             'enum' => $this->getEnumReader($schema),
             'map' => $this->getMapReader($schema),
+            'fixed' => $this->getFixedReader($schema),
             default => $this->getSchemaReader($schema['type']),
         };
     }
@@ -150,5 +152,14 @@ class ReaderFactory
         $values = $this->schemaHelper->getMapValues($schema);
 
         return new MapReader($this->getSchemaReader($values), $this->decoder);
+    }
+
+    /**
+     * @param array<mixed> $schema
+     * @throws InvalidSchemaException
+     */
+    private function getFixedReader(array $schema): FixedReader
+    {
+        return new FixedReader($this->schemaHelper->getFixedSize($schema));
     }
 }

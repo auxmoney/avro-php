@@ -1,0 +1,8 @@
+{"schema":{"type":"fixed","size":1}}
+{"data":"a","hex":"61"}
+{"data":"b","hex":"62"}
+{"data":"c","hex":"63"}
+
+{"schema":{"type":"fixed","size":2}}
+{"data":"ab","hex":"6162"}
+{"data":"cd","hex":"6364"}
