@@ -22,6 +22,16 @@ use Auxmoney\Avro\Serialization\RecordWriter;
 use Auxmoney\Avro\Serialization\StringWriter;
 use Auxmoney\Avro\Serialization\UnionWriter;
 
+/**
+ * @phpstan-import-type NormalizedSchema from SchemaHelper
+ * @phpstan-import-type PrimitiveSchema from SchemaHelper
+ * @phpstan-import-type UnionSchema from SchemaHelper
+ * @phpstan-import-type RecordSchema from SchemaHelper
+ * @phpstan-import-type ArraySchema from SchemaHelper
+ * @phpstan-import-type EnumSchema from SchemaHelper
+ * @phpstan-import-type MapSchema from SchemaHelper
+ * @phpstan-import-type FixedSchema from SchemaHelper
+ */
 class WriterFactory
 {
     public function __construct(
@@ -41,17 +51,15 @@ class WriterFactory
     }
 
     /**
+     * @param array<mixed>|string $schema
      * @throws InvalidSchemaException
      */
-    private function getSchemaWriter(mixed $schema): WriterInterface
+    private function getSchemaWriter(array|string $schema): WriterInterface
     {
-        if (!is_string($schema) && !is_array($schema)) {
-            throw new InvalidSchemaException('AVRO schema must be a string or an array');
-        }
+        $nomalizedSchema = $this->schemaHelper->normalizeSchema($schema);
+        $rawWriter = $this->getRawWriter($nomalizedSchema);
 
-        $rawWriter = $this->getRawWriter($schema);
-
-        $logicalType = $this->schemaHelper->getLogicalType($schema);
+        $logicalType = $this->schemaHelper->getLogicalType($nomalizedSchema);
         if ($logicalType !== null) {
             return new LogicalTypeWriter($rawWriter, $logicalType);
         }
@@ -60,105 +68,41 @@ class WriterFactory
     }
 
     /**
-     * @param string|array<mixed> $schema
+     * @param NormalizedSchema $schema
      * @throws InvalidSchemaException
      */
-    private function getRawWriter(string|array $schema): WriterInterface
+    private function getRawWriter(array $schema): WriterInterface
     {
-        if (is_string($schema)) {
-            return match ($schema) {
-                'null' => new NullWriter(),
-                'boolean' => new BooleanWriter(),
-                'int', 'long' => new LongWriter($this->encoder),
-                'float' => new FloatWriter($this->encoder),
-                'double' => new DoubleWriter($this->encoder),
-                'bytes', 'string' => new StringWriter($this->encoder),
-                default => throw new InvalidSchemaException("Unknown AVRO schema type '{$schema}'"),
-            };
-        }
-
-        if ($this->isArrayIndexed($schema)) {
-            return new UnionWriter(array_map(fn ($branch) => $this->getSchemaWriter($branch), $schema), $this->encoder);
-        }
-
-        if (!isset($schema['type'])) {
-            throw new InvalidSchemaException('AVRO schema is missing type');
-        }
-
         return match ($schema['type']) {
+            'null' => new NullWriter(),
+            'boolean' => new BooleanWriter(),
+            'int', 'long' => new LongWriter($this->encoder),
+            'float' => new FloatWriter($this->encoder),
+            'double' => new DoubleWriter($this->encoder),
+            'bytes', 'string' => new StringWriter($this->encoder),
             'record' => $this->getRecordWriter($schema),
-            'array' => $this->getArrayWriter($schema),
-            'enum' => $this->getEnumWriter($schema),
-            'map' => $this->getMapWriter($schema),
-            'fixed' => $this->getFixedWriter($schema),
-            default => $this->getSchemaWriter($schema['type']),
+            'array' => new ArrayWriter($this->getSchemaWriter($schema['items']), $this->encoder),
+            'enum' => new EnumWriter($schema['symbols'], $this->encoder),
+            'map' => new MapWriter($this->getSchemaWriter($schema['values']), $this->encoder),
+            'fixed' => new FixedWriter($schema['size']),
+            'union' => new UnionWriter(array_map($this->getSchemaWriter(...), $schema['branches']), $this->encoder),
         };
     }
 
     /**
-     * @param array<mixed> $array
-     */
-    private function isArrayIndexed(array $array): bool
-    {
-        return array_keys($array) === range(0, count($array) - 1);
-    }
-
-    /**
-     * @param array<mixed> $schema
+     * @param RecordSchema $schema
      * @throws InvalidSchemaException
      */
     private function getRecordWriter(array $schema): RecordWriter
     {
         $propertyWriters = [];
 
-        foreach ($this->schemaHelper->getRecordFields($schema) as $field) {
+        foreach ($schema['fields'] as $field) {
             $propertyTypeWriter = $this->getSchemaWriter($field['type']);
             $hasDefault = array_key_exists('default', $field);
             $propertyWriters[] = new PropertyWriter($propertyTypeWriter, $field['name'], $hasDefault, $field['default'] ?? null);
         }
 
         return new RecordWriter($propertyWriters);
-    }
-
-    /**
-     * @param array<mixed> $schema
-     * @throws InvalidSchemaException
-     */
-    private function getArrayWriter(array $schema): ArrayWriter
-    {
-        $items = $this->schemaHelper->getArrayItems($schema);
-
-        return new ArrayWriter($this->getSchemaWriter($items), $this->encoder);
-    }
-
-    /**
-     * @param array<mixed> $schema
-     * @throws InvalidSchemaException
-     */
-    private function getEnumWriter(array $schema): EnumWriter
-    {
-        $symbols = $this->schemaHelper->getEnumSymbols($schema);
-
-        return new EnumWriter($symbols, $this->encoder);
-    }
-
-    /**
-     * @param array<mixed> $schema
-     * @throws InvalidSchemaException
-     */
-    private function getMapWriter(array $schema): MapWriter
-    {
-        $values = $this->schemaHelper->getMapValues($schema);
-
-        return new MapWriter($this->getSchemaWriter($values), $this->encoder);
-    }
-
-    /**
-     * @param array<mixed> $schema
-     * @throws InvalidSchemaException
-     */
-    private function getFixedWriter(array|string $schema): FixedWriter
-    {
-        return new FixedWriter($this->schemaHelper->getFixedSize($schema));
     }
 }
