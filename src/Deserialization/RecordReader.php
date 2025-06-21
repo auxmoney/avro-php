@@ -10,7 +10,7 @@ use Auxmoney\Avro\Contracts\ReaderInterface;
 class RecordReader implements ReaderInterface
 {
     /**
-     * @param array<PropertyReader> $propertyReaders
+     * @param array<RecordPropertyReader> $propertyReaders
      */
     public function __construct(
         private readonly array $propertyReaders,
@@ -21,7 +21,7 @@ class RecordReader implements ReaderInterface
     {
         $record = [];
         foreach ($this->propertyReaders as $propertyReader) {
-            $record[$propertyReader->name] = $propertyReader->read($stream);
+            $propertyReader->read($stream, $record);
         }
 
         return $record;

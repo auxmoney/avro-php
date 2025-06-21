@@ -7,25 +7,16 @@ namespace Auxmoney\Avro\Deserialization;
 use Auxmoney\Avro\Contracts\ReadableStreamInterface;
 use Auxmoney\Avro\Contracts\ReaderInterface;
 
-readonly class PropertyReader implements RecordPropertyReader
+class PropertySkipReader implements RecordPropertyReader
 {
     public function __construct(
-        public ReaderInterface $typeReader,
-        public string $name,
-        public bool $hasDefault,
-        public mixed $default,
+        public readonly ReaderInterface $typeReader,
     ) {
     }
 
     public function read(ReadableStreamInterface $stream, array &$record): void
     {
-        $value = $this->typeReader->read($stream);
-        if ($value === null && $this->hasDefault) {
-            $record[$this->name] = $this->default;
-            return;
-        }
-
-        $record[$this->name] = $value;
+        $this->typeReader->skip($stream);
     }
 
     public function skip(ReadableStreamInterface $stream): void

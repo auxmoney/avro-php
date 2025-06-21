@@ -28,6 +28,7 @@ class UnionWriter implements WriterInterface
 
             $stream->write($this->encoder->encodeLong($index));
             $branchWriter->write($datum, $stream);
+            break;
         }
     }
 
