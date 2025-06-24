@@ -26,7 +26,7 @@ class EnumWriter implements WriterInterface
         $index = array_search($rawValue, $this->values, true);
         assert(is_int($index) && $index >= 0, 'Invalid enum value');
 
-        $stream->write($this->encoder->encodeLong($index));
+        $this->encoder->writeLong($stream, $index);
     }
 
     public function validate(mixed $datum, ?ValidationContextInterface $context = null): bool

@@ -14,9 +14,8 @@ class LogicalTypeResolver
     /**
      * @param iterable<LogicalTypeFactoryInterface> $logicalTypeFactories
      */
-    public function __construct(
-        iterable $logicalTypeFactories,
-    ) {
+    public function __construct(iterable $logicalTypeFactories)
+    {
         $keyedLogicalTypeFactories = [];
         foreach ($logicalTypeFactories as $logicalTypeFactory) {
             $keyedLogicalTypeFactories[$logicalTypeFactory->getName()] = $logicalTypeFactory;

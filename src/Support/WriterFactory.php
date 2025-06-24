@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Auxmoney\Avro\Support;
 
+use Auxmoney\Avro\Contracts\Options;
 use Auxmoney\Avro\Contracts\WriterInterface;
 use Auxmoney\Avro\Exceptions\InvalidSchemaException;
 use Auxmoney\Avro\Serialization\ArrayWriter;
@@ -37,6 +38,7 @@ class WriterFactory
     public function __construct(
         private readonly BinaryEncoder $encoder,
         private readonly SchemaHelper $schemaHelper,
+        private readonly Options $options,
     ) {
     }
 
@@ -81,9 +83,19 @@ class WriterFactory
             'double' => new DoubleWriter($this->encoder),
             'bytes', 'string' => new StringWriter($this->encoder),
             'record' => $this->getRecordWriter($schema),
-            'array' => new ArrayWriter($this->getSchemaWriter($schema['items']), $this->encoder),
+            'array' => new ArrayWriter(
+                $this->getSchemaWriter($schema['items']),
+                $this->encoder,
+                $this->options->arrayBlockCount,
+                $this->options->arrayWriteBlockSize,
+            ),
             'enum' => new EnumWriter($schema['symbols'], $this->encoder),
-            'map' => new MapWriter($this->getSchemaWriter($schema['values']), $this->encoder),
+            'map' => new MapWriter(
+                $this->getSchemaWriter($schema['values']),
+                $this->encoder,
+                $this->options->mapBlockCount,
+                $this->options->mapWriteBlockSize,
+            ),
             'fixed' => new FixedWriter($schema['size']),
             'union' => new UnionWriter(array_map($this->getSchemaWriter(...), $schema['branches']), $this->encoder),
         };
