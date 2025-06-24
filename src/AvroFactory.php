@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Auxmoney\Avro;
 
 use Auxmoney\Avro\Contracts\AvroFactoryInterface;
-use Auxmoney\Avro\Contracts\LogicalTypeFactoryInterface;
+use Auxmoney\Avro\Contracts\Options;
 use Auxmoney\Avro\Contracts\ReadableStreamInterface;
 use Auxmoney\Avro\Contracts\ReaderInterface;
 use Auxmoney\Avro\Contracts\StringBufferInterface;
@@ -47,14 +47,13 @@ readonly class AvroFactory implements AvroFactoryInterface
         return new ReadableStringBuffer($string);
     }
 
-    /**
-     * @param iterable<LogicalTypeFactoryInterface> $logicalTypeFactories
-     */
-    public static function create(iterable $logicalTypeFactories = []): AvroFactoryInterface
+    public static function create(Options $options = new Options()): AvroFactoryInterface
     {
-        $logicalTypeResolver = new LogicalTypeResolver($logicalTypeFactories);
+        $logicalTypeResolver = new LogicalTypeResolver($options->logicalTypeFactories);
         $schemaHelper = new SchemaHelper($logicalTypeResolver);
+        $writerFactory = new WriterFactory(new BinaryEncoder(), $schemaHelper, $options);
+        $readerFactory = new ReaderFactory(new BinaryDecoder(), $schemaHelper);
 
-        return new self(new WriterFactory(new BinaryEncoder(), $schemaHelper), new ReaderFactory(new BinaryDecoder(), $schemaHelper));
+        return new self($writerFactory, $readerFactory);
     }
 }

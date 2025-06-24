@@ -19,9 +19,7 @@ class StringWriter implements WriterInterface
     {
         assert(is_string($datum), 'StringWriter expects a string, got ' . gettype($datum));
 
-        $length = $this->encoder->encodeLong(strlen($datum));
-        $stream->write($length);
-        $stream->write($datum);
+        $this->encoder->writeString($stream, $datum);
     }
 
     public function validate(mixed $datum, ?ValidationContextInterface $context = null): bool

@@ -26,7 +26,7 @@ class UnionWriter implements WriterInterface
                 continue;
             }
 
-            $stream->write($this->encoder->encodeLong($index));
+            $this->encoder->writeLong($stream, $index);
             $branchWriter->write($datum, $stream);
             break;
         }
@@ -46,7 +46,7 @@ class UnionWriter implements WriterInterface
             }
         }
 
-        $context?->popContext(discardErrors: !$valid);
+        $context?->popContext(discardErrors: $valid);
         return $valid;
     }
 }

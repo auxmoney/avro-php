@@ -6,8 +6,11 @@ It started as a fork of the original Apache Avro implementation available at htt
 
 The features added by this library are:
 - Basic support for logical types
-- Default values for fields
+- Default values for record fields
+- Developer-friendly error messages for schema validation
 - Serialization of objects through getters or public properties
+- Schema resolution including promotion of primitive types
+- Configurable block count and block size for array and map encoding
 
 ## Installation
 

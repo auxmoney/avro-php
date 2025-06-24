@@ -7,43 +7,38 @@ namespace Auxmoney\Avro\Serialization;
 use Auxmoney\Avro\Contracts\ValidationContextInterface;
 use Auxmoney\Avro\Contracts\WritableStreamInterface;
 use Auxmoney\Avro\Contracts\WriterInterface;
+use Auxmoney\Avro\Exceptions\DataMismatchException;
+use Auxmoney\Avro\IO\WritableStringBuffer;
+use Countable;
 use Generator;
+use Traversable;
 
 class MapWriter implements WriterInterface
 {
-    public const BLOCK_SIZE = 100;
-
     public function __construct(
         private readonly WriterInterface $valueWriter,
         private readonly BinaryEncoder $encoder,
+        private readonly int $blockCount,
+        private readonly bool $writeBlockSize,
     ) {
     }
 
     public function write(mixed $datum, WritableStreamInterface $stream): void
     {
-        assert(is_iterable($datum));
+        assert(
+            is_array($datum) || ($datum instanceof Traversable && $datum instanceof Countable),
+            'MapWriter expects an array or countable traversable, got ' . gettype($datum),
+        );
+        /** @var array<string, mixed>|(Traversable<string, mixed>&Countable) $datum */
 
-        foreach ($this->getBlocksGenerator($datum) as $block) {
-            $stream->write($this->encoder->encodeLong(count($block)));
-            foreach ($block as $key => $item) {
-                $keyLength = $this->encoder->encodeLong(strlen($key));
-                $stream->write($keyLength);
-                $stream->write($key);
-
-                $this->valueWriter->write($item, $stream);
-            }
-        }
+        $this->writeBlockSize ? $this->writeWithBlockSizes($datum, $stream) : $this->writeWithoutBlockSizes($datum, $stream);
+        $this->encoder->writeLong($stream, 0);
     }
 
     public function validate(mixed $datum, ?ValidationContextInterface $context = null): bool
     {
-        if (!is_iterable($datum)) {
-            $context?->addError('expected iterable, got ' . gettype($datum));
-            return false;
-        }
-
-        if ($datum instanceof Generator) {
-            $context?->addError('generators cannot be used as array values because they are not iterable multiple times');
+        if (!is_array($datum) && (!$datum instanceof Traversable || !$datum instanceof Countable)) {
+            $context?->addError('expected array or countable traversable, got ' . gettype($datum));
             return false;
         }
 
@@ -64,17 +59,60 @@ class MapWriter implements WriterInterface
     }
 
     /**
-     * @param iterable<mixed> $datum
-     * @return Generator<array<string, mixed>>
+     * @param array<string, mixed>|(Traversable<string, mixed>&Countable) $datum
+     * @throws DataMismatchException
      */
-    private function getBlocksGenerator(iterable $datum): Generator
+    private function writeWithBlockSizes(array|(Traversable&Countable) $datum, WritableStreamInterface $stream): void
     {
+        foreach ($this->getBlocksGenerator($datum) as $block) {
+            $this->encoder->writeLong($stream, -count($block));
+            if (count($block) === 0) {
+                continue;
+            }
+
+            $buffer = new WritableStringBuffer();
+            foreach ($block as $key => $item) {
+                $this->encoder->writeString($buffer, $key);
+                $this->valueWriter->write($item, $buffer);
+            }
+
+            $this->encoder->writeString($stream, $buffer->__toString());
+        }
+    }
+
+    /**
+     * @param array<string, mixed>|(Traversable<string, mixed>&Countable) $datum
+     * @throws DataMismatchException
+     */
+    private function writeWithoutBlockSizes(array|(Traversable&Countable) $datum, WritableStreamInterface $stream): void
+    {
+        foreach ($this->getBlocksGenerator($datum) as $block) {
+            $this->encoder->writeLong($stream, count($block));
+            foreach ($block as $key => $item) {
+                $this->encoder->writeString($stream, $key);
+                $this->valueWriter->write($item, $stream);
+            }
+        }
+    }
+
+    /**
+     * @param array<string, mixed>|(Traversable<string, mixed>&Countable) $datum
+     * @return Generator<array<string, mixed>|(Traversable<string, mixed>&Countable)>
+     */
+    private function getBlocksGenerator(array|(Traversable&Countable) $datum): Generator
+    {
+        if ($this->blockCount <= 0) {
+            if (count($datum) > 0) {
+                yield $datum;
+            }
+            return;
+        }
+
         $block = [];
         foreach ($datum as $key => $item) {
-            assert(is_string($key), 'Map keys must be strings');
             $block[$key] = $item;
 
-            if (count($block) >= self::BLOCK_SIZE) {
+            if (count($block) >= $this->blockCount) {
                 yield $block;
                 $block = [];
             }
