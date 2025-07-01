@@ -5,6 +5,7 @@ require_once __DIR__ . '/autoload.php';
 use Auxmoney\Avro\AvroFactory;
 use Auxmoney\Avro\Contracts\LogicalTypeFactoryInterface;
 use Auxmoney\Avro\Contracts\LogicalTypeInterface;
+use Auxmoney\Avro\Contracts\Options;
 use Auxmoney\Avro\Contracts\ValidationContextInterface;
 
 class Base64ExampleType implements LogicalTypeInterface
@@ -43,8 +44,8 @@ class Base64ExampleTypeFactory implements LogicalTypeFactoryInterface
     }
 }
 
-$logicalTypes = [];
-$avroFactory = AvroFactory::create([new Base64ExampleTypeFactory()]);
+$options = new Options(logicalTypeFactories: [new Base64ExampleTypeFactory()]);
+$avroFactory = AvroFactory::create($options);
 
 $schema = '{"type": "string", "logicalType": "base64-example"}';
 
