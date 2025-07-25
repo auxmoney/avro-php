@@ -1,0 +1,23 @@
+services:
+    dev:
+        init: true
+        build:
+            context: .
+            dockerfile: Dockerfile
+            args:
+                USER_ID: ${USER_ID:-1000}
+                GROUP_ID: ${GROUP_ID:-1000}
+        volumes:
+            - ..:/avro-php
+        environment:
+            PHP_IDE_CONFIG: serverName=avro-php
+        working_dir: /avro-php
+        
+    test-generator:
+        image: node:latest
+        volumes:
+            - ..:/avro-php
+        environment:
+            npm_config_cache: /tmp/.npm
+        working_dir: /avro-php
+        command: bash -c "cd tests/Integration/TestCaseGenerator && npm ci && node ."
