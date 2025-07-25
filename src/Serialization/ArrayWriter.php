@@ -46,12 +46,23 @@ class ArrayWriter implements WriterInterface
             return false;
         }
 
+        if ($context === null) {
+            // When no context is provided, short-circuit for performance
+            foreach ($datum as $item) {
+                if (!$this->itemWriter->validate($item, $context)) {
+                    return false; // Early exit on first failure
+                }
+            }
+            return true;
+        }
+
+        // When context is provided, continue through all items to collect all errors
         $valid = true;
         $index = 0;
         foreach ($datum as $item) {
-            $context?->pushPath("[#{$index}]");
-            $valid = $valid && $this->itemWriter->validate($item, $context);
-            $context?->popPath();
+            $context->pushPath("[#{$index}]");
+            $valid = $this->itemWriter->validate($item, $context) && $valid;
+            $context->popPath();
             $index++;
         }
 
