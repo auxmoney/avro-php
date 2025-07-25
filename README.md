@@ -20,6 +20,41 @@ To install auxmoney/avro-php, you can use Composer:
 composer require auxmoney/avro-php
 ```
 
+## Development Setup
+
+This project uses VS Code Dev Containers for development. This ensures a consistent development environment across all contributors.
+
+### Using VS Code Dev Container (Recommended)
+
+1. Install the [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) in VS Code
+2. Open the project in VS Code
+3. When prompted, click "Reopen in Container" or use `Ctrl+Shift+P` → "Dev Containers: Reopen in Container"
+
+The container includes:
+- PHP 8.3 with Xdebug
+- Composer for dependency management
+- PHPUnit for testing
+- Node.js for test generation tools
+- Git and GitHub CLI
+
+### Manual Docker Usage
+
+You can also use the containers manually:
+
+```bash
+# Using the convenience script (recommended)
+./docker-dev run --rm dev
+./docker-dev run --rm dev vendor/bin/phpunit
+./docker-dev run --rm test-generator
+
+# Or using docker compose directly
+docker compose -f .devcontainer/docker-compose.yaml run --rm dev
+docker compose -f .devcontainer/docker-compose.yaml run --rm dev vendor/bin/phpunit
+docker compose -f .devcontainer/docker-compose.yaml run --rm test-generator
+```
+
+For more details, see [.devcontainer/README.md](.devcontainer/README.md).
+
 ## Usage
 
 ### Encoding/Decoding Data

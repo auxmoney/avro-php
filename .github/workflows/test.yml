@@ -12,13 +12,13 @@ jobs:
               uses: actions/checkout@v1
 
             - name: Install dependencies
-              run: docker compose run --rm dev composer install
+              run: ./docker-dev run --rm dev composer install
 
             - name: Run phpunit
-              run: docker compose run --rm dev vendor/bin/phpunit --testdox
+              run: ./docker-dev run --rm dev vendor/bin/phpunit --testdox
 
             - name: Run phpstan
-              run: docker compose run --rm dev vendor/bin/phpstan
+              run: ./docker-dev run --rm dev vendor/bin/phpstan
 
             - name: Run ecs
-              run: docker compose run --rm dev vendor/bin/ecs
+              run: ./docker-dev run --rm dev vendor/bin/ecs

@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# Convenience script to run docker commands with the new devcontainer setup
+# Usage: ./docker-dev <command>
+# Examples:
+#   ./docker-dev run --rm dev vendor/bin/phpunit
+#   ./docker-dev run --rm test-generator
+
+docker compose -f .devcontainer/docker-compose.yaml "$@" 
