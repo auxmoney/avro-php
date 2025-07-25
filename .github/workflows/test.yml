@@ -18,7 +18,7 @@ jobs:
               run: ./docker-dev run --rm dev vendor/bin/phpunit --testdox
 
             - name: Run phpstan
-              run: ./docker-dev run --rm dev vendor/bin/phpstan
+              run: ./docker-dev run --rm dev vendor/bin/phpstan --memory-limit=512M
 
             - name: Run ecs
               run: ./docker-dev run --rm dev vendor/bin/ecs
