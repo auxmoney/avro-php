@@ -74,7 +74,7 @@ class RecordWriter implements WriterInterface
             return false;
         }
 
-        if (property_exists($datum, $property->name)) {
+        if (isset($datum->{$property->name})) {
             $outputValue = $datum->{$property->name};
             return true;
         }
