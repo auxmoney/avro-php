@@ -36,20 +36,37 @@ class RecordWriter implements WriterInterface
             return false;
         }
 
+        if ($context === null) {
+            // When no context is provided, short-circuit for performance
+            foreach ($this->propertyWriters as $property) {
+                if (!$this->getFieldValue($datum, $property, $value)) {
+                    if (!$property->hasDefault) {
+                        return false; // Early exit on missing required field
+                    }
+                    continue;
+                }
+
+                if (!$property->validate($value, $context)) {
+                    return false; // Early exit on validation failure
+                }
+            }
+            return true;
+        }
+
+        // When context is provided, continue through all properties to collect all errors
         $valid = true;
         foreach ($this->propertyWriters as $property) {
             if (!$this->getFieldValue($datum, $property, $value)) {
                 if (!$property->hasDefault) {
-                    $context?->addError('missing required field ' . $property->name);
+                    $context->addError('missing required field ' . $property->name);
                     $valid = false;
                 }
-
                 continue;
             }
 
-            $context?->pushPath($property->name);
-            $valid = $valid && $property->validate($value, $context);
-            $context?->popPath();
+            $context->pushPath($property->name);
+            $valid = $property->validate($value, $context) && $valid;
+            $context->popPath();
         }
 
         return $valid;

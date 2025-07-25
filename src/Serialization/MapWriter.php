@@ -42,17 +42,32 @@ class MapWriter implements WriterInterface
             return false;
         }
 
+        if ($context === null) {
+            // When no context is provided, short-circuit for performance
+            foreach ($datum as $key => $item) {
+                if (!is_string($key)) {
+                    return false; // Early exit on invalid key type
+                }
+
+                if (!$this->valueWriter->validate($item, $context)) {
+                    return false; // Early exit on validation failure
+                }
+            }
+            return true;
+        }
+
+        // When context is provided, continue through all items to collect all errors
         $valid = true;
         foreach ($datum as $key => $item) {
             if (!is_string($key)) {
-                $context?->addError('expected string key, got ' . gettype($key));
+                $context->addError('expected string key, got ' . gettype($key));
                 $valid = false;
                 continue;
             }
 
-            $context?->pushPath("[{$key}]");
-            $valid = $valid && $this->valueWriter->validate($item, $context);
-            $context?->popPath();
+            $context->pushPath("[{$key}]");
+            $valid = $this->valueWriter->validate($item, $context) && $valid;
+            $context->popPath();
         }
 
         return $valid;
