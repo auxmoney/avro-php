@@ -61,7 +61,7 @@ class BinaryDecoderTest extends TestCase
     public function testReadFloatWithValidValue(): void
     {
         // Test reading a float value (3.14)
-        $floatBytes = pack('g', 3.14);
+        $floatBytes = "\xC3\xF5\x48\x40"; // IEEE 754 representation of 3.14
 
         $this->stream->expects($this->once())
             ->method('read')
@@ -76,7 +76,7 @@ class BinaryDecoderTest extends TestCase
     public function testReadFloatWithZero(): void
     {
         // Test reading zero float
-        $floatBytes = pack('g', 0.0);
+        $floatBytes = "\x00\x00\x00\x00"; // IEEE 754 representation of 0.0
 
         $this->stream->expects($this->once())
             ->method('read')
@@ -91,7 +91,7 @@ class BinaryDecoderTest extends TestCase
     public function testReadFloatWithNegativeValue(): void
     {
         // Test reading a negative float
-        $floatBytes = pack('g', -2.5);
+        $floatBytes = "\x00\x00\x20\xC0"; // IEEE 754 representation of -2.5
 
         $this->stream->expects($this->once())
             ->method('read')
@@ -106,7 +106,7 @@ class BinaryDecoderTest extends TestCase
     public function testReadFloatWithInfinity(): void
     {
         // Test reading infinity
-        $floatBytes = pack('g', INF);
+        $floatBytes = "\x00\x00\x80\x7F"; // IEEE 754 representation of +infinity
 
         $this->stream->expects($this->once())
             ->method('read')
@@ -121,7 +121,7 @@ class BinaryDecoderTest extends TestCase
     public function testReadFloatWithNaN(): void
     {
         // Test reading NaN
-        $floatBytes = pack('g', NAN);
+        $floatBytes = "\x00\x00\xC0\x7F"; // IEEE 754 representation of NaN
 
         $this->stream->expects($this->once())
             ->method('read')
@@ -136,7 +136,7 @@ class BinaryDecoderTest extends TestCase
     public function testReadDoubleWithValidValue(): void
     {
         // Test reading a double value (3.14159265359)
-        $doubleBytes = pack('e', 3.14159265359);
+        $doubleBytes = "\xEA\x2E\x44\x54\xFB\x21\x09\x40"; // IEEE 754 representation of 3.14159265359
 
         $this->stream->expects($this->once())
             ->method('read')
@@ -151,7 +151,7 @@ class BinaryDecoderTest extends TestCase
     public function testReadDoubleWithZero(): void
     {
         // Test reading zero double
-        $doubleBytes = pack('e', 0.0);
+        $doubleBytes = "\x00\x00\x00\x00\x00\x00\x00\x00"; // IEEE 754 representation of 0.0
 
         $this->stream->expects($this->once())
             ->method('read')
@@ -166,7 +166,7 @@ class BinaryDecoderTest extends TestCase
     public function testReadDoubleWithNegativeValue(): void
     {
         // Test reading a negative double
-        $doubleBytes = pack('e', -2.71828182846);
+        $doubleBytes = "\xCF\x5F\x14\x8B\x0A\xBF\x05\xC0"; // IEEE 754 representation of -2.71828182846
 
         $this->stream->expects($this->once())
             ->method('read')
@@ -181,7 +181,7 @@ class BinaryDecoderTest extends TestCase
     public function testReadDoubleWithInfinity(): void
     {
         // Test reading infinity
-        $doubleBytes = pack('e', INF);
+        $doubleBytes = "\x00\x00\x00\x00\x00\x00\xF0\x7F"; // IEEE 754 representation of +infinity
 
         $this->stream->expects($this->once())
             ->method('read')
@@ -196,7 +196,7 @@ class BinaryDecoderTest extends TestCase
     public function testReadDoubleWithNaN(): void
     {
         // Test reading NaN
-        $doubleBytes = pack('e', NAN);
+        $doubleBytes = "\x00\x00\x00\x00\x00\x00\xF8\x7F"; // IEEE 754 representation of NaN
 
         $this->stream->expects($this->once())
             ->method('read')
