@@ -33,7 +33,7 @@ docker compose -f .devcontainer/docker-compose.yaml run --rm test-generator
 ## Services
 
 ### `dev` Service
-- **Image**: `webdevops/php-dev:8.3`
+- **Image**: custom, based on `php:8.3-cli`
 - **Purpose**: Main development environment
 - **Features**: PHP 8.3, Composer, Xdebug, PHPUnit
 - **Working Directory**: `/avro-php`
@@ -54,13 +54,6 @@ The following extensions are automatically installed in the container:
 - **PHP Namespace Resolver** - Namespace management
 - **PHP CS Fixer** - Code formatting
 - **JSON** - JSON support
-
-## Environment Variables
-
-The following environment variables can be customized:
-
-- `DOCKER_HOME` - Home directory path (defaults to `$HOME`)
-- `DOCKER_USER` - User to run as (defaults to `$USER`)
 
 ## Post-Create Commands
 
