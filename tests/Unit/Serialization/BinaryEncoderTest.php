@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 class BinaryEncoderTest extends TestCase
 {
     private BinaryEncoder $encoder;
-    private WritableStreamInterface $stream;
+    private WritableStreamInterface&\PHPUnit\Framework\MockObject\MockObject $stream;
 
     protected function setUp(): void
     {
@@ -62,9 +62,9 @@ class BinaryEncoderTest extends TestCase
         // Verify it's a 4-byte float encoding
         $this->assertSame(4, strlen($result));
 
-        // Verify we can decode it back to a similar value
-        $decoded = unpack('g', $result)[1];
-        $this->assertEqualsWithDelta($value, $decoded, 0.001);
+        // Verify the exact byte representation
+        $expectedBytes = "\x66\xE6\xF6\x42"; // IEEE 754 representation of 123.45
+        $this->assertSame($expectedBytes, $result);
     }
 
     public function testEncodeDouble(): void
@@ -75,11 +75,14 @@ class BinaryEncoderTest extends TestCase
         // Verify it's an 8-byte double encoding
         $this->assertSame(8, strlen($result));
 
-        // Verify we can decode it back to a similar value
-        $decoded = unpack('e', $result)[1];
-        $this->assertEqualsWithDelta($value, $decoded, 0.000001);
+        // Verify the exact byte representation
+        $expectedBytes = "\x0B\x0B\xEE\x07\x3C\xDD\x5E\x40"; // IEEE 754 representation of 123.456789
+        $this->assertSame($expectedBytes, $result);
     }
 
+    /**
+     * @return array<int, array{0: int, 1: string}>
+     */
     public static function encodeLongDataProvider(): array
     {
         return [
