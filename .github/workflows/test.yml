@@ -11,6 +11,9 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v1
 
+            - name: Build docker image
+              run: USER_ID=$(stat -c %u .) GROUP_ID=$(stat -c %g .) ./docker-dev build dev
+
             - name: Install dependencies
               run: ./docker-dev run --rm dev composer install
 
