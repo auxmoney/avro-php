@@ -8,7 +8,7 @@ use Exception;
 
 /**
  * Base exception for all Auxmoney Avro library exceptions.
- * 
+ *
  * This allows library users to catch all exceptions thrown by this library
  * using a single catch block: catch (AuxmoneyAvroException $e)
  */

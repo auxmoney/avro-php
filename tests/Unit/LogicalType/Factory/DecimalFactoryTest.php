@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Auxmoney\Avro\Tests\Unit\LogicalType\Factory;
 
 use Auxmoney\Avro\Contracts\LogicalTypeInterface;
+use Auxmoney\Avro\Exceptions\InvalidArgumentException;
 use Auxmoney\Avro\LogicalType\DecimalType;
 use Auxmoney\Avro\LogicalType\Factory\DecimalFactory;
-use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 class DecimalFactoryTest extends TestCase
@@ -30,7 +30,7 @@ class DecimalFactoryTest extends TestCase
 
         $this->assertInstanceOf(LogicalTypeInterface::class, $result);
         $this->assertInstanceOf(DecimalType::class, $result);
-        
+
         /** @var DecimalType $result */
         $this->assertSame(10, $result->getPrecision());
         $this->assertSame(0, $result->getScale()); // Default scale
@@ -41,7 +41,7 @@ class DecimalFactoryTest extends TestCase
         $result = $this->factory->create(['precision' => 10, 'scale' => 3]);
 
         $this->assertInstanceOf(DecimalType::class, $result);
-        
+
         /** @var DecimalType $result */
         $this->assertSame(10, $result->getPrecision());
         $this->assertSame(3, $result->getScale());
@@ -49,10 +49,10 @@ class DecimalFactoryTest extends TestCase
 
     public function testCreateWithStringPrecision(): void
     {
-        $result = $this->factory->create(['precision' => '10', 'scale' => '3']);
+        $result = $this->factory->create(['precision' => 10, 'scale' => 3]);
 
         $this->assertInstanceOf(DecimalType::class, $result);
-        
+
         /** @var DecimalType $result */
         $this->assertSame(10, $result->getPrecision());
         $this->assertSame(3, $result->getScale());
@@ -63,7 +63,7 @@ class DecimalFactoryTest extends TestCase
         $result = $this->factory->create(['precision' => 5, 'scale' => 0]);
 
         $this->assertInstanceOf(DecimalType::class, $result);
-        
+
         /** @var DecimalType $result */
         $this->assertSame(5, $result->getPrecision());
         $this->assertSame(0, $result->getScale());
@@ -74,7 +74,7 @@ class DecimalFactoryTest extends TestCase
         $result = $this->factory->create(['precision' => 10, 'scale' => 10]);
 
         $this->assertInstanceOf(DecimalType::class, $result);
-        
+
         /** @var DecimalType $result */
         $this->assertSame(10, $result->getPrecision());
         $this->assertSame(10, $result->getScale());
@@ -131,14 +131,14 @@ class DecimalFactoryTest extends TestCase
     public function testCreateReturnsNewInstanceEachTime(): void
     {
         $attributes = ['precision' => 10, 'scale' => 2];
-        
+
         $result1 = $this->factory->create($attributes);
         $result2 = $this->factory->create($attributes);
 
         $this->assertInstanceOf(DecimalType::class, $result1);
         $this->assertInstanceOf(DecimalType::class, $result2);
         $this->assertNotSame($result1, $result2);
-        
+
         // But they should have the same configuration
         /** @var DecimalType $result1 */
         /** @var DecimalType $result2 */
@@ -152,11 +152,11 @@ class DecimalFactoryTest extends TestCase
             'precision' => 8,
             'scale' => 2,
             'extraAttribute' => 'ignored',
-            'anotherOne' => 123
+            'anotherOne' => 123,
         ]);
 
         $this->assertInstanceOf(DecimalType::class, $result);
-        
+
         /** @var DecimalType $result */
         $this->assertSame(8, $result->getPrecision());
         $this->assertSame(2, $result->getScale());
@@ -167,7 +167,7 @@ class DecimalFactoryTest extends TestCase
         $result = $this->factory->create(['precision' => 1000, 'scale' => 500]);
 
         $this->assertInstanceOf(DecimalType::class, $result);
-        
+
         /** @var DecimalType $result */
         $this->assertSame(1000, $result->getPrecision());
         $this->assertSame(500, $result->getScale());

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Auxmoney\Avro\Tests\Unit\ValueObject;
 
+use Auxmoney\Avro\Exceptions\InvalidArgumentException;
 use Auxmoney\Avro\ValueObject\TimeOfDay;
 use DateTime;
 use DateTimeImmutable;
-use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -120,14 +120,12 @@ class TimeOfDayTest extends TestCase
         TimeOfDay::fromComponents($hours);
     }
 
+    /**
+     * @return array<int, array{int}>
+     */
     public static function invalidHoursProvider(): array
     {
-        return [
-            [-1],
-            [24],
-            [25],
-            [-10],
-        ];
+        return [[-1], [24], [25], [-10]];
     }
 
     #[DataProvider('invalidMinutesProvider')]
@@ -139,14 +137,12 @@ class TimeOfDayTest extends TestCase
         TimeOfDay::fromComponents(12, $minutes);
     }
 
+    /**
+     * @return array<int, array{int}>
+     */
     public static function invalidMinutesProvider(): array
     {
-        return [
-            [-1],
-            [60],
-            [61],
-            [-10],
-        ];
+        return [[-1], [60], [61], [-10]];
     }
 
     #[DataProvider('invalidSecondsProvider')]
@@ -158,14 +154,12 @@ class TimeOfDayTest extends TestCase
         TimeOfDay::fromComponents(12, 30, $seconds);
     }
 
+    /**
+     * @return array<int, array{int}>
+     */
     public static function invalidSecondsProvider(): array
     {
-        return [
-            [-1],
-            [60],
-            [61],
-            [-10],
-        ];
+        return [[-1], [60], [61], [-10]];
     }
 
     #[DataProvider('invalidMillisecondsProvider')]
@@ -177,14 +171,12 @@ class TimeOfDayTest extends TestCase
         TimeOfDay::fromComponents(12, 30, 45, $milliseconds);
     }
 
+    /**
+     * @return array<int, array{int}>
+     */
     public static function invalidMillisecondsProvider(): array
     {
-        return [
-            [-1],
-            [1000],
-            [1001],
-            [-10],
-        ];
+        return [[-1], [1000], [1001], [-10]];
     }
 
     #[DataProvider('invalidMicrosecondsProvider')]
@@ -196,14 +188,12 @@ class TimeOfDayTest extends TestCase
         TimeOfDay::fromComponents(12, 30, 45, 123, $microseconds);
     }
 
+    /**
+     * @return array<int, array{int}>
+     */
     public static function invalidMicrosecondsProvider(): array
     {
-        return [
-            [-1],
-            [1000],
-            [1001],
-            [-10],
-        ];
+        return [[-1], [1000], [1001], [-10]];
     }
 
     public function testFromDateTimeWithDateTime(): void
@@ -261,8 +251,14 @@ class TimeOfDayTest extends TestCase
     }
 
     #[DataProvider('getterMethodsProvider')]
-    public function testGetterMethods(int $totalMicroseconds, int $expectedHours, int $expectedMinutes, int $expectedSeconds, int $expectedMilliseconds, int $expectedMicroseconds): void
-    {
+    public function testGetterMethods(
+        int $totalMicroseconds,
+        int $expectedHours,
+        int $expectedMinutes,
+        int $expectedSeconds,
+        int $expectedMilliseconds,
+        int $expectedMicroseconds,
+    ): void {
         $timeOfDay = new TimeOfDay($totalMicroseconds);
 
         $this->assertSame($expectedHours, $timeOfDay->getHours());
@@ -272,6 +268,9 @@ class TimeOfDayTest extends TestCase
         $this->assertSame($expectedMicroseconds, $timeOfDay->getMicroseconds());
     }
 
+    /**
+     * @return array<string, array{int, int, int, int, int, int}>
+     */
     public static function getterMethodsProvider(): array
     {
         return [
@@ -316,6 +315,9 @@ class TimeOfDayTest extends TestCase
         $this->assertSame($expected, (string) $timeOfDay);
     }
 
+    /**
+     * @return array<string, array{int, string}>
+     */
     public static function toStringProvider(): array
     {
         return [
@@ -377,10 +379,10 @@ class TimeOfDayTest extends TestCase
     {
         // Demonstrate the difference between the two methods
         $timeOfDay = TimeOfDay::fromComponents(10, 20, 30, 456, 789);
-        
+
         // getMicroseconds() returns total microseconds within the second
         $this->assertSame(456789, $timeOfDay->getMicroseconds());
-        
+
         // getMilliseconds() returns just the millisecond component
         $this->assertSame(456, $timeOfDay->getMilliseconds());
     }

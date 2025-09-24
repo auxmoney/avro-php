@@ -7,8 +7,8 @@ namespace Auxmoney\Avro\Tests\Unit\Deserialization;
 use Auxmoney\Avro\Contracts\ReadableStreamInterface;
 use Auxmoney\Avro\Deserialization\BinaryDecoder;
 use Auxmoney\Avro\Deserialization\EnumReader;
+use Auxmoney\Avro\Exceptions\RuntimeException;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 
 class EnumReaderTest extends TestCase
 {

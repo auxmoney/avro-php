@@ -21,6 +21,11 @@ readonly class Decimal
         $this->scale = $scale;
     }
 
+    public function __toString(): string
+    {
+        return $this->toString();
+    }
+
     public static function fromDecimalRepresentation(string $value): self
     {
         if (!preg_match('/^-?\d+(\.\d+)?$/', $value)) {
@@ -32,7 +37,7 @@ readonly class Decimal
 
         // Split into integer and fractional parts
         $parts = explode('.', $absValue);
-        $integerPart = $parts[0] ?? '0';
+        $integerPart = $parts[0];
         $fractionalPart = rtrim($parts[1] ?? '', '0');
 
         // Use actual decimal places as scale
@@ -62,7 +67,7 @@ readonly class Decimal
         }
 
         $stringValue = number_format($value, $decimals, '.', '');
-        
+
         return self::fromDecimalRepresentation($stringValue);
     }
 
@@ -109,11 +114,6 @@ readonly class Decimal
         }
 
         return pack('C*', ...$digits);
-    }
-
-    public function __toString(): string
-    {
-        return $this->toString();
     }
 
     public function toBytes(): string

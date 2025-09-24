@@ -34,11 +34,8 @@ class DurationType implements LogicalTypeInterface
 
         // Unpack 3 little-endian unsigned 32-bit integers
         $values = unpack('V3', $datum);
+        assert($values !== false && is_int($values[1]) && is_int($values[2]) && is_int($values[3]), 'Failed to unpack duration data');
 
-        return new Duration(
-            months: $values[1],
-            days: $values[2],
-            milliseconds: $values[3],
-        );
+        return new Duration(months: $values[1], days: $values[2], milliseconds: $values[3]);
     }
 }

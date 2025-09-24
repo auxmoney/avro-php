@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Auxmoney\Avro\Tests\Unit\ValueObject;
 
+use Auxmoney\Avro\Exceptions\InvalidArgumentException;
 use Auxmoney\Avro\ValueObject\Duration;
-use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -18,7 +18,6 @@ class DurationTest extends TestCase
         $this->assertSame(12, $duration->months);
         $this->assertSame(25, $duration->days);
         $this->assertSame(5000, $duration->milliseconds);
-
     }
 
     public function testConstructorWithZeroComponents(): void
@@ -39,6 +38,9 @@ class DurationTest extends TestCase
         new Duration($months, $days, $milliseconds);
     }
 
+    /**
+     * @return array<string, array{int, int, int, string}>
+     */
     public static function invalidComponentsProvider(): array
     {
         return [
@@ -48,8 +50,6 @@ class DurationTest extends TestCase
         ];
     }
 
-
-
     public function testConstructorWithSpecificComponents(): void
     {
         $duration = new Duration(3, 10, 1500);
@@ -58,6 +58,4 @@ class DurationTest extends TestCase
         $this->assertSame(10, $duration->days);
         $this->assertSame(1500, $duration->milliseconds);
     }
-
-
 }

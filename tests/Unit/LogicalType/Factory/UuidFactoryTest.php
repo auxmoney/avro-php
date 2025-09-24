@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Auxmoney\Avro\Tests\Unit\LogicalType\Factory;
 
 use Auxmoney\Avro\Contracts\LogicalTypeInterface;
-use Auxmoney\Avro\LogicalType\UuidType;
 use Auxmoney\Avro\LogicalType\Factory\UuidFactory;
+use Auxmoney\Avro\LogicalType\UuidType;
 use PHPUnit\Framework\TestCase;
 
 class UuidFactoryTest extends TestCase

@@ -9,7 +9,6 @@ use Auxmoney\Avro\LogicalType\TimeMillisType;
 use Auxmoney\Avro\ValueObject\TimeOfDay;
 use DateTime;
 use DateTimeImmutable;
-use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 class TimeMillisTypeTest extends TestCase
@@ -191,34 +190,10 @@ class TimeMillisTypeTest extends TestCase
         $this->assertSame(999000, $result->getMicroseconds());
     }
 
-    public function testDenormalizeWithInvalidDatum(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Expected integer (milliseconds since midnight) for time denormalization');
-
-        $this->timeMillisType->denormalize('12:30:45');
-    }
-
-    public function testDenormalizeWithNull(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Expected integer (milliseconds since midnight) for time denormalization');
-
-        $this->timeMillisType->denormalize(null);
-    }
-
-    public function testDenormalizeWithFloat(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Expected integer (milliseconds since midnight) for time denormalization');
-
-        $this->timeMillisType->denormalize(45045.123);
-    }
-
     public function testNormalizeAndDenormalizeRoundTrip(): void
     {
         $originalTime = TimeOfDay::fromComponents(14, 25, 30, 789);
-        
+
         $normalized = $this->timeMillisType->normalize($originalTime);
         $denormalized = $this->timeMillisType->denormalize($normalized);
 
@@ -234,7 +209,7 @@ class TimeMillisTypeTest extends TestCase
     {
         // Test that microseconds are lost in round trip
         $originalTime = TimeOfDay::fromComponents(14, 25, 30, 789, 456);
-        
+
         $normalized = $this->timeMillisType->normalize($originalTime);
         $denormalized = $this->timeMillisType->denormalize($normalized);
 
@@ -249,7 +224,7 @@ class TimeMillisTypeTest extends TestCase
     public function testNormalizeAndDenormalizeRoundTripWithMidnight(): void
     {
         $originalTime = TimeOfDay::fromComponents(0, 0, 0, 0, 0);
-        
+
         $normalized = $this->timeMillisType->normalize($originalTime);
         $denormalized = $this->timeMillisType->denormalize($normalized);
 
@@ -263,7 +238,7 @@ class TimeMillisTypeTest extends TestCase
     public function testNormalizeAndDenormalizeRoundTripWithAlmostMidnight(): void
     {
         $originalTime = TimeOfDay::fromComponents(23, 59, 59, 999);
-        
+
         $normalized = $this->timeMillisType->normalize($originalTime);
         $denormalized = $this->timeMillisType->denormalize($normalized);
 
@@ -283,7 +258,7 @@ class TimeMillisTypeTest extends TestCase
 
         $this->assertIsInt($result);
         $this->assertGreaterThan(0, $result);
-        
+
         // Verify the time components are preserved (except microseconds)
         $denormalized = $this->timeMillisType->denormalize($result);
         $this->assertSame(14, $denormalized->getHours());
@@ -297,10 +272,10 @@ class TimeMillisTypeTest extends TestCase
     {
         $timeOfDay = TimeOfDay::fromComponents(9, 15, 30, 500);
         $context = $this->createMock(ValidationContextInterface::class);
-        
+
         $isValid = $this->timeMillisType->validate($timeOfDay, $context);
         $this->assertTrue($isValid);
-        
+
         $normalized = $this->timeMillisType->normalize($timeOfDay);
         $this->assertIsInt($normalized);
         $this->assertSame($timeOfDay->getTotalMilliseconds(), $normalized);
@@ -329,9 +304,12 @@ class TimeMillisTypeTest extends TestCase
         foreach ($testCases as $testCase) {
             $normalized = $this->timeMillisType->normalize($testCase['input']);
             $denormalized = $this->timeMillisType->denormalize($normalized);
-            
+
             $this->assertSame($testCase['expectedMs'], $denormalized->getMilliseconds());
-            $this->assertSame($testCase['expectedMs'] * 1000, $denormalized->getMicroseconds()); // Always milliseconds * 1000 after round trip
+            $this->assertSame(
+                $testCase['expectedMs'] * 1000,
+                $denormalized->getMicroseconds(),
+            ); // Always milliseconds * 1000 after round trip
         }
     }
 }

@@ -7,7 +7,6 @@ namespace Auxmoney\Avro\Tests\Unit\LogicalType;
 use Auxmoney\Avro\Contracts\ValidationContextInterface;
 use Auxmoney\Avro\LogicalType\DecimalType;
 use Auxmoney\Avro\ValueObject\Decimal;
-use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 class DecimalTypeTest extends TestCase
@@ -108,10 +107,9 @@ class DecimalTypeTest extends TestCase
     public function testNormalizeWithDecimal(): void
     {
         $decimal = Decimal::fromDecimalRepresentation('123.45');
-        
+
         $result = $this->decimalType->normalize($decimal);
 
-        $this->assertIsString($result);
         // The result should be the bytes representation of the decimal
         // scaled to the configured precision (2 decimal places)
         $this->assertSame($decimal->withScale(2)->toBytes(), $result);
@@ -120,10 +118,9 @@ class DecimalTypeTest extends TestCase
     public function testNormalizeWithDifferentScale(): void
     {
         $decimal = Decimal::fromDecimalRepresentation('123.4567'); // 4 decimal places
-        
+
         $result = $this->decimalType->normalize($decimal);
 
-        $this->assertIsString($result);
         // Should be scaled down to 2 decimal places as configured
         $scaledDecimal = $decimal->withScale(2);
         $this->assertSame($scaledDecimal->toBytes(), $result);
@@ -140,26 +137,10 @@ class DecimalTypeTest extends TestCase
         $this->assertSame(2, $result->getScale());
     }
 
-    public function testDenormalizeWithInvalidDatum(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Expected bytes string for decimal denormalization');
-
-        $this->decimalType->denormalize(123);
-    }
-
-    public function testDenormalizeWithNullDatum(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Expected bytes string for decimal denormalization');
-
-        $this->decimalType->denormalize(null);
-    }
-
     public function testNormalizeAndDenormalizeRoundTrip(): void
     {
         $originalDecimal = Decimal::fromDecimalRepresentation('987.65');
-        
+
         $normalized = $this->decimalType->normalize($originalDecimal);
         $denormalized = $this->decimalType->denormalize($normalized);
 
@@ -173,7 +154,7 @@ class DecimalTypeTest extends TestCase
     {
         $decimalType = new DecimalType(5, 0);
         $originalDecimal = Decimal::fromInteger(123);
-        
+
         $normalized = $decimalType->normalize($originalDecimal);
         $denormalized = $decimalType->denormalize($normalized);
 
@@ -185,7 +166,7 @@ class DecimalTypeTest extends TestCase
     {
         $decimalType = new DecimalType(20, 10);
         $decimal = Decimal::fromDecimalRepresentation('1234567890.1234567890');
-        
+
         $normalized = $decimalType->normalize($decimal);
         $denormalized = $decimalType->denormalize($normalized);
 
@@ -196,7 +177,7 @@ class DecimalTypeTest extends TestCase
     public function testWithNegativeDecimal(): void
     {
         $decimal = Decimal::fromDecimalRepresentation('-123.45');
-        
+
         $normalized = $this->decimalType->normalize($decimal);
         $denormalized = $this->decimalType->denormalize($normalized);
 

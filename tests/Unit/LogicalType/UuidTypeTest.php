@@ -201,7 +201,7 @@ class UuidTypeTest extends TestCase
 
         $this->assertIsString($result);
         $this->assertSame(16, strlen($result)); // 16 bytes
-        
+
         // Verify it's the correct binary representation
         $expectedBinary = hex2bin('12345678123412341234123456789abc');
         $this->assertSame($expectedBinary, $result);
@@ -215,7 +215,7 @@ class UuidTypeTest extends TestCase
 
         $this->assertIsString($result);
         $this->assertSame(16, strlen($result));
-        
+
         // Should handle uppercase correctly
         $expectedBinary = hex2bin('12345678123412341234123456789ABC');
         $this->assertSame($expectedBinary, $result);
@@ -286,7 +286,7 @@ class UuidTypeTest extends TestCase
     public function testNormalizeAndDenormalizeRoundTrip(): void
     {
         $originalUuid = '12345678-1234-1234-1234-123456789abc';
-        
+
         $normalized = $this->uuidType->normalize($originalUuid);
         $denormalized = $this->uuidType->denormalize($normalized);
 
@@ -296,7 +296,7 @@ class UuidTypeTest extends TestCase
     public function testNormalizeAndDenormalizeRoundTripWithUppercase(): void
     {
         $originalUuid = '12345678-1234-1234-1234-123456789ABC';
-        
+
         $normalized = $this->uuidType->normalize($originalUuid);
         $denormalized = $this->uuidType->denormalize($normalized);
 
@@ -307,7 +307,7 @@ class UuidTypeTest extends TestCase
     public function testNormalizeAndDenormalizeRoundTripWithNil(): void
     {
         $originalUuid = '00000000-0000-0000-0000-000000000000';
-        
+
         $normalized = $this->uuidType->normalize($originalUuid);
         $denormalized = $this->uuidType->denormalize($normalized);
 
@@ -317,7 +317,7 @@ class UuidTypeTest extends TestCase
     public function testNormalizeAndDenormalizeRoundTripWithMax(): void
     {
         $originalUuid = 'ffffffff-ffff-ffff-ffff-ffffffffffff';
-        
+
         $normalized = $this->uuidType->normalize($originalUuid);
         $denormalized = $this->uuidType->denormalize($normalized);
 
@@ -328,10 +328,10 @@ class UuidTypeTest extends TestCase
     {
         $uuid = 'a1b2c3d4-e5f6-7890-1234-567890123456';
         $context = $this->createMock(ValidationContextInterface::class);
-        
+
         $isValid = $this->uuidType->validate($uuid, $context);
         $this->assertTrue($isValid);
-        
+
         $normalized = $this->uuidType->normalize($uuid);
         $this->assertIsString($normalized);
         $this->assertSame(16, strlen($normalized));
@@ -349,10 +349,11 @@ class UuidTypeTest extends TestCase
 
         foreach ($testUuids as $uuid) {
             $normalized = $this->uuidType->normalize($uuid);
-            
+            $this->assertIsString($normalized);
+
             // Verify binary length
             $this->assertSame(16, strlen($normalized), "Failed for UUID: {$uuid}");
-            
+
             // Verify round trip
             $denormalized = $this->uuidType->denormalize($normalized);
             $this->assertSame(strtolower($uuid), $denormalized, "Round trip failed for UUID: {$uuid}");
@@ -362,14 +363,12 @@ class UuidTypeTest extends TestCase
     public function testFormatConsistency(): void
     {
         $binary = hex2bin('123456789abcdef0123456789abcdef0');
-        
+
         $result = $this->uuidType->denormalize($binary);
-        
+        $this->assertIsString($result);
+
         // Check format pattern
-        $this->assertMatchesRegularExpression(
-            '/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/',
-            $result
-        );
+        $this->assertMatchesRegularExpression('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/', $result);
     }
 
     public function testCaseInsensitiveValidation(): void
@@ -377,10 +376,10 @@ class UuidTypeTest extends TestCase
         $lowerUuid = 'abcdef12-3456-7890-abcd-ef1234567890';
         $upperUuid = 'ABCDEF12-3456-7890-ABCD-EF1234567890';
         $mixedUuid = 'AbCdEf12-3456-7890-AbCd-Ef1234567890';
-        
+
         $context = $this->createMock(ValidationContextInterface::class);
         $context->expects($this->never())->method('addError');
-        
+
         $this->assertTrue($this->uuidType->validate($lowerUuid, $context));
         $this->assertTrue($this->uuidType->validate($upperUuid, $context));
         $this->assertTrue($this->uuidType->validate($mixedUuid, $context));
