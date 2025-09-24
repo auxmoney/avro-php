@@ -223,7 +223,7 @@ class LocalTimestampMicrosTypeTest extends TestCase
         $result = $this->timestampType->denormalize($microseconds);
 
         $this->assertInstanceOf(DateTimeInterface::class, $result);
-        
+
         // The result should be a proper DateTimeInterface object
         // Format it to check it doesn't contain timezone indicators when formatted as local
         $formatted = $result->format('Y-m-d H:i:s.u');
