@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Auxmoney\Avro\Tests\Unit\LogicalType\Factory;
 
 use Auxmoney\Avro\Contracts\LogicalTypeInterface;
-use Auxmoney\Avro\Exceptions\InvalidArgumentException;
+use Auxmoney\Avro\Exceptions\InvalidSchemaException;
 use Auxmoney\Avro\LogicalType\DecimalType;
 use Auxmoney\Avro\LogicalType\Factory\DecimalFactory;
 use PHPUnit\Framework\TestCase;
@@ -26,7 +26,10 @@ class DecimalFactoryTest extends TestCase
 
     public function testCreateWithValidPrecision(): void
     {
-        $result = $this->factory->create(['precision' => 10]);
+        $result = $this->factory->create([
+            'type' => 'bytes',
+            'precision' => 10,
+        ]);
 
         $this->assertInstanceOf(LogicalTypeInterface::class, $result);
         $this->assertInstanceOf(DecimalType::class, $result);
@@ -38,7 +41,11 @@ class DecimalFactoryTest extends TestCase
 
     public function testCreateWithValidPrecisionAndScale(): void
     {
-        $result = $this->factory->create(['precision' => 10, 'scale' => 3]);
+        $result = $this->factory->create([
+            'type' => 'bytes',
+            'precision' => 10,
+            'scale' => 3,
+        ]);
 
         $this->assertInstanceOf(DecimalType::class, $result);
 
@@ -49,7 +56,11 @@ class DecimalFactoryTest extends TestCase
 
     public function testCreateWithStringPrecision(): void
     {
-        $result = $this->factory->create(['precision' => 10, 'scale' => 3]);
+        $result = $this->factory->create([
+            'type' => 'fixed',
+            'precision' => 10,
+            'scale' => 3,
+        ]);
 
         $this->assertInstanceOf(DecimalType::class, $result);
 
@@ -60,7 +71,11 @@ class DecimalFactoryTest extends TestCase
 
     public function testCreateWithZeroScale(): void
     {
-        $result = $this->factory->create(['precision' => 5, 'scale' => 0]);
+        $result = $this->factory->create([
+            'type' => 'bytes',
+            'precision' => 5,
+            'scale' => 0,
+        ]);
 
         $this->assertInstanceOf(DecimalType::class, $result);
 
@@ -71,7 +86,11 @@ class DecimalFactoryTest extends TestCase
 
     public function testCreateWithMaxValidScale(): void
     {
-        $result = $this->factory->create(['precision' => 10, 'scale' => 10]);
+        $result = $this->factory->create([
+            'type' => 'bytes',
+            'precision' => 10,
+            'scale' => 10,
+        ]);
 
         $this->assertInstanceOf(DecimalType::class, $result);
 
@@ -82,55 +101,55 @@ class DecimalFactoryTest extends TestCase
 
     public function testCreateWithMissingPrecision(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(InvalidSchemaException::class);
         $this->expectExceptionMessage('Decimal logical type requires "precision" attribute');
 
-        $this->factory->create([]);
+        $this->factory->create(['type' => 'bytes']);
     }
 
     public function testCreateWithMissingPrecisionButHasScale(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(InvalidSchemaException::class);
         $this->expectExceptionMessage('Decimal logical type requires "precision" attribute');
 
-        $this->factory->create(['scale' => 3]);
+        $this->factory->create(['type' => 'bytes', 'scale' => 3]);
     }
 
     public function testCreateWithZeroPrecision(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(InvalidSchemaException::class);
         $this->expectExceptionMessage('Decimal precision must be a positive integer');
 
-        $this->factory->create(['precision' => 0]);
+        $this->factory->create(['type' => 'bytes', 'precision' => 0]);
     }
 
     public function testCreateWithNegativePrecision(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(InvalidSchemaException::class);
         $this->expectExceptionMessage('Decimal precision must be a positive integer');
 
-        $this->factory->create(['precision' => -5]);
+        $this->factory->create(['type' => 'bytes', 'precision' => -5]);
     }
 
     public function testCreateWithNegativeScale(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(InvalidSchemaException::class);
         $this->expectExceptionMessage('Decimal scale must be between 0 and precision');
 
-        $this->factory->create(['precision' => 10, 'scale' => -1]);
+        $this->factory->create(['type' => 'bytes', 'precision' => 10, 'scale' => -1]);
     }
 
     public function testCreateWithScaleGreaterThanPrecision(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(InvalidSchemaException::class);
         $this->expectExceptionMessage('Decimal scale must be between 0 and precision');
 
-        $this->factory->create(['precision' => 5, 'scale' => 6]);
+        $this->factory->create(['type' => 'bytes', 'precision' => 5, 'scale' => 6]);
     }
 
     public function testCreateReturnsNewInstanceEachTime(): void
     {
-        $attributes = ['precision' => 10, 'scale' => 2];
+        $attributes = ['type' => 'bytes', 'precision' => 10, 'scale' => 2];
 
         $result1 = $this->factory->create($attributes);
         $result2 = $this->factory->create($attributes);
@@ -149,6 +168,7 @@ class DecimalFactoryTest extends TestCase
     public function testCreateWithExtraAttributes(): void
     {
         $result = $this->factory->create([
+            'type' => 'bytes',
             'precision' => 8,
             'scale' => 2,
             'extraAttribute' => 'ignored',
@@ -164,7 +184,7 @@ class DecimalFactoryTest extends TestCase
 
     public function testCreateWithLargePrecision(): void
     {
-        $result = $this->factory->create(['precision' => 1000, 'scale' => 500]);
+        $result = $this->factory->create(['type' => 'bytes', 'precision' => 1000, 'scale' => 500]);
 
         $this->assertInstanceOf(DecimalType::class, $result);
 
