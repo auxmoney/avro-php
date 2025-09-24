@@ -20,7 +20,7 @@ class TimestampMicrosType implements LogicalTypeInterface
         $this->zeroDate = new DateTimeImmutable('@0');
         $this->defaultTimeZone = (new DateTimeImmutable())->getTimezone();
     }
-    
+
     public function validate(mixed $datum, ?ValidationContextInterface $context): bool
     {
         if (!($datum instanceof DateTimeInterface)) {

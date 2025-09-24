@@ -6,43 +6,58 @@ namespace Auxmoney\Avro\LogicalType;
 
 use Auxmoney\Avro\Contracts\LogicalTypeInterface;
 use Auxmoney\Avro\Contracts\ValidationContextInterface;
-use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
+use DateTimeZone;
 
 class LocalTimestampMillisType implements LogicalTypeInterface
 {
+    private DateTimeImmutable $zeroDate;
+    private DateTimeZone $defaultTimeZone;
+
+    public function __construct()
+    {
+        $this->zeroDate = new DateTimeImmutable('@0');
+        $this->defaultTimeZone = (new DateTimeImmutable())->getTimezone();
+    }
+
     public function validate(mixed $datum, ?ValidationContextInterface $context): bool
     {
-        if ($datum instanceof DateTimeInterface) {
-            return true;
+        if (!($datum instanceof DateTimeInterface)) {
+            $context?->addError('expected DateTimeInterface, got ' . gettype($datum));
+            return false;
         }
 
-        $context?->addError('Local timestamp value must be a DateTimeInterface object');
-        return false;
+        return true;
     }
 
     public function normalize(mixed $datum): mixed
     {
         assert($datum instanceof DateTimeInterface);
 
-        // Local timestamp ignores timezone, treats as local time
-        $localTime = new DateTime($datum->format('Y-m-d H:i:s.u'));
-        return (int) ($localTime->getTimestamp() * 1000 + intval($localTime->format('u') / 1000));
+        // For local timestamp: treat the local time components as if they were UTC
+        // e.g., 14:00 CEST should be treated as 14:00 UTC, not 12:00 UTC
+        $utcDateTime = new DateTimeImmutable($datum->format('Y-m-d H:i:s.u'), new DateTimeZone('UTC'));
+        return $this->getMillisecondsSinceEpoch($utcDateTime);
     }
 
     public function denormalize(mixed $datum): mixed
     {
-        assert(is_int($datum), 'Expected integer (milliseconds) for local timestamp denormalization');
+        assert(is_int($datum), 'LocalTimestampMillis logical type datum must be an integer');
 
-        $seconds = intval($datum / 1000);
-        $milliseconds = $datum % 1000;
+        // Create UTC datetime from epoch milliseconds
+        $utcDateTime = $this->zeroDate->modify("{$datum} milliseconds");
 
-        $dateTime = new DateTime('@' . $seconds);
+        // Create a new DateTime with the same time components but in local timezone
+        // This preserves the time (e.g., 12:00 UTC becomes 12:00 local, not shifted)
+        return new DateTimeImmutable($utcDateTime->format('Y-m-d H:i:s.u'), $this->defaultTimeZone);
+    }
 
-        // Format as local timestamp (no timezone indicator)
-        if ($milliseconds > 0) {
-            return $dateTime->format('Y-m-d H:i:s') . '.' . str_pad((string) $milliseconds, 3, '0', STR_PAD_LEFT);
-        }
-        return $dateTime->format('Y-m-d H:i:s');
+    private function getMillisecondsSinceEpoch(DateTimeInterface $datum): int
+    {
+        $seconds = (int) $datum->format('U');
+        $milliseconds = (int) $datum->format('v');
+
+        return $seconds * 1000 + $milliseconds;
     }
 }
