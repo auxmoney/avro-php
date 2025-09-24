@@ -192,4 +192,97 @@ class DecimalFactoryTest extends TestCase
         $this->assertSame(1000, $result->getPrecision());
         $this->assertSame(500, $result->getScale());
     }
+
+    public function testCreateWithFixedTypeAndSize(): void
+    {
+        $result = $this->factory->create([
+            'type' => 'fixed',
+            'precision' => 10,
+            'scale' => 2,
+            'size' => 8,
+        ]);
+
+        $this->assertInstanceOf(DecimalType::class, $result);
+
+        /** @var DecimalType $result */
+        $this->assertSame(10, $result->getPrecision());
+        $this->assertSame(2, $result->getScale());
+        $this->assertSame(8, $result->getSize());
+    }
+
+    public function testCreateWithFixedTypeWithoutSize(): void
+    {
+        $result = $this->factory->create([
+            'type' => 'fixed',
+            'precision' => 10,
+            'scale' => 2,
+        ]);
+
+        $this->assertInstanceOf(DecimalType::class, $result);
+
+        /** @var DecimalType $result */
+        $this->assertSame(10, $result->getPrecision());
+        $this->assertSame(2, $result->getScale());
+        $this->assertNull($result->getSize());
+    }
+
+    public function testCreateWithBytesTypeIgnoresSize(): void
+    {
+        $result = $this->factory->create([
+            'type' => 'bytes',
+            'precision' => 10,
+            'scale' => 2,
+            'size' => 8, // This should be ignored for bytes type
+        ]);
+
+        $this->assertInstanceOf(DecimalType::class, $result);
+
+        /** @var DecimalType $result */
+        $this->assertSame(10, $result->getPrecision());
+        $this->assertSame(2, $result->getScale());
+        $this->assertNull($result->getSize()); // Should be null for bytes type
+    }
+
+    public function testCreateWithInvalidSizeType(): void
+    {
+        $result = $this->factory->create([
+            'type' => 'fixed',
+            'precision' => 10,
+            'scale' => 2,
+            'size' => '8', // String instead of int - should be ignored
+        ]);
+
+        $this->assertInstanceOf(DecimalType::class, $result);
+
+        /** @var DecimalType $result */
+        $this->assertSame(10, $result->getPrecision());
+        $this->assertSame(2, $result->getScale());
+        $this->assertNull($result->getSize()); // Should be null due to invalid type
+    }
+
+    public function testCreateWithZeroSize(): void
+    {
+        $this->expectException(InvalidSchemaException::class);
+        $this->expectExceptionMessage('Fixed size must be a positive integer');
+
+        $this->factory->create([
+            'type' => 'fixed',
+            'precision' => 10,
+            'scale' => 2,
+            'size' => 0,
+        ]);
+    }
+
+    public function testCreateWithNegativeSize(): void
+    {
+        $this->expectException(InvalidSchemaException::class);
+        $this->expectExceptionMessage('Fixed size must be a positive integer');
+
+        $this->factory->create([
+            'type' => 'fixed',
+            'precision' => 10,
+            'scale' => 2,
+            'size' => -5,
+        ]);
+    }
 }

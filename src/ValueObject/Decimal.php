@@ -76,6 +76,11 @@ readonly class Decimal
         return $this->unscaledValue;
     }
 
+    public function isNegative(): bool
+    {
+        return $this->unscaledValue->isNegative();
+    }
+
     public function getScale(): int
     {
         return $this->scale;
@@ -116,9 +121,9 @@ readonly class Decimal
         return pack('C*', ...$digits);
     }
 
-    public function toBytes(): string
+    public function toBytes(?int $padLength = null): string
     {
-        return $this->unscaledValue->toBytes();
+        return $this->unscaledValue->toBytes($padLength);
     }
 
     public static function fromBytes(string $bytes, int $scale): self
