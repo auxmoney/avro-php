@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Auxmoney\Avro\Tests\Unit\LogicalType\Factory;
 
 use Auxmoney\Avro\Contracts\LogicalTypeInterface;
-use Auxmoney\Avro\LogicalType\TimeMicrosType;
 use Auxmoney\Avro\LogicalType\Factory\TimeMicrosFactory;
+use Auxmoney\Avro\LogicalType\TimeMicrosType;
 use PHPUnit\Framework\TestCase;
 
 class TimeMicrosFactoryTest extends TestCase

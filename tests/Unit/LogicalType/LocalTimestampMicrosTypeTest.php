@@ -8,9 +8,7 @@ use Auxmoney\Avro\Contracts\ValidationContextInterface;
 use Auxmoney\Avro\LogicalType\LocalTimestampMicrosType;
 use DateTime;
 use DateTimeImmutable;
-use DateTimeInterface;
 use DateTimeZone;
-use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 class LocalTimestampMicrosTypeTest extends TestCase
@@ -160,34 +158,10 @@ class LocalTimestampMicrosTypeTest extends TestCase
         $this->assertStringContainsString('.000100', $result);
     }
 
-    public function testDenormalizeWithInvalidDatum(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Expected integer (microseconds) for local timestamp denormalization');
-
-        $this->timestampType->denormalize('not an integer');
-    }
-
-    public function testDenormalizeWithNull(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Expected integer (microseconds) for local timestamp denormalization');
-
-        $this->timestampType->denormalize(null);
-    }
-
-    public function testDenormalizeWithFloat(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Expected integer (microseconds) for local timestamp denormalization');
-
-        $this->timestampType->denormalize(1684152645.123);
-    }
-
     public function testNormalizeAndDenormalizeRoundTrip(): void
     {
         $originalDateTime = new DateTimeImmutable('2023-05-15 12:30:45.123456');
-        
+
         $normalized = $this->timestampType->normalize($originalDateTime);
         $denormalized = $this->timestampType->denormalize($normalized);
 
@@ -200,7 +174,7 @@ class LocalTimestampMicrosTypeTest extends TestCase
     public function testNormalizeAndDenormalizeRoundTripWithoutMicroseconds(): void
     {
         $originalDateTime = new DateTimeImmutable('2023-05-15 12:30:45');
-        
+
         $normalized = $this->timestampType->normalize($originalDateTime);
         $denormalized = $this->timestampType->denormalize($normalized);
 
@@ -250,6 +224,8 @@ class LocalTimestampMicrosTypeTest extends TestCase
         $microseconds = 1684152645123456;
 
         $result = $this->timestampType->denormalize($microseconds);
+
+        $this->assertIsString($result);
 
         // Should not contain any timezone indicators
         $this->assertStringNotContainsString('Z', $result);

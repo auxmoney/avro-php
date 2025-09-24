@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Auxmoney\Avro\Tests\Unit\ValueObject;
 
+use Auxmoney\Avro\Exceptions\InvalidArgumentException;
 use Auxmoney\Avro\ValueObject\ArbitraryPrecisionInteger;
 use Auxmoney\Avro\ValueObject\Decimal;
-use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 class DecimalTest extends TestCase
 {
@@ -48,6 +49,9 @@ class DecimalTest extends TestCase
         self::assertSame($expectedScale, $decimal->getScale());
     }
 
+    /**
+     * @return array<int, array{string, string, int}>
+     */
     public static function fromDecimalRepresentationValidProvider(): array
     {
         return [
@@ -90,22 +94,12 @@ class DecimalTest extends TestCase
         Decimal::fromDecimalRepresentation($input);
     }
 
+    /**
+     * @return array<int, array{string}>
+     */
     public static function fromDecimalRepresentationInvalidProvider(): array
     {
-        return [
-            [''],
-            ['abc'],
-            ['1.2.3'],
-            ['1,23'],
-            ['1e5'],
-            ['1.23e2'],
-            ['+123'],
-            ['--123'],
-            ['123-'],
-            ['123.'],
-            ['.123'],
-            ['1..2'],
-        ];
+        return [[''], ['abc'], ['1.2.3'], ['1,23'], ['1e5'], ['1.23e2'], ['+123'], ['--123'], ['123-'], ['123.'], ['.123'], ['1..2']];
     }
 
     #[DataProvider('fromIntegerProvider')]
@@ -117,6 +111,9 @@ class DecimalTest extends TestCase
         self::assertSame($expectedScale, $decimal->getScale());
     }
 
+    /**
+     * @return array<int, array{int, string, int}>
+     */
     public static function fromIntegerProvider(): array
     {
         return [
@@ -137,23 +134,15 @@ class DecimalTest extends TestCase
 
         // Verify the decimal was created without throwing an exception
         self::assertInstanceOf(Decimal::class, $decimal);
-        self::assertIsInt($decimal->getScale());
         self::assertInstanceOf(ArbitraryPrecisionInteger::class, $decimal->getUnscaledValue());
     }
 
+    /**
+     * @return array<int, array{float, int}>
+     */
     public static function fromFloatValidProvider(): array
     {
-        return [
-            [0.0, 2],
-            [1.0, 2],
-            [-1.0, 2],
-            [1.5, 1],
-            [-1.5, 1],
-            [123.45, 2],
-            [-123.45, 2],
-            [0.123, 3],
-            [3.14159, 5],
-        ];
+        return [[0.0, 2], [1.0, 2], [-1.0, 2], [1.5, 1], [-1.5, 1], [123.45, 2], [-123.45, 2], [0.123, 3], [3.14159, 5]];
     }
 
     #[DataProvider('fromFloatInvalidProvider')]
@@ -165,24 +154,26 @@ class DecimalTest extends TestCase
         Decimal::fromFloat($input, $decimals);
     }
 
+    /**
+     * @return array<int, array{float, int}>
+     */
     public static function fromFloatInvalidProvider(): array
     {
-        return [
-            [INF, 2],
-            [-INF, 2],
-            [NAN, 2],
-        ];
+        return [[INF, 2], [-INF, 2], [NAN, 2]];
     }
 
     #[DataProvider('toStringProvider')]
     public function testToString(string $decimalInput, string $expectedOutput): void
     {
         $decimal = Decimal::fromDecimalRepresentation($decimalInput);
-        
+
         self::assertSame($expectedOutput, $decimal->toString());
         self::assertSame($expectedOutput, (string) $decimal);
     }
 
+    /**
+     * @return array<int, array{string, string}>
+     */
     public static function toStringProvider(): array
     {
         return [
@@ -233,6 +224,9 @@ class DecimalTest extends TestCase
         self::assertSame($original->toString(), $restored->toString());
     }
 
+    /**
+     * @return array<int, array{string}>
+     */
     public static function bytesRoundTripProvider(): array
     {
         return [
@@ -259,11 +253,14 @@ class DecimalTest extends TestCase
 
         self::assertSame($expectedValue, $scaledDecimal->toString());
         self::assertSame($newScale, $scaledDecimal->getScale());
-        
+
         // Original should be unchanged
         self::assertSame($originalValue, $decimal->toString());
     }
 
+    /**
+     * @return array<int, array{string, int, string}>
+     */
     public static function withScaleProvider(): array
     {
         return [
@@ -313,11 +310,14 @@ class DecimalTest extends TestCase
     public function testLargeNumbers(string $input, int $expectedScale, string $expectedOutput): void
     {
         $decimal = Decimal::fromDecimalRepresentation($input);
-        
+
         self::assertSame($expectedScale, $decimal->getScale());
         self::assertSame($expectedOutput, $decimal->toString());
     }
 
+    /**
+     * @return array<int, array{string, int, string}>
+     */
     public static function largeNumberProvider(): array
     {
         return [
@@ -332,8 +332,8 @@ class DecimalTest extends TestCase
     public function testReadonlyClass(): void
     {
         $decimal = Decimal::fromDecimalRepresentation('123.45');
-        $reflection = new \ReflectionClass($decimal);
-        
+        $reflection = new ReflectionClass($decimal);
+
         self::assertTrue($reflection->isReadOnly());
     }
 
@@ -343,7 +343,7 @@ class DecimalTest extends TestCase
         // The method uses number_format with 17 decimals regardless of the input
         $decimal1 = Decimal::fromFloat(1.5, 1);
         $decimal2 = Decimal::fromFloat(1.5, 5);
-        
+
         // Both should produce the same result since the decimals parameter is ignored
         self::assertSame($decimal1->toString(), $decimal2->toString());
         self::assertSame($decimal1->getScale(), $decimal2->getScale());
@@ -356,6 +356,9 @@ class DecimalTest extends TestCase
         self::assertSame($expectedOutput, $decimal->toString());
     }
 
+    /**
+     * @return array<int, array{float, string, int}>
+     */
     public static function fromFloatPrecisionProvider(): array
     {
         return [
@@ -395,7 +398,7 @@ class DecimalTest extends TestCase
     public function testFromDecimalRepresentationWithLeadingZeros(): void
     {
         $decimal = Decimal::fromDecimalRepresentation('000123.45000');
-        
+
         self::assertSame('12345', $decimal->getUnscaledValue()->toString());
         self::assertSame(2, $decimal->getScale());
         self::assertSame('123.45', $decimal->toString());
@@ -422,7 +425,7 @@ class DecimalTest extends TestCase
     {
         $largeNumber = '999999999999999999999999999999999999999999999999.12345678901234567890123456789';
         $decimal = Decimal::fromDecimalRepresentation($largeNumber);
-        
+
         $result = $decimal->toString();
         self::assertSame($largeNumber, $result);
     }
@@ -441,7 +444,7 @@ class DecimalTest extends TestCase
 
         foreach ($testCases as $input => $expected) {
             $decimal = Decimal::fromDecimalRepresentation((string) $input);
-            self::assertSame($expected, $decimal->toString(), "Failed for input: $input");
+            self::assertSame($expected, $decimal->toString(), "Failed for input: {$input}");
         }
     }
 
@@ -483,11 +486,11 @@ class DecimalTest extends TestCase
     {
         // Test various representations of zero
         $zeroInputs = ['0', '0.0', '0.00', '0.000'];
-        
+
         foreach ($zeroInputs as $input) {
             $decimal = Decimal::fromDecimalRepresentation($input);
-            self::assertSame('0', $decimal->getUnscaledValue()->toString(), "Failed for zero input: $input");           
-            self::assertSame(0, $decimal->getScale(), "Scale failed for zero input: $input");
+            self::assertSame('0', $decimal->getUnscaledValue()->toString(), "Failed for zero input: {$input}");
+            self::assertSame(0, $decimal->getScale(), "Scale failed for zero input: {$input}");
         }
     }
 
@@ -503,13 +506,13 @@ class DecimalTest extends TestCase
     public function testBytesRoundTripWithNegativeNumbers(): void
     {
         $testValues = ['-1', '-123', '-123.45', '-0.123'];
-        
+
         foreach ($testValues as $value) {
             $original = Decimal::fromDecimalRepresentation($value);
             $bytes = $original->toBytes();
             $restored = Decimal::fromBytes($bytes, $original->getScale());
-            
-            self::assertSame($original->toString(), $restored->toString(), "Round-trip failed for: $value");
+
+            self::assertSame($original->toString(), $restored->toString(), "Round-trip failed for: {$value}");
         }
     }
 }
