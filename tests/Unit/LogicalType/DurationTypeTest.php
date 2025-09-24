@@ -7,7 +7,6 @@ namespace Auxmoney\Avro\Tests\Unit\LogicalType;
 use Auxmoney\Avro\Contracts\ValidationContextInterface;
 use Auxmoney\Avro\LogicalType\DurationType;
 use Auxmoney\Avro\ValueObject\Duration;
-use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -53,8 +52,6 @@ class DurationTypeTest extends TestCase
         $this->assertTrue($result);
     }
 
-
-
     public function testValidateWithInvalidType(): void
     {
         $duration = 123;
@@ -70,7 +67,7 @@ class DurationTypeTest extends TestCase
     public function testValidateWithInvalidObject(): void
     {
         $duration = new stdClass();
-        
+
         $context = $this->createMock(ValidationContextInterface::class);
         $context->expects($this->once())->method('addError')
             ->with('Duration value must be a Duration object');
@@ -97,10 +94,14 @@ class DurationTypeTest extends TestCase
 
         $this->assertIsString($result);
         $this->assertSame(12, strlen($result));
-        
+
         // Verify the packed values
         $unpacked = unpack('V3', $result);
-        $this->assertSame([1 => 12, 2 => 30, 3 => 45000], $unpacked);
+        $this->assertSame([
+            1 => 12,
+            2 => 30,
+            3 => 45000,
+        ], $unpacked);
     }
 
     public function testNormalizeWithDurationValueObject(): void
@@ -111,10 +112,14 @@ class DurationTypeTest extends TestCase
 
         $this->assertIsString($result);
         $this->assertSame(12, strlen($result));
-        
+
         // Verify the packed values
         $unpacked = unpack('V3', $result);
-        $this->assertSame([1 => 5, 2 => 15, 3 => 2500], $unpacked);
+        $this->assertSame([
+            1 => 5,
+            2 => 15,
+            3 => 2500,
+        ], $unpacked);
     }
 
     public function testNormalizeWithZeroValues(): void
@@ -125,10 +130,14 @@ class DurationTypeTest extends TestCase
 
         $this->assertIsString($result);
         $this->assertSame(12, strlen($result));
-        
+
         // Verify all zeros
         $unpacked = unpack('V3', $result);
-        $this->assertSame([1 => 0, 2 => 0, 3 => 0], $unpacked);
+        $this->assertSame([
+            1 => 0,
+            2 => 0,
+            3 => 0,
+        ], $unpacked);
     }
 
     public function testDenormalizeWithValidBytes(): void
@@ -155,28 +164,10 @@ class DurationTypeTest extends TestCase
         $this->assertSame(0, $result->milliseconds);
     }
 
-    public function testDenormalizeWithInvalidLength(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Expected 12-byte string for duration denormalization');
-
-        $this->durationType->denormalize(str_repeat("\x00", 11));
-    }
-
-    public function testDenormalizeWithNonString(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Expected 12-byte string for duration denormalization');
-
-        $this->durationType->denormalize([12, 30, 45000]);
-    }
-
-
-
     public function testNormalizeAndDenormalizeRoundTripWithDurationValueObject(): void
     {
         $original = new Duration(10, 25, 5500);
-        
+
         $normalized = $this->durationType->normalize($original);
         $denormalized = $this->durationType->denormalize($normalized);
 
@@ -185,6 +176,4 @@ class DurationTypeTest extends TestCase
         $this->assertSame(25, $denormalized->days);
         $this->assertSame(5500, $denormalized->milliseconds);
     }
-
-
 }

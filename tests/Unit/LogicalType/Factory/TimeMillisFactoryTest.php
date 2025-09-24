@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Auxmoney\Avro\Tests\Unit\LogicalType\Factory;
 
 use Auxmoney\Avro\Contracts\LogicalTypeInterface;
-use Auxmoney\Avro\LogicalType\TimeMillisType;
 use Auxmoney\Avro\LogicalType\Factory\TimeMillisFactory;
+use Auxmoney\Avro\LogicalType\TimeMillisType;
 use PHPUnit\Framework\TestCase;
 
 class TimeMillisFactoryTest extends TestCase

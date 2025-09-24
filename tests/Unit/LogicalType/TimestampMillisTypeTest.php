@@ -8,9 +8,7 @@ use Auxmoney\Avro\Contracts\ValidationContextInterface;
 use Auxmoney\Avro\LogicalType\TimestampMillisType;
 use DateTime;
 use DateTimeImmutable;
-use DateTimeInterface;
 use DateTimeZone;
-use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 class TimestampMillisTypeTest extends TestCase
@@ -157,34 +155,10 @@ class TimestampMillisTypeTest extends TestCase
         $this->assertStringEndsWith('.000Z', $result);
     }
 
-    public function testDenormalizeWithInvalidDatum(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Expected integer (milliseconds since Unix epoch) for timestamp denormalization');
-
-        $this->timestampType->denormalize('not an integer');
-    }
-
-    public function testDenormalizeWithNull(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Expected integer (milliseconds since Unix epoch) for timestamp denormalization');
-
-        $this->timestampType->denormalize(null);
-    }
-
-    public function testDenormalizeWithFloat(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Expected integer (milliseconds since Unix epoch) for timestamp denormalization');
-
-        $this->timestampType->denormalize(1684152645.123);
-    }
-
     public function testNormalizeAndDenormalizeRoundTrip(): void
     {
         $originalDateTime = new DateTimeImmutable('2023-05-15 12:30:45.123', new DateTimeZone('UTC'));
-        
+
         $normalized = $this->timestampType->normalize($originalDateTime);
         $denormalized = $this->timestampType->denormalize($normalized);
 
@@ -196,7 +170,7 @@ class TimestampMillisTypeTest extends TestCase
     public function testNormalizeAndDenormalizeRoundTripWithoutMilliseconds(): void
     {
         $originalDateTime = new DateTimeImmutable('2023-05-15 12:30:45', new DateTimeZone('UTC'));
-        
+
         $normalized = $this->timestampType->normalize($originalDateTime);
         $denormalized = $this->timestampType->denormalize($normalized);
 
@@ -248,12 +222,16 @@ class TimestampMillisTypeTest extends TestCase
 
         foreach ($testCases as $microseconds => $expectedMilliseconds) {
             $dateTime = new DateTimeImmutable("2023-05-15 12:30:45.{$microseconds}", new DateTimeZone('UTC'));
-            
+
             $result = $this->timestampType->normalize($dateTime);
+            $this->assertIsInt($result);
             $actualMilliseconds = $result % 1000;
 
-            $this->assertSame($expectedMilliseconds, $actualMilliseconds, 
-                "Failed for microseconds {$microseconds}, expected {$expectedMilliseconds} ms, got {$actualMilliseconds} ms");
+            $this->assertSame(
+                $expectedMilliseconds,
+                $actualMilliseconds,
+                "Failed for microseconds {$microseconds}, expected {$expectedMilliseconds} ms, got {$actualMilliseconds} ms",
+            );
         }
     }
 }

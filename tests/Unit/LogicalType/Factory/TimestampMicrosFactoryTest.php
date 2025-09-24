@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Auxmoney\Avro\Tests\Unit\LogicalType\Factory;
 
 use Auxmoney\Avro\Contracts\LogicalTypeInterface;
-use Auxmoney\Avro\LogicalType\TimestampMicrosType;
 use Auxmoney\Avro\LogicalType\Factory\TimestampMicrosFactory;
+use Auxmoney\Avro\LogicalType\TimestampMicrosType;
 use PHPUnit\Framework\TestCase;
 
 class TimestampMicrosFactoryTest extends TestCase

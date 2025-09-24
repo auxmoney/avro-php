@@ -122,7 +122,7 @@ class DateTypeTest extends TestCase
     {
         $utc = new DateTimeZone('UTC');
         $pacific = new DateTimeZone('America/Los_Angeles');
-        
+
         $utcDate = new DateTimeImmutable('2023-05-15 00:00:00', $utc);
         $pacificDate = new DateTimeImmutable('2023-05-15 00:00:00', $pacific);
 
@@ -167,7 +167,7 @@ class DateTypeTest extends TestCase
     public function testNormalizeAndDenormalizeRoundTrip(): void
     {
         $originalDate = new DateTimeImmutable('2023-05-15');
-        
+
         $normalized = $this->dateType->normalize($originalDate);
         $denormalized = $this->dateType->denormalize($normalized);
 
@@ -177,7 +177,7 @@ class DateTypeTest extends TestCase
     public function testNormalizeAndDenormalizeRoundTripWithBeforeEpoch(): void
     {
         $originalDate = new DateTimeImmutable('1950-03-15');
-        
+
         $normalized = $this->dateType->normalize($originalDate);
         $denormalized = $this->dateType->denormalize($normalized);
 

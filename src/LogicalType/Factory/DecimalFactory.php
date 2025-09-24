@@ -18,16 +18,22 @@ class DecimalFactory implements LogicalTypeFactoryInterface
 
     public function create(array $attributes): LogicalTypeInterface
     {
-        if (!isset($attributes['precision'])) {
-            throw new InvalidArgumentException('Decimal logical type requires "precision" attribute');
+        if (!isset($attributes['precision']) || !is_int($attributes['precision'])) {
+            throw new InvalidArgumentException('Decimal logical type requires "precision" attribute and it must be an integer');
         }
 
-        $precision = (int) $attributes['precision'];
+        $precision = $attributes['precision'];
         if ($precision <= 0) {
             throw new InvalidArgumentException('Decimal precision must be a positive integer');
         }
 
-        $scale = isset($attributes['scale']) ? (int) $attributes['scale'] : 0;
+        $scale = 0;
+        if (isset($attributes['scale'])) {
+            if (!is_int($attributes['scale'])) {
+                throw new InvalidArgumentException('Decimal "scale" attribute must be an integer');
+            }
+            $scale = $attributes['scale'];
+        }
         if ($scale < 0 || $scale > $precision) {
             throw new InvalidArgumentException('Decimal scale must be between 0 and precision');
         }

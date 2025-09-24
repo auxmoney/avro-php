@@ -10,13 +10,16 @@ use DateTimeInterface;
 readonly class TimeOfDay
 {
     public function __construct(
-        public int $totalMicroseconds
+        public int $totalMicroseconds,
     ) {
         if ($totalMicroseconds < 0 || $totalMicroseconds >= 86400000000) {
-            throw new InvalidArgumentException(
-                'Total microseconds must be between 0 and 86399999999 (midnight to 23:59:59.999999)'
-            );
+            throw new InvalidArgumentException('Total microseconds must be between 0 and 86399999999 (midnight to 23:59:59.999999)');
         }
+    }
+
+    public function __toString(): string
+    {
+        return sprintf('%02d:%02d:%02d.%06d', $this->getHours(), $this->getMinutes(), $this->getSeconds(), $this->getMicroseconds());
     }
 
     public static function fromComponents(
@@ -24,7 +27,7 @@ readonly class TimeOfDay
         int $minutes = 0,
         int $seconds = 0,
         int $milliseconds = 0,
-        int $microseconds = 0
+        int $microseconds = 0,
     ): self {
         if ($hours < 0 || $hours > 23) {
             throw new InvalidArgumentException('Hours must be between 0 and 23');
@@ -43,7 +46,7 @@ readonly class TimeOfDay
         }
 
         $totalMicroseconds = ($hours * 3600 + $minutes * 60 + $seconds) * 1000000 + $milliseconds * 1000 + $microseconds;
-        
+
         return new self($totalMicroseconds);
     }
 
@@ -85,16 +88,5 @@ readonly class TimeOfDay
     public function getTotalMilliseconds(): int
     {
         return intval($this->totalMicroseconds / 1000);
-    }
-
-    public function __toString(): string
-    {
-        return sprintf(
-            '%02d:%02d:%02d.%06d',
-            $this->getHours(),
-            $this->getMinutes(),
-            $this->getSeconds(),
-            $this->getMicroseconds(),
-        );
     }
 }

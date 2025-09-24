@@ -8,8 +8,8 @@ use Auxmoney\Avro\Contracts\ReadableStreamInterface;
 use Auxmoney\Avro\Contracts\ReaderInterface;
 use Auxmoney\Avro\Deserialization\BinaryDecoder;
 use Auxmoney\Avro\Deserialization\UnionReader;
+use Auxmoney\Avro\Exceptions\RuntimeException;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 
 class UnionReaderTest extends TestCase
 {

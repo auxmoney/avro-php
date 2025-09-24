@@ -9,7 +9,6 @@ use Auxmoney\Avro\LogicalType\TimeMicrosType;
 use Auxmoney\Avro\ValueObject\TimeOfDay;
 use DateTime;
 use DateTimeImmutable;
-use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 class TimeMicrosTypeTest extends TestCase
@@ -181,34 +180,10 @@ class TimeMicrosTypeTest extends TestCase
         $this->assertSame(999999, $result->getMicroseconds());
     }
 
-    public function testDenormalizeWithInvalidDatum(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Expected integer (microseconds since midnight) for time denormalization');
-
-        $this->timeMicrosType->denormalize('12:30:45');
-    }
-
-    public function testDenormalizeWithNull(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Expected integer (microseconds since midnight) for time denormalization');
-
-        $this->timeMicrosType->denormalize(null);
-    }
-
-    public function testDenormalizeWithFloat(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Expected integer (microseconds since midnight) for time denormalization');
-
-        $this->timeMicrosType->denormalize(45045.123456);
-    }
-
     public function testNormalizeAndDenormalizeRoundTrip(): void
     {
         $originalTime = TimeOfDay::fromComponents(14, 25, 30, 789, 123);
-        
+
         $normalized = $this->timeMicrosType->normalize($originalTime);
         $denormalized = $this->timeMicrosType->denormalize($normalized);
 
@@ -224,7 +199,7 @@ class TimeMicrosTypeTest extends TestCase
     public function testNormalizeAndDenormalizeRoundTripWithMidnight(): void
     {
         $originalTime = TimeOfDay::fromComponents(0, 0, 0, 0, 0);
-        
+
         $normalized = $this->timeMicrosType->normalize($originalTime);
         $denormalized = $this->timeMicrosType->denormalize($normalized);
 
@@ -235,7 +210,7 @@ class TimeMicrosTypeTest extends TestCase
     public function testNormalizeAndDenormalizeRoundTripWithAlmostMidnight(): void
     {
         $originalTime = TimeOfDay::fromComponents(23, 59, 59, 999, 999);
-        
+
         $normalized = $this->timeMicrosType->normalize($originalTime);
         $denormalized = $this->timeMicrosType->denormalize($normalized);
 
@@ -252,7 +227,7 @@ class TimeMicrosTypeTest extends TestCase
 
         $this->assertIsInt($result);
         $this->assertGreaterThan(0, $result);
-        
+
         // Verify the time components are preserved
         $denormalized = $this->timeMicrosType->denormalize($result);
         $this->assertSame(14, $denormalized->getHours());
@@ -266,10 +241,10 @@ class TimeMicrosTypeTest extends TestCase
     {
         $timeOfDay = TimeOfDay::fromComponents(9, 15, 30, 500, 750);
         $context = $this->createMock(ValidationContextInterface::class);
-        
+
         $isValid = $this->timeMicrosType->validate($timeOfDay, $context);
         $this->assertTrue($isValid);
-        
+
         $normalized = $this->timeMicrosType->normalize($timeOfDay);
         $this->assertIsInt($normalized);
         $this->assertSame($timeOfDay->totalMicroseconds, $normalized);

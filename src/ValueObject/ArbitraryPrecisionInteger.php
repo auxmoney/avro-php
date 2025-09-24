@@ -8,9 +8,10 @@ use Auxmoney\Avro\Exceptions\InvalidArgumentException;
 
 final readonly class ArbitraryPrecisionInteger
 {
-    /** @var int Limit the maximum exponent for each multiplication step to avoid 64-bit integer overflow */
+    /**
+     * @var int Limit the maximum exponent for each multiplication step to avoid 64-bit integer overflow
+     */
     private const MAX_BYTES_EXPONENT = 16;
-
     private string $bytes;
 
     private function __construct(string $bytes)
@@ -50,8 +51,7 @@ final readonly class ArbitraryPrecisionInteger
         $absValue = ltrim($value, '-0') ?: '0';
 
         $bytes = [];
-        $digitBytes = array_values(unpack('C*', $absValue));
-        foreach ($digitBytes as $digitByte) {
+        foreach (self::toBytesArray($absValue) as $digitByte) {
             $digit = $digitByte - 48; // Convert ASCII digit to numeric value (0-9)
 
             // Multiply current value by 10
@@ -69,7 +69,7 @@ final readonly class ArbitraryPrecisionInteger
         }
         $bytes = self::leftTrimBytes($bytes);
 
-        return new self(pack('C*', ...$bytes));
+        return new self(self::toBytesString($bytes));
     }
 
     public function toString(): string
@@ -83,12 +83,16 @@ final readonly class ArbitraryPrecisionInteger
             array_unshift($decimalDigits, 45); // ASCII code for '-'
         }
 
-        return pack('C*', ...$decimalDigits);
+        return self::toBytesString($decimalDigits);
     }
 
+    /**
+     * @return array<int>
+     */
     public function toAbsoluteDecimalDigits(): array
     {
-        $byteArray = array_values(unpack('C*', $this->bytes));
+        $byteArray = self::toBytesArray($this->bytes);
+
         if ($this->isNegative()) {
             $byteArray = self::toTwosComplement($byteArray);
         }
@@ -102,14 +106,11 @@ final readonly class ArbitraryPrecisionInteger
         return $digits === [] ? [0] : array_reverse($digits);
     }
 
-
-
     /**
      * Shift decimal position by moving the implicit decimal point
      * Positive positions = multiply by 10^positions, negative = divide with HALF_UP rounding
      *
      * @param int $positions Number of decimal positions to shift
-     * @return self
      */
     public function shiftDecimalPosition(int $positions): self
     {
@@ -121,7 +122,7 @@ final readonly class ArbitraryPrecisionInteger
             return $this;
         }
 
-        $bytes = array_values(unpack('C*', $this->bytes));
+        $bytes = self::toBytesArray($this->bytes);
         $isNegative = $this->isNegative();
 
         if ($isNegative) {
@@ -141,21 +142,21 @@ final readonly class ArbitraryPrecisionInteger
             // Negative positions: divide by 10^(-positions) with HALF_UP rounding
             $remainingPositions = -$positions;
             $finalRemainder = 0;
-            
+
             while ($remainingPositions > 0) {
                 $iterationPositions = min($remainingPositions, self::MAX_BYTES_EXPONENT);
                 $divisor = 10 ** $iterationPositions;
                 [$bytes, $remainder] = self::divideBytesByInt($bytes, $divisor);
-                
+
                 // Keep track of final remainder for rounding
                 if ($remainingPositions === $iterationPositions) {
                     $finalRemainder = $remainder;
                     $finalDivisor = $divisor;
                 }
-                
+
                 $remainingPositions -= $iterationPositions;
             }
-            
+
             // Apply HALF_UP rounding: if remainder >= divisor/2, round up
             if (isset($finalDivisor) && $finalRemainder >= $finalDivisor / 2) {
                 $bytes = self::addBytesInt($bytes, 1);
@@ -168,20 +169,73 @@ final readonly class ArbitraryPrecisionInteger
         }
         $bytes = self::leftTrimBytes($bytes);
 
-        return new self(pack('C*', ...$bytes));
+        return new self(self::toBytesString($bytes));
+    }
+
+    public function toBytes(): string
+    {
+        return $this->bytes;
+    }
+
+    public function toInteger(): int
+    {
+        if (strlen($this->bytes) > 8) {
+            throw new InvalidArgumentException('Cannot convert to integer: number of bytes exceeds 8');
+        }
+
+        // Pad with appropriate bytes based on sign to reach 8 bytes for unpack
+        $paddedBytes = $this->bytes;
+        $paddingByte = $this->isNegative() ? "\xFF" : "\x00";
+
+        // Pad to 8 bytes from the left
+        while (strlen($paddedBytes) < 8) {
+            $paddedBytes = $paddingByte . $paddedBytes;
+        }
+
+        // Unpack as signed 64-bit integer (big-endian)
+        $result = unpack('J', $paddedBytes);
+        assert($result !== false && is_int($result[1]), 'Failed to unpack integer bytes');
+        return $result[1];
+    }
+
+    public function isNegative(): bool
+    {
+        return $this->bytes !== '' && (ord($this->bytes[0]) & 0x80) !== 0;
+    }
+
+    /**
+     * @return array<int>
+     */
+    private static function toBytesArray(string $bytes): array
+    {
+        /** @var array<int> $unpackResult */
+        $unpackResult = unpack('C*', $bytes);
+        assert(is_array($unpackResult));
+
+        return array_values($unpackResult);
+    }
+
+    /**
+     * @param array<int> $bytes
+     */
+    private static function toBytesString(array $bytes): string
+    {
+        return pack('C*', ...$bytes);
     }
 
     private static function trimBytesString(string $packedBytes): string
     {
-        $byteArray = array_values(unpack('C*', $packedBytes));
+        $byteArray = self::toBytesArray($packedBytes);
+
         $trimmedBytes = self::leftTrimBytes($byteArray);
-        return pack('C*', ...$trimmedBytes);
+        return self::toBytesString($trimmedBytes);
     }
 
     /**
      * Convert two's complement bytes to absolute value (invert bits and add 1)
      *
      * @param array<int> $bytes
+     * @return array<int>
      */
     private static function toTwosComplement(array $bytes): array
     {
@@ -258,6 +312,9 @@ final readonly class ArbitraryPrecisionInteger
 
     /**
      * Add a small integer value to a byte array using carry arithmetic
+     *
+     * @param array<int> $bytes
+     * @return array<int>
      */
     private static function addBytesInt(array $bytes, int $value): array
     {
@@ -277,36 +334,6 @@ final readonly class ArbitraryPrecisionInteger
         }
 
         return $bytes;
-    }
-
-    public function toBytes(): string
-    {
-        return $this->bytes;
-    }
-
-    public function toInteger(): int
-    {
-        if (strlen($this->bytes) > 8) {
-            throw new InvalidArgumentException('Cannot convert to integer: number of bytes exceeds 8');
-        }
-
-        // Pad with appropriate bytes based on sign to reach 8 bytes for unpack
-        $paddedBytes = $this->bytes;
-        $paddingByte = $this->isNegative() ? "\xFF" : "\x00";
-        
-        // Pad to 8 bytes from the left
-        while (strlen($paddedBytes) < 8) {
-            $paddedBytes = $paddingByte . $paddedBytes;
-        }
-
-        // Unpack as signed 64-bit integer (big-endian)
-        $result = unpack('J', $paddedBytes);
-        return $result[1];
-    }
-
-    public function isNegative(): bool
-    {
-        return ($this->bytes !== '' && (ord($this->bytes[0]) & 0x80) !== 0);
     }
 
     /**
