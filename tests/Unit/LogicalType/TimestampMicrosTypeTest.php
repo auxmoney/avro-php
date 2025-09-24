@@ -88,9 +88,6 @@ class TimestampMicrosTypeTest extends TestCase
         yield 'large future date' => [new DateTime('2100-01-01 00:00:00.000000+00'), 4102444800000000];
     }
 
-    /**
-     * @throws Exception
-     */
     #[DataProvider('microsecondsProvider')]
     public function testNormalize(object $dateTime, int $expected): void
     {
@@ -98,9 +95,6 @@ class TimestampMicrosTypeTest extends TestCase
         self::assertSame($expected, $actual);
     }
 
-    /**
-     * @throws Exception
-     */
     #[DataProvider('microsecondsProvider')]
     public function testDenormalize(DateTimeInterface $expected, int $input): void
     {
