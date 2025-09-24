@@ -8,7 +8,10 @@ use Auxmoney\Avro\Contracts\ValidationContextInterface;
 use Auxmoney\Avro\LogicalType\LocalTimestampMicrosType;
 use DateTime;
 use DateTimeImmutable;
+use DateTimeInterface;
 use DateTimeZone;
+use Generator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class LocalTimestampMicrosTypeTest extends TestCase
@@ -46,7 +49,7 @@ class LocalTimestampMicrosTypeTest extends TestCase
     {
         $context = $this->createMock(ValidationContextInterface::class);
         $context->expects($this->once())->method('addError')
-            ->with('Local timestamp value must be a DateTimeInterface object');
+            ->with('expected DateTimeInterface, got string');
 
         $result = $this->timestampType->validate('2023-05-15', $context);
 
@@ -57,7 +60,7 @@ class LocalTimestampMicrosTypeTest extends TestCase
     {
         $context = $this->createMock(ValidationContextInterface::class);
         $context->expects($this->once())->method('addError')
-            ->with('Local timestamp value must be a DateTimeInterface object');
+            ->with('expected DateTimeInterface, got integer');
 
         $result = $this->timestampType->validate(1684152645, $context);
 
@@ -120,8 +123,8 @@ class LocalTimestampMicrosTypeTest extends TestCase
     {
         $result = $this->timestampType->denormalize(0);
 
-        $this->assertIsString($result);
-        $this->assertSame('1970-01-01 00:00:00', $result);
+        $this->assertInstanceOf(DateTimeInterface::class, $result);
+        $this->assertSame('1970-01-01T00:00:00', $result->format('Y-m-d\TH:i:s'));
     }
 
     public function testDenormalizeWithMicroseconds(): void
@@ -130,10 +133,8 @@ class LocalTimestampMicrosTypeTest extends TestCase
 
         $result = $this->timestampType->denormalize($microseconds);
 
-        $this->assertIsString($result);
-        $this->assertStringContainsString('.123456', $result);
-        $this->assertStringNotContainsString('Z', $result); // No timezone indicator for local timestamp
-        $this->assertStringNotContainsString('T', $result); // Local format uses space
+        $this->assertInstanceOf(DateTimeInterface::class, $result);
+        $this->assertStringContainsString('.123456', $result->format('Y-m-d H:i:s.u'));
     }
 
     public function testDenormalizeWithoutMicroseconds(): void
@@ -142,10 +143,8 @@ class LocalTimestampMicrosTypeTest extends TestCase
 
         $result = $this->timestampType->denormalize($microseconds);
 
-        $this->assertIsString($result);
-        $this->assertStringNotContainsString('.', $result); // No microseconds shown when zero
-        $this->assertStringNotContainsString('Z', $result);
-        $this->assertStringNotContainsString('T', $result);
+        $this->assertInstanceOf(DateTimeInterface::class, $result);
+        $this->assertStringNotContainsString('.', $result->format('Y-m-d H:i:s')); // No microseconds shown when zero
     }
 
     public function testDenormalizeWithPartialMicroseconds(): void
@@ -154,8 +153,8 @@ class LocalTimestampMicrosTypeTest extends TestCase
 
         $result = $this->timestampType->denormalize($microseconds);
 
-        $this->assertIsString($result);
-        $this->assertStringContainsString('.000100', $result);
+        $this->assertInstanceOf(DateTimeInterface::class, $result);
+        $this->assertStringContainsString('.000100', $result->format('Y-m-d H:i:s.u'));
     }
 
     public function testNormalizeAndDenormalizeRoundTrip(): void
@@ -165,10 +164,9 @@ class LocalTimestampMicrosTypeTest extends TestCase
         $normalized = $this->timestampType->normalize($originalDateTime);
         $denormalized = $this->timestampType->denormalize($normalized);
 
-        // Check that we get back a valid local timestamp string
-        $this->assertIsString($denormalized);
-        $this->assertStringContainsString('12:30:45.123456', $denormalized);
-        $this->assertStringNotContainsString('Z', $denormalized);
+        // Check that we get back a DateTimeInterface object
+        $this->assertInstanceOf(DateTimeInterface::class, $denormalized);
+        $this->assertStringContainsString('12:30:45.123456', $denormalized->format('Y-m-d H:i:s.u'));
     }
 
     public function testNormalizeAndDenormalizeRoundTripWithoutMicroseconds(): void
@@ -178,11 +176,10 @@ class LocalTimestampMicrosTypeTest extends TestCase
         $normalized = $this->timestampType->normalize($originalDateTime);
         $denormalized = $this->timestampType->denormalize($normalized);
 
-        // Check that we get back a valid local timestamp string
-        $this->assertIsString($denormalized);
-        $this->assertStringContainsString('12:30:45', $denormalized);
-        $this->assertStringNotContainsString('.', $denormalized); // No decimal when no microseconds
-        $this->assertStringNotContainsString('Z', $denormalized);
+        // Check that we get back a DateTimeInterface object
+        $this->assertInstanceOf(DateTimeInterface::class, $denormalized);
+        $this->assertStringContainsString('12:30:45', $denormalized->format('Y-m-d H:i:s'));
+        $this->assertStringNotContainsString('.', $denormalized->format('Y-m-d H:i:s')); // No decimal when no microseconds
     }
 
     public function testNormalizeWithNegativeTimestamp(): void
@@ -200,8 +197,8 @@ class LocalTimestampMicrosTypeTest extends TestCase
 
         $result = $this->timestampType->denormalize($microseconds);
 
-        $this->assertIsString($result);
-        $this->assertStringContainsString('1969-12-31 23:59:59', $result);
+        $this->assertInstanceOf(DateTimeInterface::class, $result);
+        $this->assertStringContainsString('1969-12-31 23:59:59', $result->format('Y-m-d H:i:s'));
     }
 
     public function testTimezoneIgnoredInNormalization(): void
@@ -225,13 +222,43 @@ class LocalTimestampMicrosTypeTest extends TestCase
 
         $result = $this->timestampType->denormalize($microseconds);
 
-        $this->assertIsString($result);
+        $this->assertInstanceOf(DateTimeInterface::class, $result);
+        
+        // The result should be a proper DateTimeInterface object
+        // Format it to check it doesn't contain timezone indicators when formatted as local
+        $formatted = $result->format('Y-m-d H:i:s.u');
+        $this->assertStringContainsString('12:10:45.123456', $formatted);
+    }
 
-        // Should not contain any timezone indicators
-        $this->assertStringNotContainsString('Z', $result);
-        $this->assertStringNotContainsString('+', $result);
-        $this->assertStringNotContainsString('UTC', $result);
-        $this->assertStringNotContainsString('T', $result); // Uses space separator for local format
-        $this->assertStringContainsString(' ', $result); // Should have space between date and time
+    public static function localTimestampMicrosecondsProvider(): Generator
+    {
+        // For local timestamp: time components are treated as UTC regardless of original timezone
+        yield '12 microseconds after epoch (local as UTC)' => [new DateTime('1970-01-01 00:00:00.000012'), 12];
+        yield '1001 microseconds after epoch (local as UTC)' => [new DateTime('1970-01-01 00:00:00.001001'), 1001];
+        yield 'epoch (local as UTC)' => [new DateTime('1970-01-01 00:00:00.000000'), 0];
+        yield '877 microseconds before epoch (local as UTC)' => [new DateTime('1969-12-31 23:59:59.999123'), -877];
+        yield '1001 microseconds before epoch (local as UTC)' => [new DateTime('1969-12-31 23:59:59.998999'), -1001];
+        // These should be treated as the time components in UTC, ignoring timezone
+        yield 'date within summer time (local as UTC)' => [new DateTime('2024-04-01T14:05:00.123456+02:00'), 1711980300123456];
+        yield 'date out of summer time (local as UTC)' => [new DateTime('2024-03-30T14:05:00.123456+01:00'), 1711807500123456];
+        yield 'large future date (local as UTC)' => [new DateTime('2100-01-01 00:00:00.000000'), 4102444800000000];
+    }
+
+    #[DataProvider('localTimestampMicrosecondsProvider')]
+    public function testNormalizeWithProvider(object $dateTime, int $expected): void
+    {
+        $actual = $this->timestampType->normalize($dateTime);
+        self::assertSame($expected, $actual);
+    }
+
+    #[DataProvider('localTimestampMicrosecondsProvider')]
+    public function testDenormalizeWithProvider(DateTimeInterface $expected, int $input): void
+    {
+        $actual = $this->timestampType->denormalize($input);
+
+        self::assertInstanceOf(DateTimeInterface::class, $actual);
+        self::assertSame((new DateTime())->getTimezone()->getName(), $actual->getTimezone()->getName());
+        // For local timestamp: the time components should match (ignoring timezone)
+        self::assertSame($expected->format('Y-m-d H:i:s.u'), $actual->format('Y-m-d H:i:s.u'));
     }
 }
