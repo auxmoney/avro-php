@@ -42,6 +42,15 @@ class DecimalFactory implements LogicalTypeFactoryInterface
             throw new InvalidSchemaException('Decimal scale must be between 0 and precision');
         }
 
-        return new DecimalType($precision, $scale);
+        // For fixed schemas, extract the size from the schema
+        $size = null;
+        if ($attributes['type'] === 'fixed' && isset($attributes['size']) && is_int($attributes['size'])) {
+            $size = $attributes['size'];
+            if ($size <= 0) {
+                throw new InvalidSchemaException('Fixed size must be a positive integer');
+            }
+        }
+
+        return new DecimalType($precision, $scale, $size);
     }
 }

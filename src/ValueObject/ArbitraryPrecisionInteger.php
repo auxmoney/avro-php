@@ -35,10 +35,7 @@ final readonly class ArbitraryPrecisionInteger
 
     public static function fromInteger(int $value): self
     {
-        $packedBytes = pack('J', $value);
-        $bytes = self::trimBytesString($packedBytes);
-
-        return new self($bytes);
+        return self::fromBytes(pack('J', $value));
     }
 
     public static function fromDecimalRepresentation(string $value): self
@@ -67,9 +64,8 @@ final readonly class ArbitraryPrecisionInteger
         if ($isNegative) {
             $bytes = self::toTwosComplement($bytes);
         }
-        $bytes = self::leftTrimBytes($bytes);
 
-        return new self(self::toBytesString($bytes));
+        return self::fromBytes(self::toBytesString($bytes));
     }
 
     public function toString(): string
@@ -167,14 +163,19 @@ final readonly class ArbitraryPrecisionInteger
         if ($isNegative && $bytes !== [0]) {
             $bytes = self::toTwosComplement($bytes);
         }
-        $bytes = self::leftTrimBytes($bytes);
 
-        return new self(self::toBytesString($bytes));
+        return self::fromBytes(self::toBytesString($bytes));
     }
 
-    public function toBytes(): string
+    public function toBytes(?int $padLength = null): string
     {
-        return $this->bytes;
+        $bytes = $this->bytes;
+        if ($padLength !== null) {
+            $paddingByte = $this->isNegative() ? "\xFF" : "\x00";
+            $bytes = str_pad($bytes, $padLength, $paddingByte, STR_PAD_LEFT);
+        }
+
+        return $bytes;
     }
 
     public function toInteger(): int
@@ -183,24 +184,20 @@ final readonly class ArbitraryPrecisionInteger
             throw new InvalidArgumentException('Cannot convert to integer: number of bytes exceeds 8');
         }
 
-        // Pad with appropriate bytes based on sign to reach 8 bytes for unpack
-        $paddedBytes = $this->bytes;
-        $paddingByte = $this->isNegative() ? "\xFF" : "\x00";
-
-        // Pad to 8 bytes from the left
-        while (strlen($paddedBytes) < 8) {
-            $paddedBytes = $paddingByte . $paddedBytes;
-        }
-
         // Unpack as signed 64-bit integer (big-endian)
-        $result = unpack('J', $paddedBytes);
+        $result = unpack('J', $this->toBytes(8));
         assert($result !== false && is_int($result[1]), 'Failed to unpack integer bytes');
         return $result[1];
     }
 
     public function isNegative(): bool
     {
-        return $this->bytes !== '' && (ord($this->bytes[0]) & 0x80) !== 0;
+        return self::isBytesNegative($this->bytes);
+    }
+
+    private static function isBytesNegative(string $bytes): bool
+    {
+        return $bytes !== '' && (ord($bytes[0]) & 0x80) !== 0;
     }
 
     /**
@@ -225,10 +222,14 @@ final readonly class ArbitraryPrecisionInteger
 
     private static function trimBytesString(string $packedBytes): string
     {
-        $byteArray = self::toBytesArray($packedBytes);
+        $isNegative = self::isBytesNegative($packedBytes);
+        $trimByte = $isNegative ? "\xFF" : "\x00";
+        $trimmed = ltrim($packedBytes, $trimByte);
+        if (self::isBytesNegative($trimmed) !== $isNegative) {
+            $trimmed = $trimByte . $trimmed;
+        }
 
-        $trimmedBytes = self::leftTrimBytes($byteArray);
-        return self::toBytesString($trimmedBytes);
+        return $trimmed;
     }
 
     /**
@@ -334,34 +335,5 @@ final readonly class ArbitraryPrecisionInteger
         }
 
         return $bytes;
-    }
-
-    /**
-     * @param array<int> $bytes
-     * @return array<int>
-     */
-    private static function leftTrimBytes(array $bytes): array
-    {
-        $len = count($bytes);
-        if ($len === 0) {
-            return [];
-        }
-
-        // Determine what byte value we should trim based on the sign of the number
-        $mostSignificantBit = $bytes[0] & 0x80;
-        $trimByte = $mostSignificantBit === 0 ? 0x00 : 0xFF;
-
-        // Find how many leading bytes we can trim
-        $trimIndex = 0;
-        $currentByte = $bytes[0];
-        $nextByte = $trimIndex + 1 < $len ? $bytes[$trimIndex + 1] : 0;
-
-        while ($trimIndex < $len && $currentByte === $trimByte && ($nextByte & 0x80) === $mostSignificantBit) {
-            $trimIndex++;
-            $currentByte = $nextByte;
-            $nextByte = $trimIndex + 1 < $len ? $bytes[$trimIndex + 1] : 0;
-        }
-
-        return array_slice($bytes, $trimIndex);
     }
 }
