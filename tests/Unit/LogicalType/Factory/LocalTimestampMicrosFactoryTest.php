@@ -25,7 +25,7 @@ class LocalTimestampMicrosFactoryTest extends TestCase
 
     public function testCreateWithEmptyAttributes(): void
     {
-        $result = $this->factory->create([]);
+        $result = $this->factory->create(['type' => 'long']);
 
         $this->assertInstanceOf(LogicalTypeInterface::class, $result);
         $this->assertInstanceOf(LocalTimestampMicrosType::class, $result);
@@ -33,7 +33,7 @@ class LocalTimestampMicrosFactoryTest extends TestCase
 
     public function testCreateWithAttributes(): void
     {
-        $result = $this->factory->create(['someAttribute' => 'value']);
+        $result = $this->factory->create(['type' => 'long', 'someAttribute' => 'value']);
 
         $this->assertInstanceOf(LogicalTypeInterface::class, $result);
         $this->assertInstanceOf(LocalTimestampMicrosType::class, $result);
@@ -41,8 +41,8 @@ class LocalTimestampMicrosFactoryTest extends TestCase
 
     public function testCreateReturnsNewInstanceEachTime(): void
     {
-        $result1 = $this->factory->create([]);
-        $result2 = $this->factory->create([]);
+        $result1 = $this->factory->create(['type' => 'long']);
+        $result2 = $this->factory->create(['type' => 'long']);
 
         $this->assertInstanceOf(LocalTimestampMicrosType::class, $result1);
         $this->assertInstanceOf(LocalTimestampMicrosType::class, $result2);

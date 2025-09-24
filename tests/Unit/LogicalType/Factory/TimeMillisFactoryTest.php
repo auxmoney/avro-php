@@ -25,7 +25,7 @@ class TimeMillisFactoryTest extends TestCase
 
     public function testCreateWithEmptyAttributes(): void
     {
-        $result = $this->factory->create([]);
+        $result = $this->factory->create(['type' => 'int']);
 
         $this->assertInstanceOf(LogicalTypeInterface::class, $result);
         $this->assertInstanceOf(TimeMillisType::class, $result);
@@ -33,7 +33,7 @@ class TimeMillisFactoryTest extends TestCase
 
     public function testCreateWithAttributes(): void
     {
-        $result = $this->factory->create(['someAttribute' => 'value']);
+        $result = $this->factory->create(['type' => 'int', 'someAttribute' => 'value']);
 
         $this->assertInstanceOf(LogicalTypeInterface::class, $result);
         $this->assertInstanceOf(TimeMillisType::class, $result);
@@ -41,8 +41,8 @@ class TimeMillisFactoryTest extends TestCase
 
     public function testCreateReturnsNewInstanceEachTime(): void
     {
-        $result1 = $this->factory->create([]);
-        $result2 = $this->factory->create([]);
+        $result1 = $this->factory->create(['type' => 'int']);
+        $result2 = $this->factory->create(['type' => 'int']);
 
         $this->assertInstanceOf(TimeMillisType::class, $result1);
         $this->assertInstanceOf(TimeMillisType::class, $result2);
