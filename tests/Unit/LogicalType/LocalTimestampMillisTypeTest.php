@@ -8,7 +8,10 @@ use Auxmoney\Avro\Contracts\ValidationContextInterface;
 use Auxmoney\Avro\LogicalType\LocalTimestampMillisType;
 use DateTime;
 use DateTimeImmutable;
+use DateTimeInterface;
 use DateTimeZone;
+use Generator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class LocalTimestampMillisTypeTest extends TestCase
@@ -271,5 +274,37 @@ class LocalTimestampMillisTypeTest extends TestCase
                 "Failed for microseconds {$microseconds}, expected {$expectedMilliseconds} ms, got {$actualMilliseconds} ms",
             );
         }
+    }
+
+    public static function localTimestampMillisecondsProvider(): Generator
+    {
+        // For local timestamp: time components are treated as UTC regardless of original timezone
+        yield '12 milliseconds after epoch (local as UTC)' => [new DateTime('1970-01-01 00:00:00.012'), 12];
+        yield '1001 milliseconds after epoch (local as UTC)' => [new DateTime('1970-01-01 00:00:01.001'), 1001];
+        yield 'epoch (local as UTC)' => [new DateTime('1970-01-01 00:00:00.000'), 0];
+        yield '877 milliseconds before epoch (local as UTC)' => [new DateTime('1969-12-31 23:59:59.123'), -877];
+        yield '1001 milliseconds before epoch (local as UTC)' => [new DateTime('1969-12-31 23:59:58.999'), -1001];
+        // These should be treated as the time components in UTC, ignoring timezone
+        yield 'date within summer time (local as UTC)' => [new DateTime('2024-04-01T14:05:00.123+02:00'), 1711980300123];
+        yield 'date out of summer time (local as UTC)' => [new DateTime('2024-03-30T14:05:00.123+01:00'), 1711807500123];
+        yield 'large future date (local as UTC)' => [new DateTime('2100-01-01 00:00:00.000'), 4102444800000];
+    }
+
+    #[DataProvider('localTimestampMillisecondsProvider')]
+    public function testNormalizeWithProvider(object $dateTime, int $expected): void
+    {
+        $actual = $this->timestampType->normalize($dateTime);
+        self::assertSame($expected, $actual);
+    }
+
+    #[DataProvider('localTimestampMillisecondsProvider')]
+    public function testDenormalizeWithProvider(DateTimeInterface $expected, int $input): void
+    {
+        $actual = $this->timestampType->denormalize($input);
+
+        self::assertInstanceOf(DateTimeInterface::class, $actual);
+        self::assertSame((new DateTime())->getTimezone()->getName(), $actual->getTimezone()->getName());
+        // For local timestamp: the time components should match (ignoring timezone)
+        self::assertSame($expected->format('Y-m-d H:i:s.v'), $actual->format('Y-m-d H:i:s.v'));
     }
 }
