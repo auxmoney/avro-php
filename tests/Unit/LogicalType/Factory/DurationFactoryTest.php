@@ -25,7 +25,10 @@ class DurationFactoryTest extends TestCase
 
     public function testCreateWithEmptyAttributes(): void
     {
-        $result = $this->factory->create([]);
+        $result = $this->factory->create([
+            'type' => 'fixed',
+            'size' => 12,
+        ]);
 
         $this->assertInstanceOf(LogicalTypeInterface::class, $result);
         $this->assertInstanceOf(DurationType::class, $result);
@@ -33,7 +36,11 @@ class DurationFactoryTest extends TestCase
 
     public function testCreateWithAttributes(): void
     {
-        $result = $this->factory->create(['someAttribute' => 'value']);
+        $result = $this->factory->create([
+            'type' => 'fixed',
+            'size' => 12,
+            'someAttribute' => 'value',
+        ]);
 
         $this->assertInstanceOf(LogicalTypeInterface::class, $result);
         $this->assertInstanceOf(DurationType::class, $result);
@@ -41,8 +48,14 @@ class DurationFactoryTest extends TestCase
 
     public function testCreateReturnsNewInstanceEachTime(): void
     {
-        $result1 = $this->factory->create([]);
-        $result2 = $this->factory->create([]);
+        $result1 = $this->factory->create([
+            'type' => 'fixed',
+            'size' => 12,
+        ]);
+        $result2 = $this->factory->create([
+            'type' => 'fixed',
+            'size' => 12,
+        ]);
 
         $this->assertInstanceOf(DurationType::class, $result1);
         $this->assertInstanceOf(DurationType::class, $result2);
