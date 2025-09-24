@@ -6,44 +6,49 @@ namespace Auxmoney\Avro\LogicalType;
 
 use Auxmoney\Avro\Contracts\LogicalTypeInterface;
 use Auxmoney\Avro\Contracts\ValidationContextInterface;
-use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
 
 class TimestampMillisType implements LogicalTypeInterface
 {
+    private DateTimeImmutable $zeroDate;
+    private DateTimeZone $defaultTimeZone;
+
+    public function __construct()
+    {
+        $this->zeroDate = new DateTimeImmutable('@0');
+        $this->defaultTimeZone = (new DateTimeImmutable())->getTimezone();
+    }
+
     public function validate(mixed $datum, ?ValidationContextInterface $context): bool
     {
-        if ($datum instanceof DateTimeInterface) {
-            return true;
+        if (!($datum instanceof DateTimeInterface)) {
+            $context?->addError('expected DateTimeInterface, got ' . gettype($datum));
+            return false;
         }
 
-        $context?->addError('Timestamp value must be a DateTimeInterface object');
-        return false;
+        return true;
     }
 
     public function normalize(mixed $datum): mixed
     {
         assert($datum instanceof DateTimeInterface);
-
-        return (int) ($datum->getTimestamp() * 1000 + intval($datum->format('u') / 1000));
+        return $this->getMillisecondsSinceEpoch($datum);
     }
 
     public function denormalize(mixed $datum): mixed
     {
-        assert(is_int($datum), 'Expected integer (milliseconds since Unix epoch) for timestamp denormalization');
+        assert(is_int($datum), 'TimestampMillis logical type datum must be an integer');
 
-        $seconds = intval($datum / 1000);
-        $milliseconds = $datum % 1000;
+        return $this->zeroDate->modify("{$datum} milliseconds")->setTimezone($this->defaultTimeZone);
+    }
 
-        $dateTime = new DateTime('@' . $seconds);
-        $dateTime->setTimezone(new DateTimeZone('UTC'));
+    private function getMillisecondsSinceEpoch(DateTimeInterface $datum): int
+    {
+        $seconds = (int) $datum->format('U');
+        $milliseconds = (int) $datum->format('v');
 
-        // Add milliseconds
-        if ($milliseconds > 0) {
-            $dateTime->modify('+' . $milliseconds . ' milliseconds');
-        }
-
-        return $dateTime->format('Y-m-d\TH:i:s.v\Z');
+        return $seconds * 1000 + $milliseconds;
     }
 }

@@ -8,7 +8,10 @@ use Auxmoney\Avro\Contracts\ValidationContextInterface;
 use Auxmoney\Avro\LogicalType\TimestampMicrosType;
 use DateTime;
 use DateTimeImmutable;
+use DateTimeInterface;
 use DateTimeZone;
+use Generator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class TimestampMicrosTypeTest extends TestCase
@@ -46,7 +49,7 @@ class TimestampMicrosTypeTest extends TestCase
     {
         $context = $this->createMock(ValidationContextInterface::class);
         $context->expects($this->once())->method('addError')
-            ->with('Timestamp value must be a DateTimeInterface object');
+            ->with('expected DateTimeInterface, got string');
 
         $result = $this->timestampType->validate('2023-05-15', $context);
 
@@ -57,7 +60,7 @@ class TimestampMicrosTypeTest extends TestCase
     {
         $context = $this->createMock(ValidationContextInterface::class);
         $context->expects($this->once())->method('addError')
-            ->with('Timestamp value must be a DateTimeInterface object');
+            ->with('expected DateTimeInterface, got integer');
 
         $result = $this->timestampType->validate(1684152645, $context);
 
@@ -73,23 +76,39 @@ class TimestampMicrosTypeTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testNormalizeWithEpochTime(): void
+    public static function microsecondsProvider(): Generator
     {
-        $dateTime = new DateTimeImmutable('1970-01-01 00:00:00.000000', new DateTimeZone('UTC'));
-
-        $result = $this->timestampType->normalize($dateTime);
-
-        $this->assertSame(0, $result);
+        yield '12 microseconds after epoch' => [new DateTime('1970-01-01 00:00:00.000012+00'), 12];
+        yield '1001 microseconds after epoch' => [new DateTime('1970-01-01 00:00:00.001001+00'), 1001];
+        yield 'epoch' => [new DateTime('1970-01-01 00:00:00.000000+00'), 0];
+        yield '877 microseconds before epoch' => [new DateTime('1969-12-31 23:59:59.999123+00'), -877];
+        yield '1001 microseconds before epoch' => [new DateTime('1969-12-31 23:59:59.998999+00'), -1001];
+        yield 'date within summer time' => [new DateTime('2024-04-01T14:05:00.123456+00:00'), 1711980300123456];
+        yield 'date out of summer time' => [new DateTime('2024-03-30T14:05:00.123456+00:00'), 1711807500123456];
+        yield 'large future date' => [new DateTime('2100-01-01 00:00:00.000000+00'), 4102444800000000];
     }
 
-    public function testNormalizeWithMicroseconds(): void
+    /**
+     * @throws Exception
+     */
+    #[DataProvider('microsecondsProvider')]
+    public function testNormalize(object $dateTime, int $expected): void
     {
-        $dateTime = new DateTimeImmutable('2023-05-15 12:30:45.123456', new DateTimeZone('UTC'));
+        $actual = $this->timestampType->normalize($dateTime);
+        self::assertSame($expected, $actual);
+    }
 
-        $result = $this->timestampType->normalize($dateTime);
+    /**
+     * @throws Exception
+     */
+    #[DataProvider('microsecondsProvider')]
+    public function testDenormalize(DateTimeInterface $expected, int $input): void
+    {
+        $actual = $this->timestampType->denormalize($input);
 
-        $expected = $dateTime->getTimestamp() * 1000000 + 123456;
-        $this->assertSame($expected, $result);
+        self::assertInstanceOf(DateTimeInterface::class, $actual);
+        self::assertSame((new DateTime())->getTimezone()->getName(), $actual->getTimezone()->getName());
+        self::assertEquals($expected, $actual);
     }
 
     public function testNormalizeWithoutMicroseconds(): void
@@ -102,46 +121,14 @@ class TimestampMicrosTypeTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function testNormalizeWithTimezone(): void
-    {
-        $utc = new DateTimeImmutable('2023-05-15 12:30:45', new DateTimeZone('UTC'));
-        $pst = new DateTimeImmutable('2023-05-15 12:30:45', new DateTimeZone('America/Los_Angeles'));
-
-        $utcResult = $this->timestampType->normalize($utc);
-        $pstResult = $this->timestampType->normalize($pst);
-
-        // PST is 7-8 hours behind UTC, so the timestamp should be different
-        $this->assertNotEquals($utcResult, $pstResult);
-    }
-
-    public function testDenormalizeWithZero(): void
-    {
-        $result = $this->timestampType->denormalize(0);
-
-        $this->assertIsString($result);
-        $this->assertSame('1970-01-01T00:00:00.000000Z', $result);
-    }
-
-    public function testDenormalizeWithMicroseconds(): void
-    {
-        $microseconds = 1684152645123456; // Some timestamp with microseconds
-
-        $result = $this->timestampType->denormalize($microseconds);
-
-        $this->assertIsString($result);
-        $this->assertStringContainsString('T', $result);
-        $this->assertStringEndsWith('Z', $result);
-        $this->assertStringContainsString('.123456', $result);
-    }
-
     public function testDenormalizeWithoutMicroseconds(): void
     {
         $microseconds = 1684152645000000; // Exact seconds
 
         $result = $this->timestampType->denormalize($microseconds);
 
-        $this->assertIsString($result);
-        $this->assertStringEndsWith('.000000Z', $result);
+        $this->assertInstanceOf(DateTimeImmutable::class, $result);
+        $this->assertStringEndsWith('.000000', $result->format('Y-m-d\TH:i:s.u'));
     }
 
     public function testNormalizeAndDenormalizeRoundTrip(): void
@@ -151,41 +138,8 @@ class TimestampMicrosTypeTest extends TestCase
         $normalized = $this->timestampType->normalize($originalDateTime);
         $denormalized = $this->timestampType->denormalize($normalized);
 
-        // Check that we get back a valid timestamp string
-        $this->assertIsString($denormalized);
-        $this->assertStringContainsString('2023-05-15T12:30:45.123456Z', $denormalized);
-    }
-
-    public function testNormalizeAndDenormalizeRoundTripWithoutMicroseconds(): void
-    {
-        $originalDateTime = new DateTimeImmutable('2023-05-15 12:30:45', new DateTimeZone('UTC'));
-
-        $normalized = $this->timestampType->normalize($originalDateTime);
-        $denormalized = $this->timestampType->denormalize($normalized);
-
-        // Check that we get back a valid timestamp string
-        $this->assertIsString($denormalized);
-        $this->assertStringContainsString('2023-05-15T12:30:45.000000Z', $denormalized);
-    }
-
-    public function testNormalizeWithNegativeTimestamp(): void
-    {
-        $dateTime = new DateTimeImmutable('1969-12-31 23:59:59', new DateTimeZone('UTC'));
-
-        $result = $this->timestampType->normalize($dateTime);
-
-        $expected = $dateTime->getTimestamp() * 1000000 + (int) $dateTime->format('u');
-        $this->assertSame($expected, $result);
-        $this->assertLessThan(0, $result);
-    }
-
-    public function testDenormalizeWithNegativeTimestamp(): void
-    {
-        $microseconds = -1000000; // 1 second before epoch
-
-        $result = $this->timestampType->denormalize($microseconds);
-
-        $this->assertIsString($result);
-        $this->assertStringContainsString('1969-12-31T23:59:59.000000Z', $result);
+        // Check that we get back a DateTimeImmutable object
+        $this->assertInstanceOf(DateTimeImmutable::class, $denormalized);
+        $this->assertSame('2023-05-15T12:30:45.123456', $denormalized->format('Y-m-d\TH:i:s.u'));
     }
 }
