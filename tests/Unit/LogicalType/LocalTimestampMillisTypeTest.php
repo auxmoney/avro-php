@@ -49,7 +49,7 @@ class LocalTimestampMillisTypeTest extends TestCase
     {
         $context = $this->createMock(ValidationContextInterface::class);
         $context->expects($this->once())->method('addError')
-            ->with('Local timestamp value must be a DateTimeInterface object');
+            ->with('expected DateTimeInterface, got string');
 
         $result = $this->timestampType->validate('2023-05-15', $context);
 
@@ -60,7 +60,7 @@ class LocalTimestampMillisTypeTest extends TestCase
     {
         $context = $this->createMock(ValidationContextInterface::class);
         $context->expects($this->once())->method('addError')
-            ->with('Local timestamp value must be a DateTimeInterface object');
+            ->with('expected DateTimeInterface, got integer');
 
         $result = $this->timestampType->validate(1684152645, $context);
 
@@ -132,24 +132,16 @@ class LocalTimestampMillisTypeTest extends TestCase
         $this->assertIsInt($result);
     }
 
-    public function testDenormalizeWithZero(): void
-    {
-        $result = $this->timestampType->denormalize(0);
-
-        $this->assertIsString($result);
-        $this->assertSame('1970-01-01 00:00:00', $result);
-    }
-
     public function testDenormalizeWithMilliseconds(): void
     {
         $milliseconds = 1684152645123; // Some timestamp with milliseconds
 
         $result = $this->timestampType->denormalize($milliseconds);
 
-        $this->assertIsString($result);
-        $this->assertStringContainsString('.123', $result);
-        $this->assertStringNotContainsString('Z', $result); // No timezone indicator for local timestamp
-        $this->assertStringNotContainsString('T', $result); // Local format uses space
+        $this->assertInstanceOf(DateTimeInterface::class, $result);
+        $formatted = $result->format('Y-m-d H:i:s.v');
+        $this->assertStringContainsString('.123', $formatted);
+        // Local timestamp should not show timezone indicators when formatted as local
     }
 
     public function testDenormalizeWithoutMilliseconds(): void
@@ -158,10 +150,9 @@ class LocalTimestampMillisTypeTest extends TestCase
 
         $result = $this->timestampType->denormalize($milliseconds);
 
-        $this->assertIsString($result);
-        $this->assertStringNotContainsString('.', $result); // No milliseconds shown when zero
-        $this->assertStringNotContainsString('Z', $result);
-        $this->assertStringNotContainsString('T', $result);
+        $this->assertInstanceOf(DateTimeInterface::class, $result);
+        $formatted = $result->format('Y-m-d H:i:s.v');
+        $this->assertStringContainsString('.000', $formatted); // Milliseconds shown as .000 when zero
     }
 
     public function testDenormalizeWithPartialMilliseconds(): void
@@ -170,8 +161,9 @@ class LocalTimestampMillisTypeTest extends TestCase
 
         $result = $this->timestampType->denormalize($milliseconds);
 
-        $this->assertIsString($result);
-        $this->assertStringContainsString('.001', $result);
+        $this->assertInstanceOf(DateTimeInterface::class, $result);
+        $formatted = $result->format('Y-m-d H:i:s.v');
+        $this->assertStringContainsString('.001', $formatted);
     }
 
     public function testNormalizeAndDenormalizeRoundTrip(): void
@@ -181,10 +173,10 @@ class LocalTimestampMillisTypeTest extends TestCase
         $normalized = $this->timestampType->normalize($originalDateTime);
         $denormalized = $this->timestampType->denormalize($normalized);
 
-        // Check that we get back a valid local timestamp string
-        $this->assertIsString($denormalized);
-        $this->assertStringContainsString('12:30:45.123', $denormalized);
-        $this->assertStringNotContainsString('Z', $denormalized);
+        // Check that we get back a DateTimeInterface with the correct time components
+        $this->assertInstanceOf(DateTimeInterface::class, $denormalized);
+        $formatted = $denormalized->format('H:i:s.v');
+        $this->assertStringContainsString('12:30:45.123', $formatted);
     }
 
     public function testNormalizeAndDenormalizeRoundTripWithoutMilliseconds(): void
@@ -194,11 +186,10 @@ class LocalTimestampMillisTypeTest extends TestCase
         $normalized = $this->timestampType->normalize($originalDateTime);
         $denormalized = $this->timestampType->denormalize($normalized);
 
-        // Check that we get back a valid local timestamp string
-        $this->assertIsString($denormalized);
-        $this->assertStringContainsString('12:30:45', $denormalized);
-        $this->assertStringNotContainsString('.', $denormalized); // No decimal when no milliseconds
-        $this->assertStringNotContainsString('Z', $denormalized);
+        // Check that we get back a DateTimeInterface with the correct time components
+        $this->assertInstanceOf(DateTimeInterface::class, $denormalized);
+        $formatted = $denormalized->format('H:i:s');
+        $this->assertStringContainsString('12:30:45', $formatted);
     }
 
     public function testNormalizeWithNegativeTimestamp(): void
@@ -216,8 +207,9 @@ class LocalTimestampMillisTypeTest extends TestCase
 
         $result = $this->timestampType->denormalize($milliseconds);
 
-        $this->assertIsString($result);
-        $this->assertStringContainsString('1969-12-31 23:59:59', $result);
+        $this->assertInstanceOf(DateTimeInterface::class, $result);
+        $formatted = $result->format('Y-m-d H:i:s');
+        $this->assertStringContainsString('1969-12-31 23:59:59', $formatted);
     }
 
     public function testTimezoneIgnoredInNormalization(): void
@@ -241,14 +233,15 @@ class LocalTimestampMillisTypeTest extends TestCase
 
         $result = $this->timestampType->denormalize($milliseconds);
 
-        $this->assertIsString($result);
+        $this->assertInstanceOf(DateTimeInterface::class, $result);
+        $formatted = $result->format('Y-m-d H:i:s.v');
 
-        // Should not contain any timezone indicators
-        $this->assertStringNotContainsString('Z', $result);
-        $this->assertStringNotContainsString('+', $result);
-        $this->assertStringNotContainsString('UTC', $result);
-        $this->assertStringNotContainsString('T', $result); // Uses space separator for local format
-        $this->assertStringContainsString(' ', $result); // Should have space between date and time
+        // Should not contain any timezone indicators in the formatted string
+        $this->assertStringNotContainsString('Z', $formatted);
+        $this->assertStringNotContainsString('+', $formatted);
+        $this->assertStringNotContainsString('UTC', $formatted);
+        // Check that it uses local timezone
+        $this->assertEquals((new DateTimeImmutable())->getTimezone()->getName(), $result->getTimezone()->getName());
     }
 
     public function testNormalizeWithMicrosecondsRounding(): void

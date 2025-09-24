@@ -34,7 +34,7 @@ class LocalTimestampMicrosType implements LogicalTypeInterface
     public function normalize(mixed $datum): mixed
     {
         assert($datum instanceof DateTimeInterface);
-        
+
         // For local timestamp: treat the local time components as if they were UTC
         // e.g., 14:00 CEST should be treated as 14:00 UTC, not 12:00 UTC
         $utcDateTime = new DateTimeImmutable($datum->format('Y-m-d H:i:s.u'), new DateTimeZone('UTC'));
@@ -52,7 +52,7 @@ class LocalTimestampMicrosType implements LogicalTypeInterface
         $utcDateTime = $this->zeroDate
             ->modify("+{$seconds} seconds")
             ->modify("+{$remainingMicroseconds} microseconds");
-        
+
         // Create a new DateTime with the same time components but in local timezone
         // This preserves the time (e.g., 12:00 UTC becomes 12:00 local, not shifted)
         return new DateTimeImmutable($utcDateTime->format('Y-m-d H:i:s.u'), $this->defaultTimeZone);
