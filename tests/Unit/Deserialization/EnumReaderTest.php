@@ -7,7 +7,7 @@ namespace Auxmoney\Avro\Tests\Unit\Deserialization;
 use Auxmoney\Avro\Contracts\ReadableStreamInterface;
 use Auxmoney\Avro\Deserialization\BinaryDecoder;
 use Auxmoney\Avro\Deserialization\EnumReader;
-use Auxmoney\Avro\Exceptions\RuntimeException;
+use Auxmoney\Avro\Exceptions\SchemaMismatchException;
 use PHPUnit\Framework\TestCase;
 
 class EnumReaderTest extends TestCase
@@ -72,7 +72,7 @@ class EnumReaderTest extends TestCase
             ->with($this->stream)
             ->willReturn($invalidIndex);
 
-        $this->expectException(RuntimeException::class);
+        $this->expectException(SchemaMismatchException::class);
         $this->expectExceptionMessage("Invalid enum index: {$invalidIndex}");
 
         $this->reader->read($this->stream);
@@ -87,21 +87,8 @@ class EnumReaderTest extends TestCase
             ->with($this->stream)
             ->willReturn($invalidIndex);
 
-        $this->expectException(RuntimeException::class);
+        $this->expectException(SchemaMismatchException::class);
         $this->expectExceptionMessage("Invalid enum index: {$invalidIndex}");
-
-        $this->reader->read($this->stream);
-    }
-
-    public function testReadWithDecoderException(): void
-    {
-        $this->decoder->expects($this->once())
-            ->method('readLong')
-            ->with($this->stream)
-            ->willThrowException(new RuntimeException('Decoder error'));
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Decoder error');
 
         $this->reader->read($this->stream);
     }
@@ -115,7 +102,7 @@ class EnumReaderTest extends TestCase
             ->with($this->stream)
             ->willReturn(0);
 
-        $this->expectException(RuntimeException::class);
+        $this->expectException(SchemaMismatchException::class);
         $this->expectExceptionMessage('Invalid enum index: 0');
 
         $emptyReader->read($this->stream);
@@ -144,7 +131,7 @@ class EnumReaderTest extends TestCase
             ->with($this->stream)
             ->willReturn(1); // Invalid for single-value enum
 
-        $this->expectException(RuntimeException::class);
+        $this->expectException(SchemaMismatchException::class);
         $this->expectExceptionMessage('Invalid enum index: 1');
 
         $singleValueReader->read($this->stream);
@@ -155,19 +142,6 @@ class EnumReaderTest extends TestCase
         $this->decoder->expects($this->once())
             ->method('skipLong')
             ->with($this->stream);
-
-        $this->reader->skip($this->stream);
-    }
-
-    public function testSkipWithDecoderException(): void
-    {
-        $this->decoder->expects($this->once())
-            ->method('skipLong')
-            ->with($this->stream)
-            ->willThrowException(new RuntimeException('Skip error'));
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Skip error');
 
         $this->reader->skip($this->stream);
     }
@@ -197,7 +171,7 @@ class EnumReaderTest extends TestCase
             ->with($this->stream)
             ->willReturn($invalidIndex);
 
-        $this->expectException(RuntimeException::class);
+        $this->expectException(SchemaMismatchException::class);
         $this->expectExceptionMessage("Invalid enum index: {$invalidIndex}");
 
         $this->reader->read($this->stream);

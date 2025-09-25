@@ -26,6 +26,9 @@ readonly class Decimal
         return $this->toString();
     }
 
+    /**
+     * @throws InvalidArgumentException if the input is not a valid decimal string
+     */
     public static function fromDecimalRepresentation(string $value): self
     {
         if (!preg_match('/^-?\d+(\.\d+)?$/', $value)) {

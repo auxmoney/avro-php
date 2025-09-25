@@ -38,6 +38,9 @@ final readonly class ArbitraryPrecisionInteger
         return self::fromBytes(pack('J', $value));
     }
 
+    /**
+     * @throws InvalidArgumentException if the input is not a valid integer string
+     */
     public static function fromDecimalRepresentation(string $value): self
     {
         if (!preg_match('/^-?\d+$/', $value)) {
