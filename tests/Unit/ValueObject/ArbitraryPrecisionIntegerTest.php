@@ -11,18 +11,24 @@ use PHPUnit\Framework\TestCase;
 
 class ArbitraryPrecisionIntegerTest extends TestCase
 {
-    #[DataProvider('constructorValidInputProvider')]
-    #[DataProvider('constructorValidInputProvider')]
-    public function testConstructorWithBasicValues(string|int $input, string $expected): void
+    #[DataProvider('constructorValidIntegerProvider')]
+    public function testConstructorWithBasicIntegerValues(int $input, string $expected): void
     {
-        $integer = ArbitraryPrecisionInteger::fromNumeric($input);
+        $integer = ArbitraryPrecisionInteger::fromInteger($input);
+        self::assertSame($expected, $integer->toString());
+    }
+
+    #[DataProvider('constructorValidStringProvider')]
+    public function testConstructorWithBasicStringValues(string $input, string $expected): void
+    {
+        $integer = ArbitraryPrecisionInteger::fromString($input);
         self::assertSame($expected, $integer->toString());
     }
 
     /**
-     * @return array<int, array{string|int, string}>
+     * @return array<int, array{int, string}>
      */
-    public static function constructorValidInputProvider(): array
+    public static function constructorValidIntegerProvider(): array
     {
         return [
             // Integer inputs
@@ -35,7 +41,15 @@ class ArbitraryPrecisionIntegerTest extends TestCase
             [-123456789, '-123456789'],
             [PHP_INT_MAX, (string) PHP_INT_MAX],
             [PHP_INT_MIN, (string) PHP_INT_MIN],
+        ];
+    }
 
+    /**
+     * @return array<int, array{string, string}>
+     */
+    public static function constructorValidStringProvider(): array
+    {
+        return [
             // String inputs
             ['0', '0'],
             ['1', '1'],
@@ -67,7 +81,7 @@ class ArbitraryPrecisionIntegerTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Value must be a valid integer string');
 
-        ArbitraryPrecisionInteger::fromNumeric($input);
+        ArbitraryPrecisionInteger::fromString($input);
     }
 
     /**
@@ -93,24 +107,34 @@ class ArbitraryPrecisionIntegerTest extends TestCase
         ];
     }
 
-    #[DataProvider('getValueProvider')]
-    public function testGetValue(string|int $input, string $expected): void
+    #[DataProvider('getValueIntegerProvider')]
+    public function testGetValueWithInteger(int $input, string $expected): void
     {
-        $integer = ArbitraryPrecisionInteger::fromNumeric($input);
+        $integer = ArbitraryPrecisionInteger::fromInteger($input);
+        $this->assertSame($expected, $integer->toString());
+    }
+
+    #[DataProvider('getValueStringProvider')]
+    public function testGetValueWithString(string $input, string $expected): void
+    {
+        $integer = ArbitraryPrecisionInteger::fromString($input);
         $this->assertSame($expected, $integer->toString());
     }
 
     /**
-     * @return array<int, array{string|int, string}>
+     * @return array<int, array{int, string}>
      */
-    public static function getValueProvider(): array
+    public static function getValueIntegerProvider(): array
+    {
+        return [[0, '0'], [1, '1'], [-1, '-1'], [42, '42'], [-42, '-42']];
+    }
+
+    /**
+     * @return array<int, array{string, string}>
+     */
+    public static function getValueStringProvider(): array
     {
         return [
-            [0, '0'],
-            [1, '1'],
-            [-1, '-1'],
-            [42, '42'],
-            [-42, '-42'],
             ['12345678901234567890', '12345678901234567890'],
             ['-12345678901234567890', '-12345678901234567890'],
             ['0', '0'],
@@ -119,18 +143,26 @@ class ArbitraryPrecisionIntegerTest extends TestCase
         ];
     }
 
-    #[DataProvider('scalePositiveProvider')]
-    public function testScalePositive(string|int $input, int $exponent, string $expected): void
+    #[DataProvider('scalePositiveIntegerProvider')]
+    public function testScalePositiveWithInteger(int $input, int $exponent, string $expected): void
     {
-        $integer = ArbitraryPrecisionInteger::fromNumeric($input);
+        $integer = ArbitraryPrecisionInteger::fromInteger($input);
+        $shifted = $integer->shiftDecimalPosition($exponent);
+        $this->assertSame($expected, $shifted->toString());
+    }
+
+    #[DataProvider('scalePositiveStringProvider')]
+    public function testScalePositiveWithString(string $input, int $exponent, string $expected): void
+    {
+        $integer = ArbitraryPrecisionInteger::fromString($input);
         $shifted = $integer->shiftDecimalPosition($exponent);
         $this->assertSame($expected, $shifted->toString());
     }
 
     /**
-     * @return array<int, array{string|int, int, string}>
+     * @return array<int, array{int, int, string}>
      */
-    public static function scalePositiveProvider(): array
+    public static function scalePositiveIntegerProvider(): array
     {
         return [
             // Zero scaling
@@ -157,25 +189,41 @@ class ArbitraryPrecisionIntegerTest extends TestCase
             // Zero input with positive shift
             [0, 5, '0'],
             [0, 100, '0'],
+        ];
+    }
 
+    /**
+     * @return array<int, array{string, int, string}>
+     */
+    public static function scalePositiveStringProvider(): array
+    {
+        return [
             // Large number scaling
             ['12345678901234567890', 3, '12345678901234567890000'],
             ['-12345678901234567890', 3, '-12345678901234567890000'],
         ];
     }
 
-    #[DataProvider('scaleNegativeProvider')]
-    public function testScaleNegative(string|int $input, int $exponent, string $expected): void
+    #[DataProvider('scaleNegativeIntegerProvider')]
+    public function testScaleNegativeWithInteger(int $input, int $exponent, string $expected): void
     {
-        $integer = ArbitraryPrecisionInteger::fromNumeric($input);
+        $integer = ArbitraryPrecisionInteger::fromInteger($input);
+        $shifted = $integer->shiftDecimalPosition($exponent);
+        $this->assertSame($expected, $shifted->toString());
+    }
+
+    #[DataProvider('scaleNegativeStringProvider')]
+    public function testScaleNegativeWithString(string $input, int $exponent, string $expected): void
+    {
+        $integer = ArbitraryPrecisionInteger::fromString($input);
         $shifted = $integer->shiftDecimalPosition($exponent);
         $this->assertSame($expected, $shifted->toString());
     }
 
     /**
-     * @return array<int, array{string|int, int, string}>
+     * @return array<int, array{int, int, string}>
      */
-    public static function scaleNegativeProvider(): array
+    public static function scaleNegativeIntegerProvider(): array
     {
         return [
             // Single digit right scaling
@@ -195,14 +243,6 @@ class ArbitraryPrecisionIntegerTest extends TestCase
             [-1, -1, '0'], // -1/10 = -0.1 → rounds down to 0
             [-9, -1, '-1'], // -9/10 = -0.9 → rounds to -1
 
-            // Large number right scaling
-            ['12345678901234567890000', -3, '12345678901234567890'],
-            ['-12345678901234567890000', -3, '-12345678901234567890'],
-
-            // Base boundary tests
-            ['1000000000', -9, '1'], // Exactly one base unit
-            ['10000000000', -10, '1'],
-
             // Zero input with negative shift
             [0, -5, '0'],
             [0, -100, '0'],
@@ -215,18 +255,32 @@ class ArbitraryPrecisionIntegerTest extends TestCase
         ];
     }
 
+    /**
+     * @return array<int, array{string, int, string}>
+     */
+    public static function scaleNegativeStringProvider(): array
+    {
+        return [
+            // Large number right scaling
+            ['12345678901234567890000', -3, '12345678901234567890'],
+            ['-12345678901234567890000', -3, '-12345678901234567890'],
+
+            // Base boundary tests
+            ['1000000000', -9, '1'], // Exactly one base unit
+            ['10000000000', -10, '1'],
+        ];
+    }
+
     public function testScaleZeroPositions(): void
     {
-        $integer = ArbitraryPrecisionInteger::fromNumeric(42);
-        $shifted = $integer; // No scaling needed for zero positions
-
-        // Should return the same instance for zero shift
+        $integer = ArbitraryPrecisionInteger::fromInteger(42);
+        $shifted = $integer->shiftDecimalPosition(0);
         $this->assertSame($integer, $shifted);
     }
 
     public function testScaleZeroValue(): void
     {
-        $integer = ArbitraryPrecisionInteger::fromNumeric(0);
+        $integer = ArbitraryPrecisionInteger::fromInteger(0);
 
         // Test positive scaling (multiplication by 10^100)
         $shifted = $integer->shiftDecimalPosition(100);
@@ -244,7 +298,7 @@ class ArbitraryPrecisionIntegerTest extends TestCase
     #[DataProvider('bytesProvider')]
     public function testToBytes(string $expectedHex, string $input): void
     {
-        $integer = ArbitraryPrecisionInteger::fromNumeric($input);
+        $integer = ArbitraryPrecisionInteger::fromString($input);
         $bytes = $integer->toBytes();
         $actualHex = bin2hex($bytes);
         $this->assertSame($expectedHex, $actualHex);
@@ -310,17 +364,30 @@ class ArbitraryPrecisionIntegerTest extends TestCase
     }
 
     /**
-     * Test round-trip consistency: value -> toBytes -> fromBytes -> value
+     * Test round-trip consistency: value -> toBytes -> fromBytes -> value (integers)
      */
-    public function testRoundTripConsistency(): void
+    public function testRoundTripConsistencyWithIntegers(): void
     {
-        $testValues = [
-            0, 1, -1, 127, -128, 255, -256, 32767, -32768, 65535, -65536,
-            2147483647, -2147483648, '12345678901234567890', '-12345678901234567890',
-        ];
+        $testValues = [0, 1, -1, 127, -128, 255, -256, 32767, -32768, 65535, -65536, 2147483647, -2147483648];
 
         foreach ($testValues as $value) {
-            $original = ArbitraryPrecisionInteger::fromNumeric($value);
+            $original = ArbitraryPrecisionInteger::fromInteger($value);
+            $bytes = $original->toBytes();
+            $restored = ArbitraryPrecisionInteger::fromBytes($bytes);
+
+            $this->assertSame($original->toString(), $restored->toString(), "Round-trip failed for value: {$value}");
+        }
+    }
+
+    /**
+     * Test round-trip consistency: value -> toBytes -> fromBytes -> value (strings)
+     */
+    public function testRoundTripConsistencyWithStrings(): void
+    {
+        $testValues = ['12345678901234567890', '-12345678901234567890'];
+
+        foreach ($testValues as $value) {
+            $original = ArbitraryPrecisionInteger::fromString($value);
             $bytes = $original->toBytes();
             $restored = ArbitraryPrecisionInteger::fromBytes($bytes);
 
@@ -335,16 +402,16 @@ class ArbitraryPrecisionIntegerTest extends TestCase
     {
         // Test very large numbers
         $largePositive = '999999999999999999999999999999999999999999999999999999999999';
-        $integer = ArbitraryPrecisionInteger::fromNumeric($largePositive);
+        $integer = ArbitraryPrecisionInteger::fromString($largePositive);
         $this->assertSame($largePositive, $integer->toString());
 
         $largeNegative = '-999999999999999999999999999999999999999999999999999999999999';
-        $integer = ArbitraryPrecisionInteger::fromNumeric($largeNegative);
+        $integer = ArbitraryPrecisionInteger::fromString($largeNegative);
         $this->assertSame($largeNegative, $integer->toString());
 
         // Test number with many digits that cross base boundaries
         $manyDigits = '123456789012345678901234567890123456789012345678901234567890';
-        $integer = ArbitraryPrecisionInteger::fromNumeric($manyDigits);
+        $integer = ArbitraryPrecisionInteger::fromString($manyDigits);
         $this->assertSame($manyDigits, $integer->toString());
 
         // Test shift operations on large numbers
@@ -355,7 +422,7 @@ class ArbitraryPrecisionIntegerTest extends TestCase
 
     public function testImmutability(): void
     {
-        $original = ArbitraryPrecisionInteger::fromNumeric(42);
+        $original = ArbitraryPrecisionInteger::fromInteger(42);
         $shifted = $original->shiftDecimalPosition(2);
 
         // Original should be unchanged
@@ -369,14 +436,14 @@ class ArbitraryPrecisionIntegerTest extends TestCase
     public function testLargeScales(): void
     {
         // Test very large positive scaling
-        $integer = ArbitraryPrecisionInteger::fromNumeric(1);
+        $integer = ArbitraryPrecisionInteger::fromInteger(1);
         $shifted = $integer->shiftDecimalPosition(100);
         $expected = '1' . str_repeat('0', 100);
         $this->assertSame($expected, $shifted->toString());
 
         // Test very large negative scaling on large numbers
         $large = '1' . str_repeat('0', 100);
-        $integer = ArbitraryPrecisionInteger::fromNumeric($large);
+        $integer = ArbitraryPrecisionInteger::fromString($large);
 
         $shifted = $integer->shiftDecimalPosition(-99);
         $this->assertSame('10', $shifted->toString());
@@ -388,36 +455,57 @@ class ArbitraryPrecisionIntegerTest extends TestCase
         $this->assertSame('0', $shifted->toString());
     }
 
-    #[DataProvider('isNegativeProvider')]
-    public function testIsNegative(string|int $input, bool $expected): void
+    #[DataProvider('isNegativeIntegerProvider')]
+    public function testIsNegativeWithInteger(int $input, bool $expected): void
     {
-        $integer = ArbitraryPrecisionInteger::fromNumeric($input);
+        $integer = ArbitraryPrecisionInteger::fromInteger($input);
+        $this->assertSame($expected, $integer->isNegative());
+    }
+
+    #[DataProvider('isNegativeStringProvider')]
+    public function testIsNegativeWithString(string $input, bool $expected): void
+    {
+        $integer = ArbitraryPrecisionInteger::fromString($input);
         $this->assertSame($expected, $integer->isNegative());
     }
 
     /**
-     * @return array<int, array{string|int, bool}>
+     * @return array<int, array{int, bool}>
      */
-    public static function isNegativeProvider(): array
+    public static function isNegativeIntegerProvider(): array
     {
         return [
             // Zero cases
             [0, false],
-            ['0', false],
-            ['000', false],
-            ['-0', false], // -0 should be normalized to 0 (not negative)
 
             // Positive cases
             [1, false],
             [42, false],
             [PHP_INT_MAX, false],
-            ['12345678901234567890', false],
-            ['999999999999999999999999999999', false],
 
             // Negative cases
             [-1, true],
             [-42, true],
             [PHP_INT_MIN, true],
+        ];
+    }
+
+    /**
+     * @return array<int, array{string, bool}>
+     */
+    public static function isNegativeStringProvider(): array
+    {
+        return [
+            // Zero cases
+            ['0', false],
+            ['000', false],
+            ['-0', false], // -0 should be normalized to 0 (not negative)
+
+            // Positive cases
+            ['12345678901234567890', false],
+            ['999999999999999999999999999999', false],
+
+            // Negative cases
             ['-12345678901234567890', true],
             ['-999999999999999999999999999999', true],
         ];
@@ -426,23 +514,33 @@ class ArbitraryPrecisionIntegerTest extends TestCase
     /**
      * @param array<int> $expectedDigits
      */
-    #[DataProvider('toAbsoluteDecimalDigitsProvider')]
-    public function testToAbsoluteDecimalDigits(string|int $input, array $expectedDigits): void
+    #[DataProvider('toAbsoluteDecimalDigitsIntegerProvider')]
+    public function testToAbsoluteDecimalDigitsWithInteger(int $input, array $expectedDigits): void
     {
-        $integer = ArbitraryPrecisionInteger::fromNumeric($input);
+        $integer = ArbitraryPrecisionInteger::fromInteger($input);
         $digits = $integer->toAbsoluteDecimalDigits();
         $this->assertSame($expectedDigits, $digits);
     }
 
     /**
-     * @return array<int, array{string|int, array<int>}>
+     * @param array<int> $expectedDigits
      */
-    public static function toAbsoluteDecimalDigitsProvider(): array
+    #[DataProvider('toAbsoluteDecimalDigitsStringProvider')]
+    public function testToAbsoluteDecimalDigitsWithString(string $input, array $expectedDigits): void
+    {
+        $integer = ArbitraryPrecisionInteger::fromString($input);
+        $digits = $integer->toAbsoluteDecimalDigits();
+        $this->assertSame($expectedDigits, $digits);
+    }
+
+    /**
+     * @return array<int, array{int, array<int>}>
+     */
+    public static function toAbsoluteDecimalDigitsIntegerProvider(): array
     {
         return [
             // Zero case
             [0, [0]],
-            ['0', [0]],
 
             // Single digit cases
             [1, [1]],
@@ -465,33 +563,22 @@ class ArbitraryPrecisionIntegerTest extends TestCase
             [98765, [9, 8, 7, 6, 5]],
             [-12345, [1, 2, 3, 4, 5]], // Absolute value
             [-98765, [9, 8, 7, 6, 5]],
+        ];
+    }
+
+    /**
+     * @return array<int, array{string, array<int>}>
+     */
+    public static function toAbsoluteDecimalDigitsStringProvider(): array
+    {
+        return [
+            // Zero case
+            ['0', [0]],
 
             // Very large numbers
             ['12345678901234567890', [1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0]],
             ['-12345678901234567890', [1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0]],
         ];
-    }
-
-    public function testFromNumericWithIntegerInputCallsFromInteger(): void
-    {
-        // This test ensures fromNumeric correctly delegates to fromInteger for int inputs
-        $value = 42;
-        $fromNumeric = ArbitraryPrecisionInteger::fromNumeric($value);
-        $fromInteger = ArbitraryPrecisionInteger::fromInteger($value);
-
-        $this->assertSame($fromInteger->toString(), $fromNumeric->toString());
-        $this->assertSame($fromInteger->toBytes(), $fromNumeric->toBytes());
-    }
-
-    public function testFromNumericWithStringInputCallsFromDecimalRepresentation(): void
-    {
-        // This test ensures fromNumeric correctly delegates to fromDecimalRepresentation for string inputs
-        $value = '12345678901234567890';
-        $fromNumeric = ArbitraryPrecisionInteger::fromNumeric($value);
-        $fromDecimal = ArbitraryPrecisionInteger::fromString($value);
-
-        $this->assertSame($fromDecimal->toString(), $fromNumeric->toString());
-        $this->assertSame($fromDecimal->toBytes(), $fromNumeric->toBytes());
     }
 
     public function testEmptyBytesHandling(): void
@@ -509,23 +596,30 @@ class ArbitraryPrecisionIntegerTest extends TestCase
         $this->assertSame($zero1, $scaled);
     }
 
-    #[DataProvider('toIntegerValidProvider')]
-    public function testToIntegerValid(string|int $input, int $expected): void
+    #[DataProvider('toIntegerValidIntegerProvider')]
+    public function testToIntegerValidWithInteger(int $input, int $expected): void
     {
-        $integer = ArbitraryPrecisionInteger::fromNumeric($input);
+        $integer = ArbitraryPrecisionInteger::fromInteger($input);
+        $result = $integer->toInteger();
+        $this->assertSame($expected, $result);
+    }
+
+    #[DataProvider('toIntegerValidStringProvider')]
+    public function testToIntegerValidWithString(string $input, int $expected): void
+    {
+        $integer = ArbitraryPrecisionInteger::fromString($input);
         $result = $integer->toInteger();
         $this->assertSame($expected, $result);
     }
 
     /**
-     * @return array<int, array{string|int, int}>
+     * @return array<int, array{int, int}>
      */
-    public static function toIntegerValidProvider(): array
+    public static function toIntegerValidIntegerProvider(): array
     {
         return [
             // Zero
             [0, 0],
-            ['0', 0],
 
             // Small positive numbers
             [1, 1],
@@ -562,11 +656,22 @@ class ArbitraryPrecisionIntegerTest extends TestCase
         ];
     }
 
+    /**
+     * @return array<int, array{string, int}>
+     */
+    public static function toIntegerValidStringProvider(): array
+    {
+        return [
+            // Zero
+            ['0', 0],
+        ];
+    }
+
     public function testToIntegerExceedsMaxBytes(): void
     {
         // Create a number that requires more than 8 bytes
         $largeNumber = '12345678901234567890123456789'; // Much larger than max 64-bit int
-        $integer = ArbitraryPrecisionInteger::fromNumeric($largeNumber);
+        $integer = ArbitraryPrecisionInteger::fromString($largeNumber);
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Cannot convert to integer: number of bytes exceeds 8');
@@ -594,18 +699,18 @@ class ArbitraryPrecisionIntegerTest extends TestCase
     {
         // Test edge case with exactly 8 bytes
         $maxInt64 = '9223372036854775807'; // 2^63 - 1 (max signed 64-bit)
-        $integer = ArbitraryPrecisionInteger::fromNumeric($maxInt64);
+        $integer = ArbitraryPrecisionInteger::fromString($maxInt64);
         $result = $integer->toInteger();
         $this->assertSame(PHP_INT_MAX, $result);
 
         $minInt64 = '-9223372036854775808'; // -2^63 (min signed 64-bit)
-        $integer = ArbitraryPrecisionInteger::fromNumeric($minInt64);
+        $integer = ArbitraryPrecisionInteger::fromString($minInt64);
         $result = $integer->toInteger();
         $this->assertSame(PHP_INT_MIN, $result);
 
         // Test number slightly larger than max 64-bit (should throw)
         $tooLargePositive = '9223372036854775808'; // 2^63
-        $integer = ArbitraryPrecisionInteger::fromNumeric($tooLargePositive);
+        $integer = ArbitraryPrecisionInteger::fromString($tooLargePositive);
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Cannot convert to integer: number of bytes exceeds 8');
