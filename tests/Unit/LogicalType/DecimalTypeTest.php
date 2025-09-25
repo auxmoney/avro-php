@@ -57,7 +57,7 @@ class DecimalTypeTest extends TestCase
 
     public function testValidateWithValidDecimal(): void
     {
-        $decimal = Decimal::fromDecimalRepresentation('123.45');
+        $decimal = Decimal::fromString('123.45');
         $context = $this->createMock(ValidationContextInterface::class);
         $context->expects($this->never())->method('addError');
 
@@ -101,7 +101,7 @@ class DecimalTypeTest extends TestCase
 
     public function testValidateWithoutContext(): void
     {
-        $decimal = Decimal::fromDecimalRepresentation('123.45');
+        $decimal = Decimal::fromString('123.45');
 
         $result = $this->decimalType->validate($decimal, null);
 
@@ -117,7 +117,7 @@ class DecimalTypeTest extends TestCase
 
     public function testNormalizeWithDecimal(): void
     {
-        $decimal = Decimal::fromDecimalRepresentation('123.45');
+        $decimal = Decimal::fromString('123.45');
 
         $result = $this->decimalType->normalize($decimal);
 
@@ -128,7 +128,7 @@ class DecimalTypeTest extends TestCase
 
     public function testNormalizeWithDifferentScale(): void
     {
-        $decimal = Decimal::fromDecimalRepresentation('123.4567'); // 4 decimal places
+        $decimal = Decimal::fromString('123.4567'); // 4 decimal places
 
         $result = $this->decimalType->normalize($decimal);
 
@@ -139,7 +139,7 @@ class DecimalTypeTest extends TestCase
 
     public function testDenormalizeWithValidBytes(): void
     {
-        $originalDecimal = Decimal::fromDecimalRepresentation('123.45');
+        $originalDecimal = Decimal::fromString('123.45');
         $bytes = $originalDecimal->withScale(2)->toBytes();
 
         $result = $this->decimalType->denormalize($bytes);
@@ -150,7 +150,7 @@ class DecimalTypeTest extends TestCase
 
     public function testNormalizeAndDenormalizeRoundTrip(): void
     {
-        $originalDecimal = Decimal::fromDecimalRepresentation('987.65');
+        $originalDecimal = Decimal::fromString('987.65');
 
         $normalized = $this->decimalType->normalize($originalDecimal);
         $denormalized = $this->decimalType->denormalize($normalized);
@@ -176,7 +176,7 @@ class DecimalTypeTest extends TestCase
     public function testWithLargePrecisionAndScale(): void
     {
         $decimalType = new DecimalType(20, 10);
-        $decimal = Decimal::fromDecimalRepresentation('1234567890.1234567890');
+        $decimal = Decimal::fromString('1234567890.1234567890');
 
         $normalized = $decimalType->normalize($decimal);
         $denormalized = $decimalType->denormalize($normalized);
@@ -187,7 +187,7 @@ class DecimalTypeTest extends TestCase
 
     public function testWithNegativeDecimal(): void
     {
-        $decimal = Decimal::fromDecimalRepresentation('-123.45');
+        $decimal = Decimal::fromString('-123.45');
 
         $normalized = $this->decimalType->normalize($decimal);
         $denormalized = $this->decimalType->denormalize($normalized);
@@ -199,7 +199,7 @@ class DecimalTypeTest extends TestCase
     public function testFixedDecimalTypeWithValidSize(): void
     {
         $decimalType = new DecimalType(10, 2, 4); // 4 bytes fixed size
-        $decimal = Decimal::fromDecimalRepresentation('123.45');
+        $decimal = Decimal::fromString('123.45');
 
         $normalized = $decimalType->normalize($decimal);
         $this->assertSame(4, strlen($normalized));
@@ -212,7 +212,7 @@ class DecimalTypeTest extends TestCase
     public function testFixedDecimalTypeWithSmallerValue(): void
     {
         $decimalType = new DecimalType(10, 2, 8); // 8 bytes fixed size
-        $decimal = Decimal::fromDecimalRepresentation('1.23'); // Small value that needs padding
+        $decimal = Decimal::fromString('1.23'); // Small value that needs padding
 
         $normalized = $decimalType->normalize($decimal);
         $this->assertSame(8, strlen($normalized)); // Should be padded to 8 bytes
@@ -225,7 +225,7 @@ class DecimalTypeTest extends TestCase
     public function testFixedDecimalTypeWithNegativeValue(): void
     {
         $decimalType = new DecimalType(10, 2, 8); // 8 bytes fixed size
-        $decimal = Decimal::fromDecimalRepresentation('-1.23'); // Negative value that needs padding
+        $decimal = Decimal::fromString('-1.23'); // Negative value that needs padding
 
         $normalized = $decimalType->normalize($decimal);
         $this->assertSame(8, strlen($normalized)); // Should be padded to 8 bytes
@@ -242,7 +242,7 @@ class DecimalTypeTest extends TestCase
     public function testFixedDecimalTypeWithPositiveValuePadding(): void
     {
         $decimalType = new DecimalType(10, 2, 8); // 8 bytes fixed size
-        $decimal = Decimal::fromDecimalRepresentation('1.23'); // Positive value that needs padding
+        $decimal = Decimal::fromString('1.23'); // Positive value that needs padding
 
         $normalized = $decimalType->normalize($decimal);
         $this->assertSame(8, strlen($normalized)); // Should be padded to 8 bytes
@@ -259,7 +259,7 @@ class DecimalTypeTest extends TestCase
     public function testFixedDecimalTypeValueExceedsSize(): void
     {
         $decimalType = new DecimalType(10, 2, 2); // Only 2 bytes fixed size
-        $decimal = Decimal::fromDecimalRepresentation('1234567.89'); // Large value that exceeds 2 bytes
+        $decimal = Decimal::fromString('1234567.89'); // Large value that exceeds 2 bytes
         $context = $this->createMock(ValidationContextInterface::class);
 
         $context->expects($this->once())->method('addError')
@@ -272,7 +272,7 @@ class DecimalTypeTest extends TestCase
     public function testFixedDecimalTypeValidationPasses(): void
     {
         $decimalType = new DecimalType(10, 2, 4); // 4 bytes fixed size
-        $decimal = Decimal::fromDecimalRepresentation('123.45'); // Value that fits in 4 bytes
+        $decimal = Decimal::fromString('123.45'); // Value that fits in 4 bytes
         $context = $this->createMock(ValidationContextInterface::class);
 
         $context->expects($this->never())->method('addError');
@@ -288,7 +288,7 @@ class DecimalTypeTest extends TestCase
     public function testFixedDecimalTypeWithZero(): void
     {
         $decimalType = new DecimalType(10, 2, 4); // 4 bytes fixed size
-        $decimal = Decimal::fromDecimalRepresentation('0.00');
+        $decimal = Decimal::fromString('0.00');
 
         $normalized = $decimalType->normalize($decimal);
         $this->assertSame(4, strlen($normalized)); // Should be padded to 4 bytes
@@ -328,7 +328,7 @@ class DecimalTypeTest extends TestCase
     {
         // Test that bytes type (size = null) works as before
         $decimalType = new DecimalType(10, 2); // No size specified
-        $decimal = Decimal::fromDecimalRepresentation('12345.67');
+        $decimal = Decimal::fromString('12345.67');
 
         $normalized = $decimalType->normalize($decimal);
 
