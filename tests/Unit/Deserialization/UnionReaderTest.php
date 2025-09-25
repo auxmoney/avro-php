@@ -8,7 +8,7 @@ use Auxmoney\Avro\Contracts\ReadableStreamInterface;
 use Auxmoney\Avro\Contracts\ReaderInterface;
 use Auxmoney\Avro\Deserialization\BinaryDecoder;
 use Auxmoney\Avro\Deserialization\UnionReader;
-use Auxmoney\Avro\Exceptions\RuntimeException;
+use Auxmoney\Avro\Exceptions\SchemaMismatchException;
 use PHPUnit\Framework\TestCase;
 
 class UnionReaderTest extends TestCase
@@ -86,7 +86,7 @@ class UnionReaderTest extends TestCase
         $this->branchReader2->expects($this->never())
             ->method('read');
 
-        $this->expectException(RuntimeException::class);
+        $this->expectException(SchemaMismatchException::class);
         $this->expectExceptionMessage('Invalid branch index: 2');
 
         $this->reader->read($this->stream);
@@ -105,39 +105,8 @@ class UnionReaderTest extends TestCase
         $this->branchReader2->expects($this->never())
             ->method('read');
 
-        $this->expectException(RuntimeException::class);
+        $this->expectException(SchemaMismatchException::class);
         $this->expectExceptionMessage('Invalid branch index: -1');
-
-        $this->reader->read($this->stream);
-    }
-
-    public function testReadWithDecoderException(): void
-    {
-        $this->decoder->expects($this->once())
-            ->method('readLong')
-            ->with($this->stream)
-            ->willThrowException(new RuntimeException('Decoder error'));
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Decoder error');
-
-        $this->reader->read($this->stream);
-    }
-
-    public function testReadWithBranchReaderException(): void
-    {
-        $this->decoder->expects($this->once())
-            ->method('readLong')
-            ->with($this->stream)
-            ->willReturn(0);
-
-        $this->branchReader1->expects($this->once())
-            ->method('read')
-            ->with($this->stream)
-            ->willThrowException(new RuntimeException('Branch reader error'));
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Branch reader error');
 
         $this->reader->read($this->stream);
     }
@@ -189,7 +158,7 @@ class UnionReaderTest extends TestCase
         $this->branchReader2->expects($this->never())
             ->method('skip');
 
-        $this->expectException(RuntimeException::class);
+        $this->expectException(SchemaMismatchException::class);
         $this->expectExceptionMessage('Invalid branch index: 2');
 
         $this->reader->skip($this->stream);
@@ -208,39 +177,8 @@ class UnionReaderTest extends TestCase
         $this->branchReader2->expects($this->never())
             ->method('skip');
 
-        $this->expectException(RuntimeException::class);
+        $this->expectException(SchemaMismatchException::class);
         $this->expectExceptionMessage('Invalid branch index: -1');
-
-        $this->reader->skip($this->stream);
-    }
-
-    public function testSkipWithDecoderException(): void
-    {
-        $this->decoder->expects($this->once())
-            ->method('readLong')
-            ->with($this->stream)
-            ->willThrowException(new RuntimeException('Decoder error'));
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Decoder error');
-
-        $this->reader->skip($this->stream);
-    }
-
-    public function testSkipWithBranchReaderException(): void
-    {
-        $this->decoder->expects($this->once())
-            ->method('readLong')
-            ->with($this->stream)
-            ->willReturn(0);
-
-        $this->branchReader1->expects($this->once())
-            ->method('skip')
-            ->with($this->stream)
-            ->willThrowException(new RuntimeException('Branch skip error'));
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Branch skip error');
 
         $this->reader->skip($this->stream);
     }

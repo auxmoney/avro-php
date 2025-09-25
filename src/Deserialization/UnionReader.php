@@ -6,7 +6,7 @@ namespace Auxmoney\Avro\Deserialization;
 
 use Auxmoney\Avro\Contracts\ReadableStreamInterface;
 use Auxmoney\Avro\Contracts\ReaderInterface;
-use Auxmoney\Avro\Exceptions\RuntimeException;
+use Auxmoney\Avro\Exceptions\SchemaMismatchException;
 
 class UnionReader implements ReaderInterface
 {
@@ -23,7 +23,7 @@ class UnionReader implements ReaderInterface
     {
         $branchIndex = $this->decoder->readLong($stream);
         if (!isset($this->branchReaders[$branchIndex])) {
-            throw new RuntimeException('Invalid branch index: ' . $branchIndex);
+            throw new SchemaMismatchException('Invalid branch index: ' . $branchIndex);
         }
 
         return $this->branchReaders[$branchIndex]->read($stream);
@@ -33,7 +33,7 @@ class UnionReader implements ReaderInterface
     {
         $branchIndex = $this->decoder->readLong($stream);
         if (!isset($this->branchReaders[$branchIndex])) {
-            throw new RuntimeException('Invalid branch index: ' . $branchIndex);
+            throw new SchemaMismatchException('Invalid branch index: ' . $branchIndex);
         }
 
         $this->branchReaders[$branchIndex]->skip($stream);

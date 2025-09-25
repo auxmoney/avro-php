@@ -6,7 +6,7 @@ namespace Auxmoney\Avro\Deserialization;
 
 use Auxmoney\Avro\Contracts\ReadableStreamInterface;
 use Auxmoney\Avro\Contracts\ReaderInterface;
-use Auxmoney\Avro\Exceptions\RuntimeException;
+use Auxmoney\Avro\Exceptions\SchemaMismatchException;
 
 class EnumReader implements ReaderInterface
 {
@@ -23,7 +23,7 @@ class EnumReader implements ReaderInterface
     {
         $index = $this->decoder->readLong($stream);
         if (!isset($this->values[$index])) {
-            throw new RuntimeException('Invalid enum index: ' . $index);
+            throw new SchemaMismatchException('Invalid enum index: ' . $index);
         }
 
         return $this->values[$index];
