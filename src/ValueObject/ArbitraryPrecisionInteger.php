@@ -24,18 +24,6 @@ final readonly class ArbitraryPrecisionInteger
         return new self(self::trimBytesString($bytes));
     }
 
-    /**
-     * @throws InvalidArgumentException
-     */
-    public static function fromNumeric(string|int $value): self
-    {
-        if (is_int($value)) {
-            return self::fromInteger($value);
-        }
-
-        return self::fromString($value);
-    }
-
     public static function fromInteger(int $value): self
     {
         return self::fromBytes(pack('J', $value));
