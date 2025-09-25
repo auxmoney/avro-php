@@ -488,7 +488,7 @@ class ArbitraryPrecisionIntegerTest extends TestCase
         // This test ensures fromNumeric correctly delegates to fromDecimalRepresentation for string inputs
         $value = '12345678901234567890';
         $fromNumeric = ArbitraryPrecisionInteger::fromNumeric($value);
-        $fromDecimal = ArbitraryPrecisionInteger::fromDecimalRepresentation($value);
+        $fromDecimal = ArbitraryPrecisionInteger::fromString($value);
 
         $this->assertSame($fromDecimal->toString(), $fromNumeric->toString());
         $this->assertSame($fromDecimal->toBytes(), $fromNumeric->toBytes());

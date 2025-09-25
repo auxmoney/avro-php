@@ -8,17 +8,10 @@ use Auxmoney\Avro\Exceptions\InvalidArgumentException;
 
 readonly class Decimal
 {
-    private ArbitraryPrecisionInteger $unscaledValue;
-    private int $scale;
-
-    public function __construct(ArbitraryPrecisionInteger $unscaledValue, int $scale)
-    {
-        if ($scale < 0) {
-            throw new InvalidArgumentException('Scale must be non-negative');
-        }
-
-        $this->unscaledValue = $unscaledValue;
-        $this->scale = $scale;
+    private function __construct(
+        private ArbitraryPrecisionInteger $unscaledValue,
+        private int $scale,
+    ) {
     }
 
     public function __toString(): string
@@ -27,9 +20,21 @@ readonly class Decimal
     }
 
     /**
+     * @throws InvalidArgumentException if scale is negative
+     */
+    public static function fromUnscaledValue(ArbitraryPrecisionInteger $unscaledValue, int $scale): self
+    {
+        if ($scale < 0) {
+            throw new InvalidArgumentException('Scale must be non-negative');
+        }
+
+        return new self($unscaledValue, $scale);
+    }
+
+    /**
      * @throws InvalidArgumentException if the input is not a valid decimal string
      */
-    public static function fromDecimalRepresentation(string $value): self
+    public static function fromString(string $value): self
     {
         if (!preg_match('/^-?\d+(\.\d+)?$/', $value)) {
             throw new InvalidArgumentException('Invalid decimal format');
@@ -54,7 +59,7 @@ readonly class Decimal
             $unscaled = '-' . $unscaled;
         }
 
-        return new self(ArbitraryPrecisionInteger::fromDecimalRepresentation($unscaled), $scale);
+        return new self(ArbitraryPrecisionInteger::fromString($unscaled), $scale);
     }
 
     public static function fromInteger(int $value): self
@@ -63,6 +68,9 @@ readonly class Decimal
         return new self($unscaledValue, 0);
     }
 
+    /**
+     * @throws InvalidArgumentException if the float is not finite
+     */
     public static function fromFloat(float $value, int $decimals): self
     {
         if (!is_finite($value)) {
@@ -71,7 +79,12 @@ readonly class Decimal
 
         $stringValue = number_format($value, $decimals, '.', '');
 
-        return self::fromDecimalRepresentation($stringValue);
+        return self::fromString($stringValue);
+    }
+
+    public static function fromCents(int $cents): self
+    {
+        return new self(ArbitraryPrecisionInteger::fromInteger($cents), 2);
     }
 
     public function getUnscaledValue(): ArbitraryPrecisionInteger

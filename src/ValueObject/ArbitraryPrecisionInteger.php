@@ -24,13 +24,16 @@ final readonly class ArbitraryPrecisionInteger
         return new self(self::trimBytesString($bytes));
     }
 
+    /**
+     * @throws InvalidArgumentException
+     */
     public static function fromNumeric(string|int $value): self
     {
         if (is_int($value)) {
             return self::fromInteger($value);
         }
 
-        return self::fromDecimalRepresentation($value);
+        return self::fromString($value);
     }
 
     public static function fromInteger(int $value): self
@@ -41,7 +44,7 @@ final readonly class ArbitraryPrecisionInteger
     /**
      * @throws InvalidArgumentException if the input is not a valid integer string
      */
-    public static function fromDecimalRepresentation(string $value): self
+    public static function fromString(string $value): self
     {
         if (!preg_match('/^-?\d+$/', $value)) {
             throw new InvalidArgumentException('Value must be a valid integer string');
