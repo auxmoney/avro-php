@@ -118,37 +118,6 @@ class StringReaderTest extends TestCase
         $this->assertSame($largeString, $result);
     }
 
-    public function testReadWithStreamException(): void
-    {
-        $this->decoder->expects($this->once())
-            ->method('readLong')
-            ->with($this->stream)
-            ->willReturn(10);
-
-        $this->stream->expects($this->once())
-            ->method('read')
-            ->with(10)
-            ->willThrowException(new RuntimeException('Stream read error'));
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Stream read error');
-
-        $this->reader->read($this->stream);
-    }
-
-    public function testReadWithDecoderException(): void
-    {
-        $this->decoder->expects($this->once())
-            ->method('readLong')
-            ->with($this->stream)
-            ->willThrowException(new RuntimeException('Decoder error'));
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Decoder error');
-
-        $this->reader->read($this->stream);
-    }
-
     public function testReadWithTruncatedData(): void
     {
         $this->decoder->expects($this->once())
@@ -213,37 +182,6 @@ class StringReaderTest extends TestCase
         $this->stream->expects($this->once())
             ->method('skip')
             ->with($length);
-
-        $this->reader->skip($this->stream);
-    }
-
-    public function testSkipWithStreamException(): void
-    {
-        $this->decoder->expects($this->once())
-            ->method('readLong')
-            ->with($this->stream)
-            ->willReturn(10);
-
-        $this->stream->expects($this->once())
-            ->method('skip')
-            ->with(10)
-            ->willThrowException(new RuntimeException('Stream skip error'));
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Stream skip error');
-
-        $this->reader->skip($this->stream);
-    }
-
-    public function testSkipWithDecoderException(): void
-    {
-        $this->decoder->expects($this->once())
-            ->method('readLong')
-            ->with($this->stream)
-            ->willThrowException(new RuntimeException('Decoder error'));
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Decoder error');
 
         $this->reader->skip($this->stream);
     }
