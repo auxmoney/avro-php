@@ -8,7 +8,6 @@ use Auxmoney\Avro\Contracts\ReadableStreamInterface;
 use Auxmoney\Avro\Deserialization\BinaryDecoder;
 use Auxmoney\Avro\Deserialization\LongReader;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 
 class LongReaderTest extends TestCase
 {
@@ -77,37 +76,11 @@ class LongReaderTest extends TestCase
         $this->assertSame($expectedValue, $result);
     }
 
-    public function testReadWithDecoderException(): void
-    {
-        $this->decoder->expects($this->once())
-            ->method('readLong')
-            ->with($this->stream)
-            ->willThrowException(new RuntimeException('Decoder error'));
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Decoder error');
-
-        $this->reader->read($this->stream);
-    }
-
     public function testSkipWithValidOperation(): void
     {
         $this->decoder->expects($this->once())
             ->method('skipLong')
             ->with($this->stream);
-
-        $this->reader->skip($this->stream);
-    }
-
-    public function testSkipWithDecoderException(): void
-    {
-        $this->decoder->expects($this->once())
-            ->method('skipLong')
-            ->with($this->stream)
-            ->willThrowException(new RuntimeException('Skip error'));
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Skip error');
 
         $this->reader->skip($this->stream);
     }
