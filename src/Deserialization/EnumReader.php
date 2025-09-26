@@ -6,7 +6,7 @@ namespace Auxmoney\Avro\Deserialization;
 
 use Auxmoney\Avro\Contracts\ReadableStreamInterface;
 use Auxmoney\Avro\Contracts\ReaderInterface;
-use RuntimeException;
+use Auxmoney\Avro\Exceptions\RuntimeException;
 
 class EnumReader implements ReaderInterface
 {
