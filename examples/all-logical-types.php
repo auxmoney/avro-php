@@ -43,31 +43,31 @@ $examples = [
     ],
     'date' => [
         'schema' => '{"type": "int", "logicalType": "date"}',
-        'data' => '2023-12-25'
+        'data' => new DateTime('2023-12-25')
     ],
     'time-millis' => [
         'schema' => '{"type": "int", "logicalType": "time-millis"}',
-        'data' => '14:30:25.123'
+        'data' => DateTime::createFromFormat('H:i:s.v', '14:30:25.123')
     ],
     'time-micros' => [
         'schema' => '{"type": "long", "logicalType": "time-micros"}',
-        'data' => '14:30:25.123456'
+        'data' => DateTime::createFromFormat('H:i:s.u', '14:30:25.123456')
     ],
     'timestamp-millis' => [
         'schema' => '{"type": "long", "logicalType": "timestamp-millis"}',
-        'data' => '2023-12-25T14:30:25.123Z'
+        'data' => new DateTime('2023-12-25T14:30:25.123Z')
     ],
     'timestamp-micros' => [
         'schema' => '{"type": "long", "logicalType": "timestamp-micros"}',
-        'data' => '2023-12-25T14:30:25.123456Z'
+        'data' => DateTime::createFromFormat('Y-m-d\TH:i:s.uP', '2023-12-25T14:30:25.123456Z')
     ],
     'local-timestamp-millis' => [
         'schema' => '{"type": "long", "logicalType": "local-timestamp-millis"}',
-        'data' => '2023-12-25 14:30:25.123'
+        'data' => new DateTime('2023-12-25 14:30:25.123')
     ],
     'local-timestamp-micros' => [
         'schema' => '{"type": "long", "logicalType": "local-timestamp-micros"}',
-        'data' => '2023-12-25 14:30:25.123456'
+        'data' => DateTime::createFromFormat('Y-m-d H:i:s.u', '2023-12-25 14:30:25.123456')
     ],
     'duration' => [
         'schema' => '{"type": "fixed", "name": "Duration", "size": 12, "logicalType": "duration"}',
@@ -80,7 +80,16 @@ echo "Testing all AVRO logical types:\n\n";
 foreach ($examples as $typeName => $example) {
     echo "=== {$typeName} ===\n";
     echo "Schema: {$example['schema']}\n";
-    echo "Input data: " . (is_array($example['data']) ? json_encode($example['data']) : $example['data']) . "\n";
+    
+    $inputDisplay = '';
+    if (is_array($example['data'])) {
+        $inputDisplay = json_encode($example['data']);
+    } elseif ($example['data'] instanceof DateTimeInterface) {
+        $inputDisplay = $example['data']->format('Y-m-d H:i:s.u P');
+    } else {
+        $inputDisplay = (string) $example['data'];
+    }
+    echo "Input data: {$inputDisplay}\n";
     
     try {
         $writer = $avroFactory->createWriter($example['schema']);

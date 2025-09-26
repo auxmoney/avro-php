@@ -65,12 +65,12 @@ This document summarizes the complete implementation of all AVRO logical types a
 - Precision and scale validation for decimals
 - UUID format validation (RFC-4122)
 
-### ✅ Multiple Input Format Support
+### ✅ Clean Input Format Support
 - **Decimal**: String, numeric values
 - **UUID**: String format
-- **Date**: String (YYYY-MM-DD), DateTime objects, integers
-- **Time**: String (HH:mm:ss.SSS), DateTime objects, integers
-- **Timestamp**: ISO 8601 strings, DateTime objects, integers
+- **Date**: DateTimeInterface objects, integers
+- **Time**: DateTimeInterface objects, integers
+- **Timestamp**: DateTimeInterface objects, integers
 - **Duration**: Arrays, objects with methods, binary strings
 
 ### ✅ Proper Binary Encoding

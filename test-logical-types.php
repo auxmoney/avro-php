@@ -35,10 +35,10 @@ try {
 // Test Date
 try {
     $date = new DateLogicalType();
-    $testDate = '2023-12-25';
+    $testDate = new DateTime('2023-12-25');
     $normalized = $date->normalize($testDate);
     $denormalized = $date->denormalize($normalized);
-    echo "✓ Date: {$testDate} -> {$normalized} days -> {$denormalized}\n";
+    echo "✓ Date: " . $testDate->format('Y-m-d') . " -> {$normalized} days -> {$denormalized}\n";
 } catch (Exception $e) {
     echo "✗ Date test failed: " . $e->getMessage() . "\n";
 }
@@ -46,10 +46,10 @@ try {
 // Test Time Millis
 try {
     $time = new TimeMillisLogicalType();
-    $testTime = '14:30:25.123';
+    $testTime = DateTime::createFromFormat('H:i:s.v', '14:30:25.123');
     $normalized = $time->normalize($testTime);
     $denormalized = $time->denormalize($normalized);
-    echo "✓ Time Millis: {$testTime} -> {$normalized} ms -> {$denormalized}\n";
+    echo "✓ Time Millis: " . $testTime->format('H:i:s.v') . " -> {$normalized} ms -> {$denormalized}\n";
 } catch (Exception $e) {
     echo "✗ Time Millis test failed: " . $e->getMessage() . "\n";
 }

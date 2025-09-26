@@ -116,8 +116,8 @@ $schema = '{"type": "int", "logicalType": "date"}';
 $writer = $avroFactory->createWriter($schema);
 $buffer = $avroFactory->createStringBuffer();
 
-// Write date (accepts string, DateTime, or integer)
-$writer->write('2023-12-25', $buffer);
+// Write date (accepts DateTimeInterface or integer)
+$writer->write(new DateTime('2023-12-25'), $buffer);
 
 // Read it back
 $readBuffer = $avroFactory->createReadableStreamFromString($buffer->__toString());
@@ -154,23 +154,19 @@ Each logical type supports multiple input formats for convenience:
 - String: `"550e8400-e29b-41d4-a716-446655440000"`
 
 ### Date
-- String: `"2023-12-25"` (YYYY-MM-DD)
-- DateTime object
+- DateTimeInterface object
 - Integer: days since epoch
 
 ### Time (millis/micros)
-- String: `"14:30:25.123"` or `"14:30:25.123456"`
-- DateTime object
+- DateTimeInterface object
 - Integer: milliseconds/microseconds since midnight
 
 ### Timestamp (millis/micros)
-- String: ISO 8601 format or `"Y-m-d H:i:s"`
-- DateTime object
+- DateTimeInterface object
 - Integer: milliseconds/microseconds since Unix epoch
 
 ### Local Timestamp (millis/micros)
-- String: `"2023-12-25 14:30:25.123"` (without timezone)
-- DateTime object
+- DateTimeInterface object
 - Integer: milliseconds/microseconds
 
 ### Duration

@@ -19,21 +19,11 @@ class DateLogicalType implements LogicalTypeInterface
             return true; // Already days since epoch
         }
 
-        if (is_string($datum)) {
-            // Try to parse as date string
-            if (DateTime::createFromFormat('Y-m-d', $datum) !== false) {
-                return true;
-            }
-            
-            $context?->addError('Invalid date format. Expected YYYY-MM-DD format');
-            return false;
-        }
-
         if ($datum instanceof DateTimeInterface) {
             return true;
         }
 
-        $context?->addError('Date value must be an integer (days since epoch), date string (YYYY-MM-DD), or DateTime object');
+        $context?->addError('Date value must be an integer (days since epoch) or DateTimeInterface object');
         return false;
     }
 
@@ -49,18 +39,7 @@ class DateLogicalType implements LogicalTypeInterface
             return $diff->invert ? -$diff->days : $diff->days;
         }
 
-        if (is_string($datum)) {
-            $date = DateTime::createFromFormat('Y-m-d', $datum);
-            if ($date === false) {
-                throw new \InvalidArgumentException('Invalid date format. Expected YYYY-MM-DD');
-            }
-            
-            $epoch = new DateTime(self::UNIX_EPOCH);
-            $diff = $epoch->diff($date);
-            return $diff->invert ? -$diff->days : $diff->days;
-        }
-
-        throw new \InvalidArgumentException('Cannot normalize date value');
+        throw new \InvalidArgumentException('Date value must be an integer or DateTimeInterface object');
     }
 
     public function denormalize(mixed $datum): mixed
