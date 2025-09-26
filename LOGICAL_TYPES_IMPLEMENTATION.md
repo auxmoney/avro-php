@@ -68,9 +68,9 @@ This document summarizes the complete implementation of all AVRO logical types a
 ### ✅ Clean Input Format Support
 - **Decimal**: String, numeric values
 - **UUID**: String format
-- **Date**: DateTimeInterface objects, integers
-- **Time**: DateTimeInterface objects, integers
-- **Timestamp**: DateTimeInterface objects, integers
+- **Date**: DateTimeInterface objects only
+- **Time**: DateTimeInterface objects only
+- **Timestamp**: DateTimeInterface objects only
 - **Duration**: Arrays, objects with methods, binary strings
 
 ### ✅ Proper Binary Encoding
