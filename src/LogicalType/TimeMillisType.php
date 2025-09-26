@@ -6,10 +6,10 @@ namespace Auxmoney\Avro\LogicalType;
 
 use Auxmoney\Avro\Contracts\LogicalTypeInterface;
 use Auxmoney\Avro\Contracts\ValidationContextInterface;
-use DateTime;
 use DateTimeInterface;
+use InvalidArgumentException;
 
-class TimeMillisLogicalType implements LogicalTypeInterface
+class TimeMillisType implements LogicalTypeInterface
 {
     public function validate(mixed $datum, ?ValidationContextInterface $context): bool
     {
@@ -24,28 +24,28 @@ class TimeMillisLogicalType implements LogicalTypeInterface
     public function normalize(mixed $datum): mixed
     {
         assert($datum instanceof DateTimeInterface);
-        
+
         $hours = (int) $datum->format('H');
         $minutes = (int) $datum->format('i');
         $seconds = (int) $datum->format('s');
         $microseconds = (int) $datum->format('u');
-        
+
         return ($hours * 3600 + $minutes * 60 + $seconds) * 1000 + intval($microseconds / 1000);
     }
 
     public function denormalize(mixed $datum): mixed
     {
         if (!is_int($datum)) {
-            throw new \InvalidArgumentException('Expected integer (milliseconds since midnight) for time denormalization');
+            throw new InvalidArgumentException('Expected integer (milliseconds since midnight) for time denormalization');
         }
 
         $totalSeconds = intval($datum / 1000);
         $milliseconds = $datum % 1000;
-        
+
         $hours = intval($totalSeconds / 3600);
         $minutes = intval(($totalSeconds % 3600) / 60);
         $seconds = $totalSeconds % 60;
-        
+
         return sprintf('%02d:%02d:%02d.%03d', $hours, $minutes, $seconds, $milliseconds);
     }
 }

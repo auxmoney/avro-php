@@ -6,9 +6,9 @@ namespace Auxmoney\Avro\LogicalType\Factory;
 
 use Auxmoney\Avro\Contracts\LogicalTypeFactoryInterface;
 use Auxmoney\Avro\Contracts\LogicalTypeInterface;
-use Auxmoney\Avro\LogicalType\LocalTimestampMicrosLogicalType;
+use Auxmoney\Avro\LogicalType\LocalTimestampMicrosType;
 
-class LocalTimestampMicrosLogicalTypeFactory implements LogicalTypeFactoryInterface
+class LocalTimestampMicrosFactory implements LogicalTypeFactoryInterface
 {
     public function getName(): string
     {
@@ -17,6 +17,6 @@ class LocalTimestampMicrosLogicalTypeFactory implements LogicalTypeFactoryInterf
 
     public function create(array $attributes): LogicalTypeInterface
     {
-        return new LocalTimestampMicrosLogicalType();
+        return new LocalTimestampMicrosType();
     }
 }

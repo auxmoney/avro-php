@@ -8,8 +8,10 @@ use Auxmoney\Avro\Contracts\LogicalTypeInterface;
 use Auxmoney\Avro\Contracts\ValidationContextInterface;
 use DateTime;
 use DateTimeInterface;
+use DateTimeZone;
+use InvalidArgumentException;
 
-class TimestampMicrosLogicalType implements LogicalTypeInterface
+class TimestampMicrosType implements LogicalTypeInterface
 {
     public function validate(mixed $datum, ?ValidationContextInterface $context): bool
     {
@@ -24,22 +26,22 @@ class TimestampMicrosLogicalType implements LogicalTypeInterface
     public function normalize(mixed $datum): mixed
     {
         assert($datum instanceof DateTimeInterface);
-        
+
         return (int) ($datum->getTimestamp() * 1000000 + (int) $datum->format('u'));
     }
 
     public function denormalize(mixed $datum): mixed
     {
         if (!is_int($datum)) {
-            throw new \InvalidArgumentException('Expected integer (microseconds since Unix epoch) for timestamp denormalization');
+            throw new InvalidArgumentException('Expected integer (microseconds since Unix epoch) for timestamp denormalization');
         }
 
         $seconds = intval($datum / 1000000);
         $microseconds = $datum % 1000000;
-        
+
         $dateTime = new DateTime('@' . $seconds);
-        $dateTime->setTimezone(new \DateTimeZone('UTC'));
-        
+        $dateTime->setTimezone(new DateTimeZone('UTC'));
+
         // Format with microseconds
         return $dateTime->format('Y-m-d\TH:i:s') . '.' . str_pad((string) $microseconds, 6, '0', STR_PAD_LEFT) . 'Z';
     }

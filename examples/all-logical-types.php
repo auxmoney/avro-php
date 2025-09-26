@@ -4,29 +4,29 @@ require_once __DIR__ . '/autoload.php';
 
 use Auxmoney\Avro\AvroFactory;
 use Auxmoney\Avro\Contracts\Options;
-use Auxmoney\Avro\LogicalType\Factory\DecimalLogicalTypeFactory;
-use Auxmoney\Avro\LogicalType\Factory\UuidLogicalTypeFactory;
-use Auxmoney\Avro\LogicalType\Factory\DateLogicalTypeFactory;
-use Auxmoney\Avro\LogicalType\Factory\TimeMillisLogicalTypeFactory;
-use Auxmoney\Avro\LogicalType\Factory\TimeMicrosLogicalTypeFactory;
-use Auxmoney\Avro\LogicalType\Factory\TimestampMillisLogicalTypeFactory;
-use Auxmoney\Avro\LogicalType\Factory\TimestampMicrosLogicalTypeFactory;
-use Auxmoney\Avro\LogicalType\Factory\LocalTimestampMillisLogicalTypeFactory;
-use Auxmoney\Avro\LogicalType\Factory\LocalTimestampMicrosLogicalTypeFactory;
-use Auxmoney\Avro\LogicalType\Factory\DurationLogicalTypeFactory;
+use Auxmoney\Avro\LogicalType\Factory\DecimalFactory;
+use Auxmoney\Avro\LogicalType\Factory\UuidFactory;
+use Auxmoney\Avro\LogicalType\Factory\DateFactory;
+use Auxmoney\Avro\LogicalType\Factory\TimeMillisFactory;
+use Auxmoney\Avro\LogicalType\Factory\TimeMicrosFactory;
+use Auxmoney\Avro\LogicalType\Factory\TimestampMillisFactory;
+use Auxmoney\Avro\LogicalType\Factory\TimestampMicrosFactory;
+use Auxmoney\Avro\LogicalType\Factory\LocalTimestampMillisFactory;
+use Auxmoney\Avro\LogicalType\Factory\LocalTimestampMicrosFactory;
+use Auxmoney\Avro\LogicalType\Factory\DurationFactory;
 
 // Register all logical type factories
 $options = new Options(logicalTypeFactories: [
-    new DecimalLogicalTypeFactory(),
-    new UuidLogicalTypeFactory(),
-    new DateLogicalTypeFactory(),
-    new TimeMillisLogicalTypeFactory(),
-    new TimeMicrosLogicalTypeFactory(),
-    new TimestampMillisLogicalTypeFactory(),
-    new TimestampMicrosLogicalTypeFactory(),
-    new LocalTimestampMillisLogicalTypeFactory(),
-    new LocalTimestampMicrosLogicalTypeFactory(),
-    new DurationLogicalTypeFactory(),
+    new DecimalFactory(),
+    new UuidFactory(),
+    new DateFactory(),
+    new TimeMillisFactory(),
+    new TimeMicrosFactory(),
+    new TimestampMillisFactory(),
+    new TimestampMicrosFactory(),
+    new LocalTimestampMillisFactory(),
+    new LocalTimestampMicrosFactory(),
+    new DurationFactory(),
 ]);
 
 $avroFactory = AvroFactory::create($options);
@@ -38,7 +38,7 @@ $examples = [
         'data' => '123.45'
     ],
     'uuid' => [
-        'schema' => '{"type": "string", "logicalType": "uuid"}',
+        'schema' => '{"type": "fixed", "name": "UUID", "size": 16, "logicalType": "uuid"}',
         'data' => '550e8400-e29b-41d4-a716-446655440000'
     ],
     'date' => [

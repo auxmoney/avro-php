@@ -3,17 +3,17 @@
 // Simple test script for logical types
 require_once __DIR__ . '/examples/autoload.php';
 
-use Auxmoney\Avro\LogicalType\DecimalLogicalType;
-use Auxmoney\Avro\LogicalType\UuidLogicalType;
-use Auxmoney\Avro\LogicalType\DateLogicalType;
-use Auxmoney\Avro\LogicalType\TimeMillisLogicalType;
-use Auxmoney\Avro\LogicalType\DurationLogicalType;
+use Auxmoney\Avro\LogicalType\DecimalType;
+use Auxmoney\Avro\LogicalType\UuidType;
+use Auxmoney\Avro\LogicalType\DateType;
+use Auxmoney\Avro\LogicalType\TimeMillisType;
+use Auxmoney\Avro\LogicalType\DurationType;
 
 echo "Testing logical types implementations...\n\n";
 
 // Test Decimal
 try {
-    $decimal = new DecimalLogicalType(10, 2);
+    $decimal = new DecimalType(10, 2);
     $normalized = $decimal->normalize('123.45');
     $denormalized = $decimal->denormalize($normalized);
     echo "✓ Decimal: 123.45 -> normalized -> {$denormalized}\n";
@@ -23,7 +23,7 @@ try {
 
 // Test UUID
 try {
-    $uuid = new UuidLogicalType();
+    $uuid = new UuidType();
     $testUuid = '550e8400-e29b-41d4-a716-446655440000';
     $normalized = $uuid->normalize($testUuid);
     $denormalized = $uuid->denormalize($normalized);
@@ -34,7 +34,7 @@ try {
 
 // Test Date
 try {
-    $date = new DateLogicalType();
+    $date = new DateType();
     $testDate = new DateTime('2023-12-25');
     $normalized = $date->normalize($testDate);
     $denormalized = $date->denormalize($normalized);
@@ -45,7 +45,7 @@ try {
 
 // Test Time Millis
 try {
-    $time = new TimeMillisLogicalType();
+    $time = new TimeMillisType();
     $testTime = DateTime::createFromFormat('H:i:s.v', '14:30:25.123');
     $normalized = $time->normalize($testTime);
     $denormalized = $time->denormalize($normalized);
@@ -56,7 +56,7 @@ try {
 
 // Test Duration
 try {
-    $duration = new DurationLogicalType();
+    $duration = new DurationType();
     $testDuration = [12, 30, 86400000];
     $normalized = $duration->normalize($testDuration);
     $denormalized = $duration->denormalize($normalized);
