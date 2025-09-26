@@ -54,6 +54,8 @@ class DecimalLogicalType implements LogicalTypeInterface
 
     public function normalize(mixed $datum): mixed
     {
+        assert(is_string($datum) || is_numeric($datum));
+        
         // Convert to string representation for consistent handling
         $stringValue = (string) $datum;
         
