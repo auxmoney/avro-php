@@ -23,21 +23,11 @@ class TimeMillisLogicalType implements LogicalTypeInterface
             return false;
         }
 
-        if (is_string($datum)) {
-            // Try to parse as time string (HH:mm:ss.SSS)
-            if (preg_match('/^([01]?\d|2[0-3]):([0-5]?\d):([0-5]?\d)(\.\d{1,3})?$/', $datum)) {
-                return true;
-            }
-            
-            $context?->addError('Invalid time format. Expected HH:mm:ss.SSS format');
-            return false;
-        }
-
         if ($datum instanceof DateTimeInterface) {
             return true;
         }
 
-        $context?->addError('Time value must be an integer (milliseconds since midnight), time string (HH:mm:ss.SSS), or DateTime object');
+        $context?->addError('Time value must be an integer (milliseconds since midnight) or DateTimeInterface object');
         return false;
     }
 
@@ -56,20 +46,7 @@ class TimeMillisLogicalType implements LogicalTypeInterface
             return ($hours * 3600 + $minutes * 60 + $seconds) * 1000 + intval($microseconds / 1000);
         }
 
-        if (is_string($datum)) {
-            if (preg_match('/^(\d{1,2}):(\d{1,2}):(\d{1,2})(\.\d{1,3})?$/', $datum, $matches)) {
-                $hours = (int) $matches[1];
-                $minutes = (int) $matches[2];
-                $seconds = (int) $matches[3];
-                $milliseconds = isset($matches[4]) ? (int) (str_pad(substr($matches[4], 1), 3, '0')) : 0;
-                
-                return ($hours * 3600 + $minutes * 60 + $seconds) * 1000 + $milliseconds;
-            }
-            
-            throw new \InvalidArgumentException('Invalid time format. Expected HH:mm:ss.SSS');
-        }
-
-        throw new \InvalidArgumentException('Cannot normalize time value');
+        throw new \InvalidArgumentException('Time value must be an integer or DateTimeInterface object');
     }
 
     public function denormalize(mixed $datum): mixed

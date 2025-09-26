@@ -17,23 +17,11 @@ class LocalTimestampMicrosLogicalType implements LogicalTypeInterface
             return true; // Already microseconds since Unix epoch
         }
 
-        if (is_string($datum)) {
-            // Try to parse as local timestamp (without timezone info)
-            if (DateTime::createFromFormat('Y-m-d H:i:s', $datum) !== false ||
-                DateTime::createFromFormat('Y-m-d\TH:i:s', $datum) !== false ||
-                DateTime::createFromFormat('Y-m-d H:i:s.u', $datum) !== false) {
-                return true;
-            }
-            
-            $context?->addError('Invalid local timestamp format. Expected Y-m-d H:i:s format (without timezone)');
-            return false;
-        }
-
         if ($datum instanceof DateTimeInterface) {
             return true;
         }
 
-        $context?->addError('Local timestamp value must be an integer (microseconds), timestamp string (without timezone), or DateTime object');
+        $context?->addError('Local timestamp value must be an integer (microseconds) or DateTimeInterface object');
         return false;
     }
 
@@ -49,19 +37,7 @@ class LocalTimestampMicrosLogicalType implements LogicalTypeInterface
             return (int) ($localTime->getTimestamp() * 1000000 + (int) $localTime->format('u'));
         }
 
-        if (is_string($datum)) {
-            $date = DateTime::createFromFormat('Y-m-d H:i:s', $datum) ?:
-                    DateTime::createFromFormat('Y-m-d\TH:i:s', $datum) ?:
-                    DateTime::createFromFormat('Y-m-d H:i:s.u', $datum);
-                    
-            if ($date === false) {
-                throw new \InvalidArgumentException('Invalid local timestamp format');
-            }
-            
-            return (int) ($date->getTimestamp() * 1000000 + (int) $date->format('u'));
-        }
-
-        throw new \InvalidArgumentException('Cannot normalize local timestamp value');
+        throw new \InvalidArgumentException('Local timestamp value must be an integer or DateTimeInterface object');
     }
 
     public function denormalize(mixed $datum): mixed
