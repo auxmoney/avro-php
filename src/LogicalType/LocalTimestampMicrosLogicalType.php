@@ -13,31 +13,23 @@ class LocalTimestampMicrosLogicalType implements LogicalTypeInterface
 {
     public function validate(mixed $datum, ?ValidationContextInterface $context): bool
     {
-        if (is_int($datum)) {
-            return true; // Already microseconds since Unix epoch
-        }
-
         if ($datum instanceof DateTimeInterface) {
             return true;
         }
 
-        $context?->addError('Local timestamp value must be an integer (microseconds) or DateTimeInterface object');
+        $context?->addError('Local timestamp value must be a DateTimeInterface object');
         return false;
     }
 
     public function normalize(mixed $datum): mixed
     {
-        if (is_int($datum)) {
-            return $datum; // Already microseconds
-        }
-
         if ($datum instanceof DateTimeInterface) {
             // Local timestamp ignores timezone, treats as local time
             $localTime = new DateTime($datum->format('Y-m-d H:i:s.u'));
             return (int) ($localTime->getTimestamp() * 1000000 + (int) $localTime->format('u'));
         }
 
-        throw new \InvalidArgumentException('Local timestamp value must be an integer or DateTimeInterface object');
+        throw new \InvalidArgumentException('Local timestamp value must be a DateTimeInterface object');
     }
 
     public function denormalize(mixed $datum): mixed

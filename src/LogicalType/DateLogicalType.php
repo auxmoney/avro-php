@@ -15,31 +15,23 @@ class DateLogicalType implements LogicalTypeInterface
 
     public function validate(mixed $datum, ?ValidationContextInterface $context): bool
     {
-        if (is_int($datum)) {
-            return true; // Already days since epoch
-        }
-
         if ($datum instanceof DateTimeInterface) {
             return true;
         }
 
-        $context?->addError('Date value must be an integer (days since epoch) or DateTimeInterface object');
+        $context?->addError('Date value must be a DateTimeInterface object');
         return false;
     }
 
     public function normalize(mixed $datum): mixed
     {
-        if (is_int($datum)) {
-            return $datum; // Already days since epoch
-        }
-
         if ($datum instanceof DateTimeInterface) {
             $epoch = new DateTime(self::UNIX_EPOCH);
             $diff = $epoch->diff($datum);
             return $diff->invert ? -$diff->days : $diff->days;
         }
 
-        throw new \InvalidArgumentException('Date value must be an integer or DateTimeInterface object');
+        throw new \InvalidArgumentException('Date value must be a DateTimeInterface object');
     }
 
     public function denormalize(mixed $datum): mixed
