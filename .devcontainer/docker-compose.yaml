@@ -12,6 +12,7 @@ services:
         environment:
             PHP_IDE_CONFIG: serverName=avro-php
         working_dir: /avro-php
+        command: sleep infinity
         
     test-generator:
         image: node:latest
@@ -21,3 +22,5 @@ services:
             npm_config_cache: /tmp/.npm
         working_dir: /avro-php
         command: bash -c "cd tests/Integration/TestCaseGenerator && npm ci && node ."
+        profiles:
+            - build-tests

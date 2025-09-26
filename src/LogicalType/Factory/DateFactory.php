@@ -6,17 +6,17 @@ namespace Auxmoney\Avro\LogicalType\Factory;
 
 use Auxmoney\Avro\Contracts\LogicalTypeFactoryInterface;
 use Auxmoney\Avro\Contracts\LogicalTypeInterface;
-use Auxmoney\Avro\LogicalType\TimeMicrosLogicalType;
+use Auxmoney\Avro\LogicalType\DateType;
 
-class TimeMicrosLogicalTypeFactory implements LogicalTypeFactoryInterface
+class DateFactory implements LogicalTypeFactoryInterface
 {
     public function getName(): string
     {
-        return 'time-micros';
+        return 'date';
     }
 
     public function create(array $attributes): LogicalTypeInterface
     {
-        return new TimeMicrosLogicalType();
+        return new DateType();
     }
 }
