@@ -47,11 +47,11 @@ $examples = [
     ],
     'time-millis' => [
         'schema' => '{"type": "int", "logicalType": "time-millis"}',
-        'data' => DateTime::createFromFormat('H:i:s.v', '14:30:25.123')
+        'data' => \Auxmoney\Avro\ValueObject\TimeOfDay::fromDateTime(DateTime::createFromFormat('H:i:s.v', '14:30:25.123'))
     ],
     'time-micros' => [
         'schema' => '{"type": "long", "logicalType": "time-micros"}',
-        'data' => DateTime::createFromFormat('H:i:s.u', '14:30:25.123456')
+        'data' => \Auxmoney\Avro\ValueObject\TimeOfDay::fromDateTime(DateTime::createFromFormat('H:i:s.u', '14:30:25.123456'))
     ],
     'timestamp-millis' => [
         'schema' => '{"type": "long", "logicalType": "timestamp-millis"}',
