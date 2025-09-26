@@ -13,29 +13,21 @@ class TimestampMillisLogicalType implements LogicalTypeInterface
 {
     public function validate(mixed $datum, ?ValidationContextInterface $context): bool
     {
-        if (is_int($datum)) {
-            return true; // Already milliseconds since Unix epoch
-        }
-
         if ($datum instanceof DateTimeInterface) {
             return true;
         }
 
-        $context?->addError('Timestamp value must be an integer (milliseconds since Unix epoch) or DateTimeInterface object');
+        $context?->addError('Timestamp value must be a DateTimeInterface object');
         return false;
     }
 
     public function normalize(mixed $datum): mixed
     {
-        if (is_int($datum)) {
-            return $datum; // Already milliseconds since epoch
-        }
-
         if ($datum instanceof DateTimeInterface) {
             return (int) ($datum->getTimestamp() * 1000 + intval($datum->format('u') / 1000));
         }
 
-        throw new \InvalidArgumentException('Timestamp value must be an integer or DateTimeInterface object');
+        throw new \InvalidArgumentException('Timestamp value must be a DateTimeInterface object');
     }
 
     public function denormalize(mixed $datum): mixed
