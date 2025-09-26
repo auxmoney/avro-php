@@ -2,14 +2,12 @@
 
 A PHP library that provides schema-based Avro data serialization and deserialization.
 
-It started as a fork of the original Apache Avro implementation available at https://github.com/apache/avro, but now it has been completely rewritten. Some of the original functionality has been removed, and new features have been added.
-
-The features added by this library are:
-- Basic support for logical types
-- Default values for record fields
+Key features:
+- Support for logical types
 - Developer-friendly error messages for schema validation
-- Serialization of objects through getters or public properties
 - Schema resolution including promotion of primitive types
+- Serialization of objects through getters or public properties
+- Default values for record fields
 - Configurable block count and block size for array and map encoding
 
 ## Installation
@@ -19,6 +17,65 @@ To install auxmoney/avro-php, you can use Composer:
 ```bash
 composer require auxmoney/avro-php
 ```
+
+## Usage
+
+### Encoding/Decoding Data
+
+Try out the example scripts:
+```bash
+php examples/encoding.php
+php examples/decoding.php
+php examples/logical-type.php
+```
+
+### Logical Types
+
+It is possible to configure logical types in a few different ways:
+
+#### Using Default Logical Types
+There are built-in implementations for all logical types described in the AVRO specification, except for `timestamp-nanos` and `local-timestamp-nanos`, because PHP's DateTime doesn't have nanosecond precision.
+
+To use the default logical types, simply create an AvroFactory without any options:
+```php
+$avroFactory = AvroFactory::create();
+```
+
+#### Overriding Logical Types
+You can override default logical types or add custom ones by providing factory implementations:
+```php
+$defaultLogicalTypeFactories = AvroFactory::getDefaultLogicalTypeFactories();
+$defaultLogicalTypeFactories['custom'] = new MyCustomLogicalTypeFactory();
+$options = new Options(logicalTypeFactories: $defaultLogicalTypeFactories);
+$avroFactory = AvroFactory::create($options);
+```
+
+#### Disabling Logical Types
+To disable all logical type processing and treat them as their underlying primitive types:
+```php
+$options = new Options(logicalTypeFactories: []);
+$avroFactory = AvroFactory::create($options);
+```
+
+### Value Objects for Logical Types
+
+Some logical types work with their respective value objects to provide type safety and better representation of the data:
+
+- `decimal`: `Auxmoney\Avro\ValueObject\Decimal`
+- `duration`: `Auxmoney\Avro\ValueObject\Duration`
+- `time-millis`: `Auxmoney\Avro\ValueObject\TimeOfDay`
+- `time-micros`: `Auxmoney\Avro\ValueObject\TimeOfDay`
+- `uuid`: `Auxmoney\Avro\ValueObject\Uuid`
+
+The `local-timestamp-*` and `timestamp-*` types are serialized from/deserialized to `DateTimeInterface`.
+
+## Documentation
+
+For more detailed documentation on usage, schema design, and advanced features like schema evolution, please refer to the official Avro documentation.
+
+## Contribution
+
+Contributions are welcome! If you find a bug or want to suggest a new feature, feel free to open an issue or submit a pull request.
 
 ## Development Setup
 
@@ -54,35 +111,6 @@ docker compose -f .devcontainer/docker-compose.yaml run --rm test-generator
 ```
 
 For more details, see [.devcontainer/README.md](.devcontainer/README.md).
-
-## Usage
-
-### Encoding/Decoding Data
-
-Try out the example scripts `examples/encoding.php` and `examples/decoding.php`:
-```bash
-php examples/encoding.php
-php examples/decoding.php
-```
-
-### Logical Types
-
-Although this library does not provide an implementation for any logical type, it is possible to use them by providing the factory implementation to `Auxmoney\Avro\AvroFactory::create`.
-
-The logical type factory must implement the interface `Auxmoney\Avro\Contracts\LogicalTypeFactoryInterface`.
-
-Try out the example script `examples/logical-type.php`:
-```bash
-php examples/logical-type.php
-```
-
-## Documentation
-
-For more detailed documentation on usage, schema design, and advanced features like schema evolution, please refer to the official Avro documentation.
-
-## Contribution
-
-Contributions are welcome! If you find a bug or want to suggest a new feature, feel free to open an issue or submit a pull request.
 
 ## License
 

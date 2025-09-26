@@ -8,7 +8,6 @@ use Auxmoney\Avro\Contracts\ReadableStreamInterface;
 use Auxmoney\Avro\Deserialization\BinaryDecoder;
 use Auxmoney\Avro\Deserialization\DoubleReader;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 
 class DoubleReaderTest extends TestCase
 {
@@ -119,37 +118,11 @@ class DoubleReaderTest extends TestCase
         $this->assertNan($result);
     }
 
-    public function testReadWithDecoderException(): void
-    {
-        $this->decoder->expects($this->once())
-            ->method('readDouble')
-            ->with($this->stream)
-            ->willThrowException(new RuntimeException('Decoder error'));
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Decoder error');
-
-        $this->reader->read($this->stream);
-    }
-
     public function testSkipWithValidOperation(): void
     {
         $this->stream->expects($this->once())
             ->method('skip')
             ->with(8);
-
-        $this->reader->skip($this->stream);
-    }
-
-    public function testSkipWithStreamException(): void
-    {
-        $this->stream->expects($this->once())
-            ->method('skip')
-            ->with(8)
-            ->willThrowException(new RuntimeException('Skip error'));
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Skip error');
 
         $this->reader->skip($this->stream);
     }

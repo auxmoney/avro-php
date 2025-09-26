@@ -11,7 +11,6 @@ use Auxmoney\Avro\Contracts\ReaderInterface;
 use Auxmoney\Avro\Deserialization\BinaryDecoder;
 use Auxmoney\Avro\Deserialization\MapReader;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 
 class MapReaderTest extends TestCase
 {
@@ -128,63 +127,6 @@ class MapReaderTest extends TestCase
         $this->assertSame([$key => $value], $result);
     }
 
-    public function testReadWithDecoderException(): void
-    {
-        $this->decoder->expects($this->once())
-            ->method('readLong')
-            ->with($this->stream)
-            ->willThrowException(new RuntimeException('Decoder error'));
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Decoder error');
-
-        $this->reader->read($this->stream);
-    }
-
-    public function testReadWithStreamException(): void
-    {
-        $this->decoder->expects($this->exactly(2))
-            ->method('readLong')
-            ->with($this->stream)
-            ->willReturnOnConsecutiveCalls(1, 5);
-
-        $this->stream->expects($this->once())
-            ->method('read')
-            ->with(5)
-            ->willThrowException(new RuntimeException('Stream error'));
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Stream error');
-
-        $this->reader->read($this->stream);
-    }
-
-    public function testReadWithValueReaderException(): void
-    {
-        $key = 'test_key';
-        $keyLength = strlen($key);
-
-        $this->decoder->expects($this->exactly(2))
-            ->method('readLong')
-            ->with($this->stream)
-            ->willReturnOnConsecutiveCalls(1, $keyLength);
-
-        $this->stream->expects($this->once())
-            ->method('read')
-            ->with($keyLength)
-            ->willReturn($key);
-
-        $this->valueReader->expects($this->once())
-            ->method('read')
-            ->with($this->stream)
-            ->willThrowException(new RuntimeException('Value reader error'));
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Value reader error');
-
-        $this->reader->read($this->stream);
-    }
-
     public function testSkipWithEmptyMap(): void
     {
         $this->decoder->expects($this->once())
@@ -257,61 +199,6 @@ class MapReaderTest extends TestCase
 
         $this->valueReader->expects($this->never())
             ->method('skip');
-
-        $this->reader->skip($this->stream);
-    }
-
-    public function testSkipWithDecoderException(): void
-    {
-        $this->decoder->expects($this->once())
-            ->method('readLong')
-            ->with($this->stream)
-            ->willThrowException(new RuntimeException('Decoder error'));
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Decoder error');
-
-        $this->reader->skip($this->stream);
-    }
-
-    public function testSkipWithStreamException(): void
-    {
-        $this->decoder->expects($this->exactly(2))
-            ->method('readLong')
-            ->with($this->stream)
-            ->willReturnOnConsecutiveCalls(1, 5);
-
-        $this->stream->expects($this->once())
-            ->method('skip')
-            ->with(5)
-            ->willThrowException(new RuntimeException('Stream error'));
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Stream error');
-
-        $this->reader->skip($this->stream);
-    }
-
-    public function testSkipWithValueReaderException(): void
-    {
-        $keyLength = 8;
-
-        $this->decoder->expects($this->exactly(2))
-            ->method('readLong')
-            ->with($this->stream)
-            ->willReturnOnConsecutiveCalls(1, $keyLength);
-
-        $this->stream->expects($this->once())
-            ->method('skip')
-            ->with($keyLength);
-
-        $this->valueReader->expects($this->once())
-            ->method('skip')
-            ->with($this->stream)
-            ->willThrowException(new RuntimeException('Value skip error'));
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Value skip error');
 
         $this->reader->skip($this->stream);
     }

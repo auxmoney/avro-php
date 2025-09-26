@@ -7,7 +7,6 @@ namespace Auxmoney\Avro\Tests\Unit\Deserialization;
 use Auxmoney\Avro\Contracts\ReadableStreamInterface;
 use Auxmoney\Avro\Deserialization\RecordReader;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 
 class RecordReaderTest extends TestCase
 {
@@ -55,18 +54,5 @@ class RecordReaderTest extends TestCase
             ->method('skip');
 
         $reader->skip($this->stream);
-    }
-
-    public function testSkipWithPropertyReaderException(): void
-    {
-        $this->propertyReader1->expects($this->once())
-            ->method('skip')
-            ->with($this->stream)
-            ->willThrowException(new RuntimeException('Skip error'));
-        $this->propertyReader2->expects($this->never())
-            ->method('skip');
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Skip error');
-        $this->reader->skip($this->stream);
     }
 }

@@ -6,7 +6,7 @@ namespace Auxmoney\Avro\Exceptions;
 
 use Exception;
 
-class DataMismatchException extends Exception
+class DataMismatchException extends AuxmoneyAvroException
 {
     /**
      * @param array<string> $errors
@@ -14,7 +14,7 @@ class DataMismatchException extends Exception
     public function __construct(
         public readonly array $errors,
         int $code = 0,
-        Exception $previous = null,
+        ?Exception $previous = null,
     ) {
         $formattedErrors = array_map(fn ($error) => "- {$error}\n", $errors);
         $message = "The provided data does not match the AVRO schema.\nErrors:\n" . implode('', $formattedErrors);

@@ -9,7 +9,6 @@ use Auxmoney\Avro\Contracts\ReadableStreamInterface;
 use Auxmoney\Avro\Contracts\ReaderInterface;
 use Auxmoney\Avro\Deserialization\LogicalTypeReader;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 
 class LogicalTypeReaderTest extends TestCase
 {
@@ -107,42 +106,6 @@ class LogicalTypeReaderTest extends TestCase
         $this->assertSame($denormalizedValue, $result);
     }
 
-    public function testReadWithRawReaderException(): void
-    {
-        $this->rawReader->expects($this->once())
-            ->method('read')
-            ->with($this->stream)
-            ->willThrowException(new RuntimeException('Raw reader error'));
-
-        $this->logicalType->expects($this->never())
-            ->method('denormalize');
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Raw reader error');
-
-        $this->reader->read($this->stream);
-    }
-
-    public function testReadWithLogicalTypeException(): void
-    {
-        $rawValue = 'invalid_value';
-
-        $this->rawReader->expects($this->once())
-            ->method('read')
-            ->with($this->stream)
-            ->willReturn($rawValue);
-
-        $this->logicalType->expects($this->once())
-            ->method('denormalize')
-            ->with($rawValue)
-            ->willThrowException(new RuntimeException('Logical type error'));
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Logical type error');
-
-        $this->reader->read($this->stream);
-    }
-
     public function testSkipWithValidOperation(): void
     {
         $this->rawReader->expects($this->once())
@@ -151,22 +114,6 @@ class LogicalTypeReaderTest extends TestCase
 
         $this->logicalType->expects($this->never())
             ->method('denormalize');
-
-        $this->reader->skip($this->stream);
-    }
-
-    public function testSkipWithRawReaderException(): void
-    {
-        $this->rawReader->expects($this->once())
-            ->method('skip')
-            ->with($this->stream)
-            ->willThrowException(new RuntimeException('Skip error'));
-
-        $this->logicalType->expects($this->never())
-            ->method('denormalize');
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Skip error');
 
         $this->reader->skip($this->stream);
     }

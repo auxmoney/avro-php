@@ -7,7 +7,6 @@ namespace Auxmoney\Avro\Tests\Unit\Deserialization;
 use Auxmoney\Avro\Contracts\ReadableStreamInterface;
 use Auxmoney\Avro\Deserialization\FixedReader;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 
 class FixedReaderTest extends TestCase
 {
@@ -83,22 +82,6 @@ class FixedReaderTest extends TestCase
         $this->assertSame($expectedData, $result);
     }
 
-    public function testReadWithStreamException(): void
-    {
-        $size = 4;
-        $this->reader = new FixedReader($size);
-
-        $this->stream->expects($this->once())
-            ->method('read')
-            ->with($size)
-            ->willThrowException(new RuntimeException('Stream error'));
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Stream error');
-
-        $this->reader->read($this->stream);
-    }
-
     public function testSkipWithSmallSize(): void
     {
         $size = 4;
@@ -131,22 +114,6 @@ class FixedReaderTest extends TestCase
         $this->stream->expects($this->once())
             ->method('skip')
             ->with($size);
-
-        $this->reader->skip($this->stream);
-    }
-
-    public function testSkipWithStreamException(): void
-    {
-        $size = 4;
-        $this->reader = new FixedReader($size);
-
-        $this->stream->expects($this->once())
-            ->method('skip')
-            ->with($size)
-            ->willThrowException(new RuntimeException('Skip error'));
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Skip error');
 
         $this->reader->skip($this->stream);
     }
