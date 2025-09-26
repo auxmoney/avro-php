@@ -6,17 +6,17 @@ namespace Auxmoney\Avro\LogicalType\Factory;
 
 use Auxmoney\Avro\Contracts\LogicalTypeFactoryInterface;
 use Auxmoney\Avro\Contracts\LogicalTypeInterface;
-use Auxmoney\Avro\LogicalType\DurationLogicalType;
+use Auxmoney\Avro\LogicalType\UuidType;
 
-class DurationLogicalTypeFactory implements LogicalTypeFactoryInterface
+class UuidFactory implements LogicalTypeFactoryInterface
 {
     public function getName(): string
     {
-        return 'duration';
+        return 'uuid';
     }
 
     public function create(array $attributes): LogicalTypeInterface
     {
-        return new DurationLogicalType();
+        return new UuidType();
     }
 }
