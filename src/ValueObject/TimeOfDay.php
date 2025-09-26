@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Auxmoney\Avro\ValueObject;
 
+use Auxmoney\Avro\Exceptions\InvalidArgumentException;
 use DateTimeInterface;
-use InvalidArgumentException;
 
 readonly class TimeOfDay
 {
@@ -79,7 +79,7 @@ readonly class TimeOfDay
 
     public function getMicroseconds(): int
     {
-        return $this->totalMicroseconds % 1000;
+        return $this->totalMicroseconds % 1000000;
     }
 
     public function getTotalMilliseconds(): int
@@ -90,12 +90,11 @@ readonly class TimeOfDay
     public function __toString(): string
     {
         return sprintf(
-            '%02d:%02d:%02d.%03d%03d',
+            '%02d:%02d:%02d.%06d',
             $this->getHours(),
             $this->getMinutes(),
             $this->getSeconds(),
-            $this->getMilliseconds(),
-            $this->getMicroseconds()
+            $this->getMicroseconds(),
         );
     }
 }

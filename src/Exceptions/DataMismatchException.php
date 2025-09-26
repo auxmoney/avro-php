@@ -6,7 +6,7 @@ namespace Auxmoney\Avro\Exceptions;
 
 use Exception;
 
-class DataMismatchException extends Exception
+class DataMismatchException extends AuxmoneyAvroException
 {
     /**
      * @param array<string> $errors

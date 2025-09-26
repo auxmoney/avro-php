@@ -6,8 +6,8 @@ namespace Auxmoney\Avro\LogicalType\Factory;
 
 use Auxmoney\Avro\Contracts\LogicalTypeFactoryInterface;
 use Auxmoney\Avro\Contracts\LogicalTypeInterface;
+use Auxmoney\Avro\Exceptions\InvalidArgumentException;
 use Auxmoney\Avro\LogicalType\DecimalType;
-use InvalidArgumentException;
 
 class DecimalFactory implements LogicalTypeFactoryInterface
 {
