@@ -23,13 +23,11 @@ class LocalTimestampMicrosLogicalType implements LogicalTypeInterface
 
     public function normalize(mixed $datum): mixed
     {
-        if ($datum instanceof DateTimeInterface) {
-            // Local timestamp ignores timezone, treats as local time
-            $localTime = new DateTime($datum->format('Y-m-d H:i:s.u'));
-            return (int) ($localTime->getTimestamp() * 1000000 + (int) $localTime->format('u'));
-        }
-
-        throw new \InvalidArgumentException('Local timestamp value must be a DateTimeInterface object');
+        assert($datum instanceof DateTimeInterface);
+        
+        // Local timestamp ignores timezone, treats as local time
+        $localTime = new DateTime($datum->format('Y-m-d H:i:s.u'));
+        return (int) ($localTime->getTimestamp() * 1000000 + (int) $localTime->format('u'));
     }
 
     public function denormalize(mixed $datum): mixed

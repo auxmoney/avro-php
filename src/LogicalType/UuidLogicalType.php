@@ -27,13 +27,17 @@ class UuidLogicalType implements LogicalTypeInterface
 
     public function normalize(mixed $datum): mixed
     {
+        assert(is_string($datum));
+        
         // UUIDs are stored as strings in Avro, so no conversion needed
-        return (string) $datum;
+        return $datum;
     }
 
     public function denormalize(mixed $datum): mixed
     {
+        assert(is_string($datum));
+        
         // UUIDs are stored as strings in Avro, so no conversion needed
-        return (string) $datum;
+        return $datum;
     }
 }

@@ -23,16 +23,14 @@ class TimeMicrosLogicalType implements LogicalTypeInterface
 
     public function normalize(mixed $datum): mixed
     {
-        if ($datum instanceof DateTimeInterface) {
-            $hours = (int) $datum->format('H');
-            $minutes = (int) $datum->format('i');
-            $seconds = (int) $datum->format('s');
-            $microseconds = (int) $datum->format('u');
-            
-            return ($hours * 3600 + $minutes * 60 + $seconds) * 1000000 + $microseconds;
-        }
-
-        throw new \InvalidArgumentException('Time value must be a DateTimeInterface object');
+        assert($datum instanceof DateTimeInterface);
+        
+        $hours = (int) $datum->format('H');
+        $minutes = (int) $datum->format('i');
+        $seconds = (int) $datum->format('s');
+        $microseconds = (int) $datum->format('u');
+        
+        return ($hours * 3600 + $minutes * 60 + $seconds) * 1000000 + $microseconds;
     }
 
     public function denormalize(mixed $datum): mixed
