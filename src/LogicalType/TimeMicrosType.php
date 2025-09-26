@@ -7,7 +7,6 @@ namespace Auxmoney\Avro\LogicalType;
 use Auxmoney\Avro\Contracts\LogicalTypeInterface;
 use Auxmoney\Avro\Contracts\ValidationContextInterface;
 use Auxmoney\Avro\ValueObject\TimeOfDay;
-use InvalidArgumentException;
 
 class TimeMicrosType implements LogicalTypeInterface
 {
@@ -30,9 +29,7 @@ class TimeMicrosType implements LogicalTypeInterface
 
     public function denormalize(mixed $datum): TimeOfDay
     {
-        if (!is_int($datum)) {
-            throw new InvalidArgumentException('Expected integer (microseconds since midnight) for time denormalization');
-        }
+        assert(is_int($datum), 'Expected integer (microseconds since midnight) for time denormalization');
 
         return new TimeOfDay($datum);
     }

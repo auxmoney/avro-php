@@ -8,7 +8,6 @@ use Auxmoney\Avro\Contracts\LogicalTypeInterface;
 use Auxmoney\Avro\Contracts\ValidationContextInterface;
 use DateTime;
 use DateTimeInterface;
-use InvalidArgumentException;
 
 class LocalTimestampMillisType implements LogicalTypeInterface
 {
@@ -33,9 +32,7 @@ class LocalTimestampMillisType implements LogicalTypeInterface
 
     public function denormalize(mixed $datum): mixed
     {
-        if (!is_int($datum)) {
-            throw new InvalidArgumentException('Expected integer (milliseconds) for local timestamp denormalization');
-        }
+        assert(is_int($datum), 'Expected integer (milliseconds) for local timestamp denormalization');
 
         $seconds = intval($datum / 1000);
         $milliseconds = $datum % 1000;
