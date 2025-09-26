@@ -6,46 +6,34 @@ namespace Auxmoney\Avro\LogicalType;
 
 use Auxmoney\Avro\Contracts\LogicalTypeInterface;
 use Auxmoney\Avro\Contracts\ValidationContextInterface;
-use DateTimeInterface;
+use Auxmoney\Avro\ValueObject\TimeOfDay;
 use InvalidArgumentException;
 
 class TimeMicrosType implements LogicalTypeInterface
 {
     public function validate(mixed $datum, ?ValidationContextInterface $context): bool
     {
-        if ($datum instanceof DateTimeInterface) {
+        if ($datum instanceof TimeOfDay) {
             return true;
         }
 
-        $context?->addError('Time value must be a DateTimeInterface object');
+        $context?->addError('Time value must be a TimeOfDay object');
         return false;
     }
 
     public function normalize(mixed $datum): mixed
     {
-        assert($datum instanceof DateTimeInterface);
+        assert($datum instanceof TimeOfDay);
 
-        $hours = (int) $datum->format('H');
-        $minutes = (int) $datum->format('i');
-        $seconds = (int) $datum->format('s');
-        $microseconds = (int) $datum->format('u');
-
-        return ($hours * 3600 + $minutes * 60 + $seconds) * 1000000 + $microseconds;
+        return $datum->totalMicroseconds;
     }
 
-    public function denormalize(mixed $datum): mixed
+    public function denormalize(mixed $datum): TimeOfDay
     {
         if (!is_int($datum)) {
             throw new InvalidArgumentException('Expected integer (microseconds since midnight) for time denormalization');
         }
 
-        $totalSeconds = intval($datum / 1000000);
-        $microseconds = $datum % 1000000;
-
-        $hours = intval($totalSeconds / 3600);
-        $minutes = intval(($totalSeconds % 3600) / 60);
-        $seconds = $totalSeconds % 60;
-
-        return sprintf('%02d:%02d:%02d.%06d', $hours, $minutes, $seconds, $microseconds);
+        return new TimeOfDay($datum);
     }
 }
