@@ -23,11 +23,9 @@ class TimestampMicrosLogicalType implements LogicalTypeInterface
 
     public function normalize(mixed $datum): mixed
     {
-        if ($datum instanceof DateTimeInterface) {
-            return (int) ($datum->getTimestamp() * 1000000 + (int) $datum->format('u'));
-        }
-
-        throw new \InvalidArgumentException('Timestamp value must be a DateTimeInterface object');
+        assert($datum instanceof DateTimeInterface);
+        
+        return (int) ($datum->getTimestamp() * 1000000 + (int) $datum->format('u'));
     }
 
     public function denormalize(mixed $datum): mixed

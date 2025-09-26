@@ -38,6 +38,13 @@ class DurationLogicalType implements LogicalTypeInterface
 
     public function normalize(mixed $datum): mixed
     {
+        assert(
+            (is_string($datum) && strlen($datum) === 12) ||
+            is_array($datum) ||
+            (is_object($datum) && method_exists($datum, 'getMonths') && 
+             method_exists($datum, 'getDays') && method_exists($datum, 'getMilliseconds'))
+        );
+        
         if (is_string($datum) && strlen($datum) === 12) {
             return $datum; // Already in correct format
         }
@@ -52,8 +59,6 @@ class DurationLogicalType implements LogicalTypeInterface
             $months = $datum->getMonths();
             $days = $datum->getDays();
             $milliseconds = $datum->getMilliseconds();
-        } else {
-            throw new \InvalidArgumentException('Cannot normalize duration value');
         }
 
         // Pack as 3 little-endian unsigned 32-bit integers (12 bytes total)

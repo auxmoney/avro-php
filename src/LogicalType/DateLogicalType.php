@@ -25,13 +25,11 @@ class DateLogicalType implements LogicalTypeInterface
 
     public function normalize(mixed $datum): mixed
     {
-        if ($datum instanceof DateTimeInterface) {
-            $epoch = new DateTime(self::UNIX_EPOCH);
-            $diff = $epoch->diff($datum);
-            return $diff->invert ? -$diff->days : $diff->days;
-        }
-
-        throw new \InvalidArgumentException('Date value must be a DateTimeInterface object');
+        assert($datum instanceof DateTimeInterface);
+        
+        $epoch = new DateTime(self::UNIX_EPOCH);
+        $diff = $epoch->diff($datum);
+        return $diff->invert ? -$diff->days : $diff->days;
     }
 
     public function denormalize(mixed $datum): mixed
