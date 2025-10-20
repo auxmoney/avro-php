@@ -22,9 +22,7 @@ class RecordWriter implements WriterInterface
     {
         assert(is_array($datum) || is_object($datum));
         foreach ($this->propertyWriters as $property) {
-            $success = $this->getFieldValue($datum, $property, $value);
-            assert($success);
-
+            $value = $this->getFieldValue($datum, $property);
             $property->write($value, $stream);
         }
     }
@@ -39,13 +37,7 @@ class RecordWriter implements WriterInterface
         if ($context === null) {
             // When no context is provided, short-circuit for performance
             foreach ($this->propertyWriters as $property) {
-                if (!$this->getFieldValue($datum, $property, $value)) {
-                    if (!$property->hasDefault) {
-                        return false; // Early exit on missing required field
-                    }
-                    continue;
-                }
-
+                $value = $this->getFieldValue($datum, $property);
                 if (!$property->validate($value, $context)) {
                     return false; // Early exit on validation failure
                 }
@@ -56,14 +48,7 @@ class RecordWriter implements WriterInterface
         // When context is provided, continue through all properties to collect all errors
         $valid = true;
         foreach ($this->propertyWriters as $property) {
-            if (!$this->getFieldValue($datum, $property, $value)) {
-                if (!$property->hasDefault) {
-                    $context->addError('missing required field ' . $property->name);
-                    $valid = false;
-                }
-                continue;
-            }
-
+            $value = $this->getFieldValue($datum, $property);
             $context->pushPath($property->name);
             $valid = $property->validate($value, $context) && $valid;
             $context->popPath();
@@ -75,25 +60,22 @@ class RecordWriter implements WriterInterface
     /**
      * @param array<mixed>|object $datum
      */
-    private function getFieldValue(array|object $datum, PropertyWriter $property, mixed &$outputValue = null): bool
+    private function getFieldValue(array|object $datum, PropertyWriter $property): mixed
     {
         if (is_array($datum)) {
             if (array_key_exists($property->name, $datum)) {
-                $outputValue = $datum[$property->name];
-                return true;
+                return $datum[$property->name];
             }
 
             if ($property->hasDefault) {
-                $outputValue = $property->default;
-                return true;
+                return $property->default;
             }
 
-            return false;
+            return null;
         }
 
         if (isset($datum->{$property->name})) {
-            $outputValue = $datum->{$property->name};
-            return true;
+            return $datum->{$property->name};
         }
 
         /** @infection-ignore-all */
@@ -101,27 +83,23 @@ class RecordWriter implements WriterInterface
 
         $getter = 'get' . $ucfirst;
         if (method_exists($datum, $getter)) {
-            $outputValue = $datum->{$getter}();
-            return true;
+            return $datum->{$getter}();
         }
 
         $isser = 'is' . $ucfirst;
         if (method_exists($datum, $isser)) {
-            $outputValue = $datum->{$isser}();
-            return true;
+            return $datum->{$isser}();
         }
 
         $hasser = 'has' . $ucfirst;
         if (method_exists($datum, $hasser)) {
-            $outputValue = $datum->{$hasser}();
-            return true;
+            return $datum->{$hasser}();
         }
 
         if ($property->hasDefault) {
-            $outputValue = $property->default;
-            return true;
+            return $property->default;
         }
 
-        return false;
+        return null;
     }
 }
