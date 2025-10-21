@@ -67,10 +67,6 @@ class RecordWriter implements WriterInterface
                 return $datum[$property->name];
             }
 
-            if ($property->hasDefault) {
-                return $property->default;
-            }
-
             return null;
         }
 
@@ -94,10 +90,6 @@ class RecordWriter implements WriterInterface
         $hasser = 'has' . $ucfirst;
         if (method_exists($datum, $hasser)) {
             return $datum->{$hasser}();
-        }
-
-        if ($property->hasDefault) {
-            return $property->default;
         }
 
         return null;

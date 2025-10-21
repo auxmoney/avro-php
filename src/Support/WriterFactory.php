@@ -111,8 +111,7 @@ class WriterFactory
 
         foreach ($schema['fields'] as $field) {
             $propertyTypeWriter = $this->getSchemaWriter($field['type']);
-            $hasDefault = array_key_exists('default', $field);
-            $propertyWriters[] = new PropertyWriter($propertyTypeWriter, $field['name'], $hasDefault, $field['default'] ?? null);
+            $propertyWriters[] = new PropertyWriter($propertyTypeWriter, $field['name']);
         }
 
         return new RecordWriter($propertyWriters);

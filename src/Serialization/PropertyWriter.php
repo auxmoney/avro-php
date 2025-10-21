@@ -13,8 +13,6 @@ readonly class PropertyWriter implements WriterInterface
     public function __construct(
         public WriterInterface $typeWriter,
         public string $name,
-        public bool $hasDefault,
-        public mixed $default,
     ) {
     }
 

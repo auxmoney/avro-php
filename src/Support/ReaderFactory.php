@@ -177,12 +177,9 @@ class ReaderFactory
             if ($fieldReaderType === null && $readerSchema !== null) {
                 $propertyReaders[] = new PropertySkipReader($this->getSchemaReader($field['type'], null));
             } else {
-                $hasDefault = array_key_exists('default', $field);
                 $propertyReaders[] = new PropertyReader(
                     $this->getSchemaReader($field['type'], $fieldReaderType),
                     $field['name'],
-                    $hasDefault,
-                    $field['default'] ?? null,
                 );
             }
 

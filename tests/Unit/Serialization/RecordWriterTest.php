@@ -21,7 +21,6 @@ class RecordWriterTest extends TestCase
     // Simple property writers for testing RecordWriter logic
     private PropertyWriter $field1PropertyWriter;
     private PropertyWriter $field2PropertyWriter;
-    private PropertyWriter $field2PropertyWriterWithDefault;
     private PropertyWriter $field2NullablePropertyWriter;
 
     protected function setUp(): void
@@ -35,10 +34,9 @@ class RecordWriterTest extends TestCase
         $nullableBoolWriter = new UnionWriter([$nullWriter, $boolWriter], $encoder);
 
         // Create simplified property writers using BooleanWriter
-        $this->field1PropertyWriter = new PropertyWriter($boolWriter, 'field1', false, null);
-        $this->field2PropertyWriter = new PropertyWriter($boolWriter, 'field2', false, null);
-        $this->field2PropertyWriterWithDefault = new PropertyWriter($boolWriter, 'field2', true, false);
-        $this->field2NullablePropertyWriter = new PropertyWriter($nullableBoolWriter, 'field2', false, null);
+        $this->field1PropertyWriter = new PropertyWriter($boolWriter, 'field1');
+        $this->field2PropertyWriter = new PropertyWriter($boolWriter, 'field2');
+        $this->field2NullablePropertyWriter = new PropertyWriter($nullableBoolWriter, 'field2');
 
         $this->stream = new WritableStringBuffer();
     }
@@ -137,17 +135,6 @@ class RecordWriterTest extends TestCase
 
         // BooleanWriter will reject null, so validation should fail
         $this->assertFalse($result);
-    }
-
-    public function testValidateWithMissingFieldWithDefault(): void
-    {
-        $data = ['field1' => true]; // missing field2
-
-        $recordWriter = new RecordWriter([$this->field1PropertyWriter, $this->field2PropertyWriterWithDefault]);
-
-        $result = $recordWriter->validate($data);
-
-        $this->assertTrue($result);
     }
 
     public function testValidateWithInvalidField(): void
@@ -701,56 +688,6 @@ class RecordWriterTest extends TestCase
         $result = $recordWriter->validate($data);
 
         $this->assertTrue($result);
-    }
-
-    public function testWriteWithObjectMissingFieldWithDefault(): void
-    {
-        $data = new class() {
-            public bool $field1 = true;
-            // field2 is missing, but has a default value
-        };
-
-        $recordWriter = new RecordWriter([$this->field1PropertyWriter, $this->field2PropertyWriterWithDefault]);
-
-        $recordWriter->write($data, $this->stream);
-
-        // Assert that the buffer contains the correct boolean values
-        $written = (string) $this->stream;
-        $this->assertSame(chr(1) . chr(0), $written); // field1=true, field2=false
-    }
-
-    public function testValidateWithObjectMissingFieldWithDefault(): void
-    {
-        $data = new class() {
-            public bool $field1 = true;
-            // field2 is missing, but has a default value
-        };
-
-        $recordWriter = new RecordWriter([$this->field1PropertyWriter, $this->field2PropertyWriterWithDefault]);
-
-        $result = $recordWriter->validate($data);
-
-        $this->assertTrue($result);
-    }
-
-    public function testWriteWithObjectMissingFieldWithDefaultAndContext(): void
-    {
-        $data = new class() {
-            public bool $field1 = true;
-            // field2 is missing, but has a default value
-        };
-
-        $context = new ValidationContext();
-
-        $recordWriter = new RecordWriter([$this->field1PropertyWriter, $this->field2PropertyWriterWithDefault]);
-
-        $result = $recordWriter->validate($data, $context);
-
-        $this->assertTrue($result);
-
-        // Check that no validation errors occurred (field has default value)
-        $errors = $context->getContextErrors();
-        $this->assertEmpty($errors);
     }
 
     // Nullable Property Tests
