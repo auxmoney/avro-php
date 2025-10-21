@@ -16,6 +16,7 @@ use Auxmoney\Avro\Deserialization\NullReader;
 use Auxmoney\Avro\Deserialization\StringReader;
 use Auxmoney\Avro\Exceptions\InvalidSchemaException;
 use Auxmoney\Avro\Exceptions\SchemaMismatchException;
+use Auxmoney\Avro\Support\DefaultValueConverter;
 use Auxmoney\Avro\Support\LogicalTypeResolver;
 use Auxmoney\Avro\Support\ReaderFactory;
 use Auxmoney\Avro\Support\SchemaHelper;
@@ -32,7 +33,8 @@ class ReaderFactoryTest extends TestCase
         $this->decoder = new BinaryDecoder();
         $logicalTypeResolver = new LogicalTypeResolver([]);
         $this->schemaHelper = new SchemaHelper($logicalTypeResolver);
-        $this->readerFactory = new ReaderFactory($this->decoder, $this->schemaHelper);
+        $defaultValueConverter = new DefaultValueConverter($this->schemaHelper);
+        $this->readerFactory = new ReaderFactory($this->decoder, $this->schemaHelper, $defaultValueConverter);
     }
 
     public function testCreateWithSimpleStringSchema(): void
@@ -408,7 +410,8 @@ class ReaderFactoryTest extends TestCase
 
         $logicalTypeResolver = new LogicalTypeResolver([$logicalTypeFactory]);
         $schemaHelper = new SchemaHelper($logicalTypeResolver);
-        $readerFactory = new ReaderFactory($this->decoder, $schemaHelper);
+        $defaultValueConverter = new DefaultValueConverter($schemaHelper);
+        $readerFactory = new ReaderFactory($this->decoder, $schemaHelper, $defaultValueConverter);
 
         $schema = '{"type": "int", "logicalType": "date"}';
 

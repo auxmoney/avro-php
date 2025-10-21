@@ -19,7 +19,7 @@ class PropertyReaderTest extends TestCase
     {
         $this->typeReader = $this->createMock(ReaderInterface::class);
         $this->stream = $this->createMock(ReadableStreamInterface::class);
-        $this->propertyReader = new PropertyReader($this->typeReader, 'testProperty', false, null);
+        $this->propertyReader = new PropertyReader($this->typeReader, 'testProperty');
     }
 
     public function testReadWithNonNullValue(): void
@@ -51,47 +51,12 @@ class PropertyReaderTest extends TestCase
         $this->assertNull($record['testProperty']);
     }
 
-    public function testReadWithNullValueAndHasDefault(): void
-    {
-        $defaultValue = 'default value';
-        $record = [];
-
-        $propertyReaderWithDefault = new PropertyReader($this->typeReader, 'testProperty', true, $defaultValue);
-
-        $this->typeReader->expects($this->once())
-            ->method('read')
-            ->with($this->stream)
-            ->willReturn(null);
-
-        $propertyReaderWithDefault->read($this->stream, $record);
-
-        $this->assertSame($defaultValue, $record['testProperty']);
-    }
-
-    public function testReadWithNonNullValueAndHasDefault(): void
-    {
-        $expectedValue = 'actual value';
-        $defaultValue = 'default value';
-        $record = [];
-
-        $propertyReaderWithDefault = new PropertyReader($this->typeReader, 'testProperty', true, $defaultValue);
-
-        $this->typeReader->expects($this->once())
-            ->method('read')
-            ->with($this->stream)
-            ->willReturn($expectedValue);
-
-        $propertyReaderWithDefault->read($this->stream, $record);
-
-        $this->assertSame($expectedValue, $record['testProperty']);
-    }
-
     public function testReadWithDifferentPropertyName(): void
     {
         $expectedValue = 'test value';
         $record = [];
 
-        $propertyReader = new PropertyReader($this->typeReader, 'differentName', false, null);
+        $propertyReader = new PropertyReader($this->typeReader, 'differentName');
 
         $this->typeReader->expects($this->once())
             ->method('read')
@@ -126,21 +91,6 @@ class PropertyReaderTest extends TestCase
             ->with($this->stream);
 
         $this->propertyReader->skip($this->stream);
-    }
-
-    public function testConstructorProperties(): void
-    {
-        $typeReader = $this->createMock(ReaderInterface::class);
-        $name = 'testName';
-        $hasDefault = true;
-        $default = 'default value';
-
-        $propertyReader = new PropertyReader($typeReader, $name, $hasDefault, $default);
-
-        $this->assertSame($typeReader, $propertyReader->typeReader);
-        $this->assertSame($name, $propertyReader->name);
-        $this->assertSame($hasDefault, $propertyReader->hasDefault);
-        $this->assertSame($default, $propertyReader->default);
     }
 
     public function testReadWithZeroValue(): void

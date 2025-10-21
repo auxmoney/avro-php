@@ -1,2 +1,6 @@
 {"schema":{"type":"record","name":"User","fields":[{"name":"name","type":"string"},{"name":"age","type":"int"}]}}
 {"data":{"name":"John Doe","age":30},"hex":"104a6f686e20446f653c"}
+
+{"schema":{"type":"record","name":"User","fields":[{"name":"nullable","type":["null","string"]}]}}
+{"data":{"nullable":null},"hex":"00"}
+{"data":{"nullable":"Hello"},"hex":"020a48656c6c6f"}

@@ -27,6 +27,7 @@ use Auxmoney\Avro\Deserialization\UnionReader;
 use Auxmoney\Avro\Deserialization\UnmatchedBranchReader;
 use Auxmoney\Avro\Exceptions\InvalidSchemaException;
 use Auxmoney\Avro\Exceptions\SchemaMismatchException;
+use Auxmoney\Avro\Serialization\ValidationContext;
 
 /**
  * @phpstan-import-type NormalizedSchema from SchemaHelper
@@ -43,6 +44,7 @@ class ReaderFactory
     public function __construct(
         private readonly BinaryDecoder $decoder,
         private readonly SchemaHelper $schemaHelper,
+        private readonly DefaultValueConverter $defaultValueConverter,
     ) {
     }
 
@@ -177,13 +179,7 @@ class ReaderFactory
             if ($fieldReaderType === null && $readerSchema !== null) {
                 $propertyReaders[] = new PropertySkipReader($this->getSchemaReader($field['type'], null));
             } else {
-                $hasDefault = array_key_exists('default', $field);
-                $propertyReaders[] = new PropertyReader(
-                    $this->getSchemaReader($field['type'], $fieldReaderType),
-                    $field['name'],
-                    $hasDefault,
-                    $field['default'] ?? null,
-                );
+                $propertyReaders[] = new PropertyReader($this->getSchemaReader($field['type'], $fieldReaderType), $field['name']);
             }
 
             unset($readerSchemaFields[$field['name']]);
@@ -194,7 +190,20 @@ class ReaderFactory
                 throw new SchemaMismatchException("Reader schema field '{$fieldName}' doesn't exist in writer schema and has no default");
             }
 
-            $propertyReaders[] = new PropertyDefaultReader($field['default'], $field['name']);
+            $convertedDefaultValue = null;
+            $validationContext = new ValidationContext();
+            if (!$this->defaultValueConverter->convertDefaultValue(
+                $field['default'],
+                $field['type'],
+                $convertedDefaultValue,
+                $validationContext,
+            )) {
+                $formattedErrors = array_map(fn ($error) => "- {$error}\n", $validationContext->getContextErrors());
+                $message = "Failed to convert default value for field {$fieldName}.\nErrors:\n" . implode('', $formattedErrors);
+                throw new SchemaMismatchException($message);
+            }
+
+            $propertyReaders[] = new PropertyDefaultReader($convertedDefaultValue, $field['name']);
         }
 
         return new RecordReader($propertyReaders);
