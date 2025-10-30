@@ -26,4 +26,3 @@ RUN groupadd -g $GROUP_ID application && \
 
 USER application
 WORKDIR /avro-php
-CMD ["sleep", "infinity"]

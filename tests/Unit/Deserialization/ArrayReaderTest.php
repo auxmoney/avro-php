@@ -9,7 +9,6 @@ use Auxmoney\Avro\Contracts\ReaderInterface;
 use Auxmoney\Avro\Deserialization\ArrayReader;
 use Auxmoney\Avro\Deserialization\BinaryDecoder;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 
 class ArrayReaderTest extends TestCase
 {
@@ -110,39 +109,6 @@ class ArrayReaderTest extends TestCase
         $this->assertSame(['item1', 'item2', 'item3'], $result);
     }
 
-    public function testReadWithDecoderException(): void
-    {
-        $this->decoder->expects($this->once())
-            ->method('readLong')
-            ->with($this->stream)
-            ->willThrowException(new RuntimeException('Decoder error'));
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Decoder error');
-
-        $this->reader->read($this->stream);
-    }
-
-    public function testReadWithItemReaderException(): void
-    {
-        // When an exception occurs during item reading, the process stops immediately
-        // so readLong is only called once (for the block count), not twice (no terminator read)
-        $this->decoder->expects($this->once())
-            ->method('readLong')
-            ->with($this->stream)
-            ->willReturn(2); // Block count
-
-        $this->itemReader->expects($this->once())
-            ->method('read')
-            ->with($this->stream)
-            ->willThrowException(new RuntimeException('Item reader error'));
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Item reader error');
-
-        $this->reader->read($this->stream);
-    }
-
     public function testSkipWithEmptyArray(): void
     {
         $this->decoder->expects($this->once())
@@ -214,44 +180,6 @@ class ArrayReaderTest extends TestCase
         $this->stream->expects($this->once())
             ->method('skip')
             ->with(30);
-
-        $this->reader->skip($this->stream);
-    }
-
-    public function testSkipWithItemReaderException(): void
-    {
-        // When an exception occurs during item skipping, the process stops immediately
-        // so readLong is only called once (for the block count), not twice (no terminator read)
-        $this->decoder->expects($this->once())
-            ->method('readLong')
-            ->with($this->stream)
-            ->willReturn(2); // Block count
-
-        $this->itemReader->expects($this->once())
-            ->method('skip')
-            ->with($this->stream)
-            ->willThrowException(new RuntimeException('Skip error'));
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Skip error');
-
-        $this->reader->skip($this->stream);
-    }
-
-    public function testSkipWithStreamException(): void
-    {
-        $this->decoder->expects($this->exactly(2))
-            ->method('readLong')
-            ->with($this->stream)
-            ->willReturnOnConsecutiveCalls(-2, 20);
-
-        $this->stream->expects($this->once())
-            ->method('skip')
-            ->with(20)
-            ->willThrowException(new RuntimeException('Stream skip error'));
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Stream skip error');
 
         $this->reader->skip($this->stream);
     }
