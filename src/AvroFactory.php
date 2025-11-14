@@ -25,6 +25,7 @@ use Auxmoney\Avro\LogicalType\Factory\TimestampMicrosFactory;
 use Auxmoney\Avro\LogicalType\Factory\TimestampMillisFactory;
 use Auxmoney\Avro\LogicalType\Factory\UuidFactory;
 use Auxmoney\Avro\Serialization\BinaryEncoder;
+use Auxmoney\Avro\Support\DefaultValueConverter;
 use Auxmoney\Avro\Support\LogicalTypeResolver;
 use Auxmoney\Avro\Support\ReaderFactory;
 use Auxmoney\Avro\Support\SchemaHelper;
@@ -63,8 +64,9 @@ readonly class AvroFactory implements AvroFactoryInterface
         $logicalTypeFactories = $options->logicalTypeFactories ?? self::getDefaultLogicalTypeFactories();
         $logicalTypeResolver = new LogicalTypeResolver($logicalTypeFactories);
         $schemaHelper = new SchemaHelper($logicalTypeResolver);
+        $defaultValueConverter = new DefaultValueConverter($schemaHelper);
         $writerFactory = new WriterFactory(new BinaryEncoder(), $schemaHelper, $options);
-        $readerFactory = new ReaderFactory(new BinaryDecoder(), $schemaHelper);
+        $readerFactory = new ReaderFactory(new BinaryDecoder(), $schemaHelper, $defaultValueConverter);
 
         return new self($writerFactory, $readerFactory);
     }

@@ -16,7 +16,7 @@ use JsonException;
  * @phpstan-type ArraySchema array{type: "array", items: array<mixed>|string}
  * @phpstan-type MapSchema array{type: "map", values: array<mixed>|string}
  * @phpstan-type FixedSchema array{type: "fixed", size: positive-int}
- * @phpstan-type UnionSchema array{type: "union", branches: array<array<mixed>|string>}
+ * @phpstan-type UnionSchema array{type: "union", branches: non-empty-array<array<mixed>|string>}
  * @phpstan-type NormalizedSchema PrimitiveSchema|RecordSchema|EnumSchema|ArraySchema|MapSchema|FixedSchema|UnionSchema
  */
 class SchemaHelper
@@ -224,12 +224,16 @@ class SchemaHelper
 
     /**
      * @param array<mixed> $schema
-     * @return array<array<mixed>|string>
+     * @return non-empty-array<array<mixed>|string>
      * @throws InvalidSchemaException
      */
     private function getUnionBranches(array $schema): array
     {
         $branches = [];
+        if ($schema === []) {
+            throw new InvalidSchemaException('AVRO union schema must have at least one branch');
+        }
+
         foreach ($schema as $branch) {
             if (!is_string($branch) && !is_array($branch)) {
                 throw new InvalidSchemaException('AVRO union branches must be strings or arrays');
