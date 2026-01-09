@@ -108,7 +108,7 @@ final readonly class ArbitraryPrecisionInteger
             return $this;
         }
 
-        if ($this->bytes === '') {
+        if ($this->bytes === "\x00") {
             return $this;
         }
 
@@ -172,6 +172,9 @@ final readonly class ArbitraryPrecisionInteger
         return $bytes;
     }
 
+    /**
+     * @throws InvalidArgumentException
+     */
     public function toInteger(): int
     {
         if (strlen($this->bytes) > 8) {
@@ -223,7 +226,7 @@ final readonly class ArbitraryPrecisionInteger
             $trimmed = $trimByte . $trimmed;
         }
 
-        return $trimmed;
+        return $trimmed === '' ? "\x00" : $trimmed;
     }
 
     /**
