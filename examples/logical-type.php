@@ -21,6 +21,6 @@ $schema = '{"type": "bytes", "logicalType": "decimal", "precision": 10, "scale":
 $decodedData = Decimal::fromString('3.14159');
 
 $writer = $avroFactory->createWriter($schema);
-$buffer = $avroFactory->createStringBuffer($decodedData);
+$buffer = $avroFactory->createStringBuffer();
 $writer->write($decodedData, $buffer);
 var_dump(bin2hex($buffer->__toString()));
