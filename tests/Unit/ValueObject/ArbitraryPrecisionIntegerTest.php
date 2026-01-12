@@ -320,7 +320,7 @@ class ArbitraryPrecisionIntegerTest extends TestCase
     {
         return [
             // Zero
-            ['', '0'],
+            ['00', '0'],
 
             // Small positive numbers
             ['01', '1'],
