@@ -15,7 +15,7 @@ services:
         command: sleep infinity
         
     test-generator:
-        image: node:latest
+        image: node:24
         volumes:
             - ..:/avro-php
         environment:
