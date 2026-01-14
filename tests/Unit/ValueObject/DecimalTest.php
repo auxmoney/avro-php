@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Auxmoney\Avro\Tests\Unit\ValueObject;
 
 use Auxmoney\Avro\Exceptions\InvalidArgumentException;
-use Auxmoney\Avro\ValueObject\ArbitraryPrecisionInteger;
 use Auxmoney\Avro\ValueObject\Decimal;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
