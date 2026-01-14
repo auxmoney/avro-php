@@ -18,10 +18,9 @@ class DecimalTest extends TestCase
      */
     public function testFromUnscaledValueWithValidValues(): void
     {
-        $unscaledValue = ArbitraryPrecisionInteger::fromInteger(12345);
-        $decimal = Decimal::fromUnscaledValue($unscaledValue, 2);
+        $decimal = Decimal::fromUnscaledValue(12345, 2);
 
-        self::assertSame($unscaledValue, $decimal->getUnscaledValue());
+        self::assertSame(12345, $decimal->getUnscaledValue()->toInteger());
         self::assertSame(2, $decimal->getScale());
     }
 
@@ -30,10 +29,9 @@ class DecimalTest extends TestCase
      */
     public function testFromUnscaledValueWithZeroScale(): void
     {
-        $unscaledValue = ArbitraryPrecisionInteger::fromInteger(123);
-        $decimal = Decimal::fromUnscaledValue($unscaledValue, 0);
+        $decimal = Decimal::fromUnscaledValue(123, 0);
 
-        self::assertSame($unscaledValue, $decimal->getUnscaledValue());
+        self::assertSame(123, $decimal->getUnscaledValue()->toInteger());
         self::assertSame(0, $decimal->getScale());
     }
 
@@ -42,8 +40,7 @@ class DecimalTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Scale must be non-negative');
 
-        $unscaledValue = ArbitraryPrecisionInteger::fromInteger(123);
-        Decimal::fromUnscaledValue($unscaledValue, -1);
+        Decimal::fromUnscaledValue(123, -1);
     }
 
     /**
@@ -343,10 +340,9 @@ class DecimalTest extends TestCase
 
     public function testGettersReturnCorrectValues(): void
     {
-        $unscaledValue = ArbitraryPrecisionInteger::fromInteger(12345);
-        $decimal = Decimal::fromUnscaledValue($unscaledValue, 3);
+        $decimal = Decimal::fromUnscaledValue(12345, 3);
 
-        self::assertSame($unscaledValue, $decimal->getUnscaledValue());
+        self::assertSame(12345, $decimal->getUnscaledValue()->toInteger());
         self::assertSame(3, $decimal->getScale());
     }
 
@@ -495,8 +491,7 @@ class DecimalTest extends TestCase
     public function testEdgeCaseWithMaximumScale(): void
     {
         // Test with very large scale value
-        $unscaled = ArbitraryPrecisionInteger::fromInteger(1);
-        $decimal = Decimal::fromUnscaledValue($unscaled, 100);
+        $decimal = Decimal::fromUnscaledValue(1, 100);
 
         $result = $decimal->toString();
         self::assertTrue(str_starts_with($result, '0.'));

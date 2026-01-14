@@ -24,9 +24,9 @@ final readonly class ArbitraryPrecisionInteger
         return new self(self::trimBytesString($bytes));
     }
 
-    public static function fromInteger(int $value): self
+    public static function fromInteger(int|ArbitraryPrecisionInteger $value): self
     {
-        return self::fromBytes(pack('J', $value));
+        return $value instanceof self ? $value : self::fromBytes(pack('J', $value));
     }
 
     /**
