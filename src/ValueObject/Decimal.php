@@ -22,13 +22,13 @@ readonly class Decimal
     /**
      * @throws InvalidArgumentException if scale is negative
      */
-    public static function fromUnscaledValue(ArbitraryPrecisionInteger $unscaledValue, int $scale): self
+    public static function fromUnscaledValue(int|ArbitraryPrecisionInteger $unscaledValue, int $scale): self
     {
         if ($scale < 0) {
             throw new InvalidArgumentException('Scale must be non-negative');
         }
 
-        return new self($unscaledValue, $scale);
+        return new self(ArbitraryPrecisionInteger::fromInteger($unscaledValue), $scale);
     }
 
     /**
@@ -62,7 +62,7 @@ readonly class Decimal
         return new self(ArbitraryPrecisionInteger::fromString($unscaled), $scale);
     }
 
-    public static function fromInteger(int $value): self
+    public static function fromInteger(int|ArbitraryPrecisionInteger $value): self
     {
         $unscaledValue = ArbitraryPrecisionInteger::fromInteger($value);
         return new self($unscaledValue, 0);
@@ -82,7 +82,7 @@ readonly class Decimal
         return self::fromString($stringValue);
     }
 
-    public static function fromCents(int $cents): self
+    public static function fromCents(int|ArbitraryPrecisionInteger $cents): self
     {
         return new self(ArbitraryPrecisionInteger::fromInteger($cents), 2);
     }
