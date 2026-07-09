@@ -18,8 +18,9 @@ class DateFactory implements LogicalTypeFactoryInterface
 
     public function create(array $attributes): LogicalTypeInterface
     {
-        if (($attributes['type'] ?? null) !== 'int') {
-            throw new InvalidSchemaException('The "date" logical type can only be used with an "int" type');
+        $type = $attributes['type'] ?? null;
+        if ($type !== 'int' && $type !== 'long') {
+            throw new InvalidSchemaException('The "date" logical type can only be used with an "int" or "long" type');
         }
 
         return new DateType();
