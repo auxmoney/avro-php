@@ -53,7 +53,7 @@ class DateFactoryTest extends TestCase
     public function testCreateWithWrongTypeThrowsException(): void
     {
         $this->expectException(InvalidSchemaException::class);
-        $this->expectExceptionMessage('The "date" logical type can only be used with an "int" type');
+        $this->expectExceptionMessage('The "date" logical type can only be used with an "int" or "long" type');
 
         $this->factory->create(['type' => 'string']);
     }
@@ -61,7 +61,7 @@ class DateFactoryTest extends TestCase
     public function testCreateWithoutTypeThrowsException(): void
     {
         $this->expectException(InvalidSchemaException::class);
-        $this->expectExceptionMessage('The "date" logical type can only be used with an "int" type');
+        $this->expectExceptionMessage('The "date" logical type can only be used with an "int" or "long" type');
 
         $this->factory->create([]);
     }
